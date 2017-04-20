@@ -56,6 +56,8 @@ class TaskQueue
                 //运行
                 $instance->run();
             }
+
+            unset($instance);
         }
 
         $worker->exit(0);
