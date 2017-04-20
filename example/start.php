@@ -1,5 +1,5 @@
 <?php
-include(__DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
+include(dirname(dirname(__FILE__ )) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Core\Robot;
@@ -22,24 +22,20 @@ $robot->onMessage(function (Message $message) use ($robot) {
         return false;
     }
 
-    //只回复群消息
-    if (!$message->isGroup()) {
-        return false;
-    }
-
     //只给体验群发消息
     $white_list = [
         '机器人体验群',
+        '杨杰',
         'happyday'
     ];
 
-    $group = $robot->getConcat()->getByUserName($message->getFromUserName());
+    $member = $robot->getConcat()->getByUserName($message->getFromUserName());
 
-    if (!$group) {
+    if (!$member) {
         return false;
     }
 
-    if (!in_array($group->getRemarkName(), $white_list)) {
+    if (!in_array($member->getRemarkName(), $white_list)) {
         return false;
     }
 
@@ -63,10 +59,14 @@ $robot->onMessage(function (Message $message) use ($robot) {
             Console::log("发送消息失败");
         }
     } else {
-        TaskQueue::run('SendMessage', [
-            'username' => $message->getFromUserName(),
-            'content' => '你发的是什么鬼，我看不懂啦。消息类型：' . $message->getMessageType()
-        ]);
+        try {
+            TaskQueue::run('SendMessage', [
+                'username' => $message->getFromUserName(),
+                'content'  => '你发的是什么鬼，我看不懂啦。'
+            ]);
+        } catch (Exception $e) {
+            Console::log("发送消息失败");
+        }
     }
 
     return true;
