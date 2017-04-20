@@ -17,7 +17,7 @@ class SendMessage extends Job
         $username = $this->username;
         $content = $this->content;
         try {
-            if (app()->api->sendMessage($content, $username)) {
+            if (app()->api->sendMessage($username, $content)) {
                 return true;
             } else {
                 return false;
@@ -27,4 +27,5 @@ class SendMessage extends Job
         }
         return true;
     }
+
 }
