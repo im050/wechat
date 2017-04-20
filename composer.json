@@ -1,0 +1,13 @@
+{
+    "name": "im050/wechat",
+    "type": "library",
+    "description": "This is a wechat robot with personal wechat",
+    "require": {
+        "symfony/console": "^3.2",
+        "aferrandini/phpqrcode": "^1.0"
+    },
+    "autoload": {
+        "files": ["src/WeChat/helpers.php"],
+        "psr-4": { "Im050\\WeChat\\": "src/WeChat/" }
+    }
+}
