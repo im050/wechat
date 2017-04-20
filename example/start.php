@@ -1,11 +1,13 @@
 <?php
-include(dirname(dirname(__FILE__ )) . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
+
+define('BASE_PATH', dirname(dirname(__FILE__ )));
+
+include(BASE_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Core\Robot;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Message\Formatter\Text;
-use Im050\WeChat\Message\Formatter\Image;
 use Im050\WeChat\Core\Account;
 use Im050\WeChat\Task\TaskQueue;
 
@@ -59,10 +61,26 @@ $robot->onMessage(function (Message $message) use ($robot) {
             Console::log("发送消息失败");
         }
     } else {
+        switch($message->getMessageType()) {
+            case Message::VOICE_MESSAGE:
+                $type_name = '语音';
+                break;
+            case Message::IMAGE_MESSAGE:
+                $type_name = '图片';
+                break;
+            case Message::ANIMATE_MESSAGE:
+                $type_name = '动图';
+                break;
+            case Message::VIDEO_MESSAGE:
+                $type_name = '视频';
+                break;
+            default:
+                $type_name = '我不知道的东西';
+        }
         try {
             TaskQueue::run('SendMessage', [
                 'username' => $message->getFromUserName(),
-                'content'  => '你发的是什么鬼，我看不懂啦。'
+                'content'  => '我猜你发的是' . $type_name . '。'
             ]);
         } catch (Exception $e) {
             Console::log("发送消息失败");
