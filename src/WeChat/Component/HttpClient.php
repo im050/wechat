@@ -193,7 +193,7 @@ class HttpClient
     {
         $this->init();
 
-        $config = $this->updateOption($config);
+        $this->updateOption($config);
 
         if ($method == 'post') {
             curl_setopt($this->curl, CURLOPT_POST, 1);
