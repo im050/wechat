@@ -12,7 +12,7 @@ use Im050\WeChat\Collection\Element\Group;
 use Im050\WeChat\Collection\Element\PublicUser;
 use Im050\WeChat\Collection\Element\Contact;
 
-class ConcatFactory
+class ContactFactory
 {
 
     public static function create($item) {
