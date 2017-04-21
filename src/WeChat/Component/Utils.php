@@ -25,7 +25,7 @@ class Utils
     {
         $number_poor = "0123456789";
         $eng_poor = "abcdefghijklmnopqrstuvwxyz";
-        $string =  '';
+        $string = '';
         if (!$is_number) {
             $poor = $number_poor . $eng_poor;
         } else {
@@ -37,4 +37,10 @@ class Utils
         }
         return $string;
     }
+
+    public static function generateDeviceID()
+    {
+        return 'e' . Utils::randomString(15, true);
+    }
+
 }

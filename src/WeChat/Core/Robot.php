@@ -1,10 +1,11 @@
 <?php
 namespace Im050\WeChat\Core;
 
-use Im050\WeChat\Collection\ConcatFactory;
 use Im050\WeChat\Collection\ContactPool;
 use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\Console;
+use Im050\WeChat\Component\Storage\Handler\FileHandler;
+use Im050\WeChat\Component\Storage\Storage;
 use Im050\WeChat\Message\MessageHandler;
 use Im050\WeChat\Task\TaskQueue;
 
@@ -17,83 +18,52 @@ class Robot
 
     protected $config = [
         'cookie_path' => '',
-        'log_path' => '',
+        'log_path'    => '',
+        'tmp_path'    => '',
     ];
 
     public function __construct($config = array())
     {
-
+        //合并配置参数
         $config = array_merge($this->config, $config);
 
+        //检查配置参数
+        $this->fixConfig($config);
+
+        //将配置参数设置到Config类
         Config::getInstance()->setConfig($config);
 
+        //初始化APP容器
         $this->app = Application::getInstance();
+
         //启动应用
         $this->boot();
+
         //配置应用
         $cookie_path = isset($config['cookie_path']) ? $config['cookie_path'] . DIRECTORY_SEPARATOR . 'cookies.txt' : __DIR__ . DIRECTORY_SEPARATOR . 'cookies.txt';
+
         //设置cookie路径
         http()->setConfig('cookiejar', $cookie_path);
         http()->setConfig('cookiefile', $cookie_path);
     }
 
-    public function run()
+    public function fixConfig($config)
     {
-
-        Console::log("正在准备二维码...");
-
-        $this->app->auth->openQRcode();
-
-        Console::log("请扫描二维码");
-
-        $flag = $this->app->auth->pollingLogin();
-
-        if ($flag == Auth::LOGIN_TIMEOUT) {
-            Console::log("扫码二维码超时，正在为您重新生成二维码...");
-            return $this->run();
+        if (!isset($config['tmp_path']) || empty($config['tmp_path'])) {
+            Console::log("没有设置临时文件路径，请设置。");
         }
 
-        if ($flag != Auth::LOGIN_SUCCESS) {
-            Console::log("程序运行异常，请重新启动", Console::ERROR);
+        if (!isset($config['cookie_path']) || empty($config['cookie_path'])) {
+            $config['cookie_path'] = $config['tmp_path'];
         }
 
-        Console::log("正在初始化账号数据...");
-
-        $this->app->auth->webWxInit();
-
-        Console::log("欢迎您，" . Account::nickname());
-
-        if ($this->app->auth->statusNotify()) {
-            Console::log("开启微信通知成功...");
-        } else {
-            Console::log("开启微信通知失败，可能导致其他问题...", Console::WARNING);
-        }
-
-        Console::log("正在加载联系人...");
-
-        $this->initContact();
-
-        Console::log("开始监听消息...");
-
-        $this->app->message->listen();
-
-        return true;
+        return $config;
     }
 
-    protected function initContact()
+    public function run()
     {
-        $contact_pool = ContactPool::getInstance();
-
-        try {
-            $data = app()->api->getContact();
-        } catch (\Exception $e) {
-            Console::log($e->getMessage(), Console::ERROR);
-        }
-
-        $member_list = $data['MemberList'];
-
-        foreach ($member_list as $key => $item) {
-            $contact_pool->add(ConcatFactory::create($item));
+        if ((new LoginService())->start()) {
+            app()->message->listen();
         }
     }
 
@@ -105,7 +75,7 @@ class Robot
         });
 
         //初始化配置类
-        app()->singleton("config", function(){
+        app()->singleton("config", function () {
             return Config::getInstance();
         });
 
@@ -123,6 +93,15 @@ class Robot
         app()->singleton('task_queue', function () {
             return new TaskQueue();
         });
+
+        //文件键值对管理
+        app()->singleton('keymap', function () {
+            $config = Config::getInstance();
+            $tmp_path = $config->get('tmp_path');
+            return new Storage(new FileHandler([
+                'path' => $tmp_path . DIRECTORY_SEPARATOR . 'keymap.json'
+            ]));
+        });
     }
 
     public function onMessage(\Closure $closure)
@@ -130,7 +109,7 @@ class Robot
         MessageHandler::getInstance()->onMessage($closure);
     }
 
-    public function getConcat()
+    public function getContact()
     {
         return ContactPool::getInstance();
     }

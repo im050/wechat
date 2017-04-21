@@ -34,8 +34,12 @@ class MessageHandler
 
     public function listen()
     {
+        Console::log("开始监听消息...");
+
         $api = app()->api;
+
         while (true) {
+
             list($retcode, $selector) = $api->syncCheck();
 
             if ($retcode == 1100 || $retcode == 1101) {

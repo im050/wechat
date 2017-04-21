@@ -6,6 +6,10 @@ use Im050\WeChat\Component\Utils;
 class Api
 {
 
+    public $base_request = [];
+
+    public $redirect_uri = '';
+
     /**
      * 同步检测
      *
@@ -13,19 +17,20 @@ class Api
      */
     public function syncCheck()
     {
+
         $sid = app()->auth->sid;
         $skey = app()->auth->skey;
         $uin = app()->auth->uin;
         $device_id = app()->auth->device_id;
 
         $payload = [
-            'r' => Utils::timeStamp(),
-            '_' => Utils::timeStamp(),
-            'skey' => $skey,
-            'sid' => $sid,
-            'uin' => $uin,
+            'r'        => Utils::timeStamp(),
+            '_'        => Utils::timeStamp(),
+            'skey'     => $skey,
+            'sid'      => $sid,
+            'uin'      => $uin,
             'deviceid' => $device_id,
-            'synckey' => SyncKey::getInstance()->string(),
+            'synckey'  => SyncKey::getInstance()->string(),
         ];
 
         $url = uri('push_uri') . '/cgi-bin/mmwebwx-bin/synccheck';
@@ -43,17 +48,17 @@ class Api
     public function pullMessage()
     {
         $payload = [
-            'BaseRequest' => app()->auth->base_request,
-            'SyncKey' => [
+            'BaseRequest' => $this->base_request,
+            'SyncKey'     => [
                 'Count' => SyncKey::getInstance()->count(),
-                'List' => SyncKey::getInstance()->get()
+                'List'  => SyncKey::getInstance()->get()
             ],
-            'rr' => Utils::timeStamp()
+            'rr'          => Utils::timeStamp()
         ];
 
         $query_string = [
-            'sid' => app()->auth->sid,
-            'skey' => app()->auth->skey,
+            'sid'         => app()->auth->sid,
+            'skey'        => app()->auth->skey,
             'pass_ticket' => app()->auth->pass_ticket
         ];
 
@@ -82,8 +87,8 @@ class Api
         $auth = app()->auth;
         $query_string = http_build_query([
             'pass_ticket' => $auth->pass_ticket,
-            'skey' => $auth->skey,
-            'r' => Utils::timeStamp()
+            'skey'        => $auth->skey,
+            'r'           => Utils::timeStamp()
         ]);
         $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxgetcontact?' . $query_string;
         $content = http()->post($url);
@@ -108,14 +113,14 @@ class Api
         $url = uri("base_uri") . '/cgi-bin/mmwebwx-bin/webwxsendmsg?pass_ticket=' . app()->auth->pass_ticket;
         $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
         $payload = [
-            'BaseRequest' => app()->auth->base_request,
-            'Msg' => [
-                "Type" => 1,
-                "Content" => $text,
+            'BaseRequest' => $this->base_request,
+            'Msg'         => [
+                "Type"         => 1,
+                "Content"      => $text,
                 "FromUserName" => Account::username(),
-                "ToUserName" => $username,
-                "LocalID" => $msg_id,
-                "ClientMsgId" => $msg_id
+                "ToUserName"   => $username,
+                "LocalID"      => $msg_id,
+                "ClientMsgId"  => $msg_id
             ]
         ];
         $data = http()->post($url, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
@@ -124,14 +129,168 @@ class Api
         return $flag;
     }
 
+    /**
+     * 获取图片地址
+     *
+     * @param $msg_id
+     * @return array|mixed
+     */
     public function getMessageImage($msg_id)
     {
         $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxgetmsgimg?' . http_build_query([
                 'MsgID' => $msg_id,
-                'skey' => app()->auth->skey
+                'skey'  => app()->auth->skey
             ]);
         $data = http()->get($url);
         return $data;
+    }
+
+    /**
+     * 微信状态通知
+     *
+     * @param string $username
+     * @return bool
+     */
+    public function statusNotify($username = '')
+    {
+        if (empty($username)) {
+            $username = Account::username();
+        }
+
+        $payload = [
+            'BaseRequest'  => $this->base_request,
+            'ClientMsgId'  => Utils::timeStamp(),
+            'Code'         => 3,
+            'FromUserName' => $username,
+            'ToUserName'   => $username
+        ];
+        $query_string = [
+            'lang'        => 'zh_CN',
+            'pass_ticket' => app()->auth->pass_ticket
+        ];
+        $url = uri('base_uri') . "/cgi-bin/mmwebwx-bin/webwxstatusnotify?" . http_build_query($query_string);
+        $content = http()->post($url, json_encode($payload));
+        $data = json_decode($content, JSON_OBJECT_AS_ARRAY);
+        if (checkBaseResponse($data)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 初始化微信
+     *
+     * @param $uin
+     * @param $sid
+     * @param string $skey
+     * @return mixed
+     */
+    public function webWxInit($uin, $sid, $skey = '', $pass_ticket = '')
+    {
+        $base_request = [
+            'Uin'      => $uin,
+            'Sid'      => $sid,
+            'Skey'     => $skey,
+            'DeviceID' => Utils::generateDeviceID(),
+        ];
+
+        $query_string = [
+            'r'           => Utils::timeStamp(),
+            'pass_ticket' => $pass_ticket
+        ];
+
+        $params = json_encode(['BaseRequest' => $base_request]);
+        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxinit?' . http_build_query($query_string);
+        $content = http()->post($url, $params);
+        $base_response = json_decode($content, JSON_OBJECT_AS_ARRAY);
+
+        if (checkBaseResponse($base_response)) {
+            $this->base_request = $base_request;
+        }
+
+        return $base_response;
+    }
+
+    public function getUuid()
+    {
+        $url = uri('login_uri') . '/jslogin';
+        $payload = [
+            'appid' => 'wx782c26e4c19acffb',
+            'fun'   => 'new',
+            '_'     => round(microtime(true) * 1000)
+        ];
+        $content = http()->get($url, $payload);
+
+        $pattern = '/window.QRLogin.code = (\d+); window.QRLogin.uuid = "(\S+?)"/';
+
+        if (preg_match($pattern, $content, $matches)) {
+            $code = $matches[1];
+            $uuid = $matches[2];
+        } else {
+            return false;
+        }
+
+        if ($code == '200') {
+            return $uuid;
+        } else {
+            return false;
+        }
+    }
+
+    public function getLoginStatus()
+    {
+        if (empty(app()->auth->uuid)) {
+            throw new \Exception("缺少UUID");
+        }
+
+        $url = uri('login_uri') . '/cgi-bin/mmwebwx-bin/login';
+        $payload = [
+            'uuid' => app()->auth->uuid,
+            'tip'  => 1,
+            '_'    => Utils::timeStamp()
+        ];
+
+        $content = http()->get($url, $payload, [
+            'timeout' => 35
+        ]);
+
+        preg_match('/window.code=(\d+);/', $content, $matches);
+        $code = $matches[1];
+
+        preg_match('/window.redirect_uri="(\S+?)";/', $content, $matches);
+        $this->redirect_uri = $matches[1];
+
+        return $code;
+    }
+
+    public function getToken()
+    {
+
+        if (empty($this->redirect_uri)) {
+            throw new \Exception("获取权限验证数据失败");
+        }
+
+        $payload = array(
+            'uuid'    => app()->auth->uuid,
+            'fun'     => 'new',
+            'version' => 'v2'
+        );
+
+        $content = http()->get($this->redirect_uri, $payload);
+        $data = Utils::xmlToArray($content);
+        if (intval($data['ret']) != 0) {
+            throw new \Exception("获取通行证失败");
+        }
+
+        $result = [
+            'sid'         => $data['wxsid'],
+            'skey'        => $data['skey'],
+            'uin'         => $data['wxuin'],
+            'pass_ticket' => $data['pass_ticket']
+        ];
+
+        return $result;
     }
 
 }

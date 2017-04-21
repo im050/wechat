@@ -27,6 +27,13 @@ class Account
         return self::$_instance;
     }
 
+    public function setUser($user) {
+        $this->nickname = $user['NickName'];
+        $this->username = $user['UserName'];
+        $this->sex = $user['Sex'];
+        $this->uin = $user['Uin'];
+    }
+
     public static function __callStatic($name, $arguments)
     {
         $account = self::getInstance();

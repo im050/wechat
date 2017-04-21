@@ -12,9 +12,10 @@ use Im050\WeChat\Core\Account;
 use Im050\WeChat\Task\TaskQueue;
 
 $robot = new Robot([
-    'cookie_path' => __DIR__,
-    'log_path' => __DIR__ . DIRECTORY_SEPARATOR . 'message_log.txt',
-    'json_path' => __DIR__ . DIRECTORY_SEPARATOR . 'json.txt',
+    'tmp_path' => BASE_PATH,
+    'cookie_path' => BASE_PATH,
+    'log_path' => BASE_PATH . DIRECTORY_SEPARATOR . 'message_log.txt',
+    'json_path' => BASE_PATH . DIRECTORY_SEPARATOR . 'json.txt',
 ]);
 
 $robot->onMessage(function (Message $message) use ($robot) {
@@ -31,7 +32,7 @@ $robot->onMessage(function (Message $message) use ($robot) {
         'happyday'
     ];
 
-    $member = $robot->getConcat()->getByUserName($message->getFromUserName());
+    $member = $robot->getContact()->getByUserName($message->getFromUserName());
 
     if (!$member) {
         return false;
