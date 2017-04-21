@@ -72,6 +72,12 @@ class LoginService
     }
 
 
+    /**
+     * 尝试登录
+     * 用上一次登录的缓存数据进行登录
+     *
+     * @return bool
+     */
     public function tryLogin()
     {
         //加载上一次登录的用户数据
@@ -100,6 +106,11 @@ class LoginService
         }
     }
 
+    /**
+     * 开始登录逻辑
+     *
+     * @return bool
+     */
     public function start()
     {
         $last_login_time = app()->keymap->get('login_time');
@@ -115,16 +126,17 @@ class LoginService
         }
 
         if ($status) {
-            $this->update();
+            //登录成功操作
+            $this->prepare();
+
             Console::log("欢迎您，" . Account::nickname());
         }
 
         return $status;
     }
 
-    public function update()
+    public function prepare()
     {
-
         Console::log("关闭手机通知状态...");
 
         app()->api->statusNotify();
@@ -132,6 +144,8 @@ class LoginService
         Console::log("正在初始化联系人...");
 
         $contact_pool = ContactPool::getInstance();
+
+        $data = [];
 
         try {
             $data = app()->api->getContact();
@@ -153,8 +167,12 @@ class LoginService
      */
     public function pollingLogin()
     {
-        for ($i = 0; $i < 10; $i++) {
+        $max_times = 10;
+
+        for ($retry_times = 0; $retry_times <= $max_times; $retry_times++) {
+
             $code = app()->api->getLoginStatus();
+
             switch ($code) {
                 case self::LOGIN_SUCCESS:
                     Console::log('登录成功.');
@@ -164,12 +182,16 @@ class LoginService
                     app()->auth->setToken($token);
                     return $code;
                 case self::LOGIN_CONFIRM:
+
                     if (!isset($click_btn)) {
                         $click_btn = true;
                         Console::log("请在手机上点击登录按钮.");
                     }
-                    $i--;
+
+                    $retry_times -= 1;
+
                     sleep(1);
+
                     break;
                 default:
                     return $code;
@@ -184,7 +206,10 @@ class LoginService
      */
     public function openQRcode()
     {
-        for ($i = 0; $i <= 10; $i++) {
+
+        $max_times = 10;
+
+        for ($retry_times = 0; $retry_times <= $max_times; $retry_times++) {
             $uuid = app()->api->getUuid();
 
             if ($uuid === false) {
@@ -194,7 +219,7 @@ class LoginService
             app()->auth->setUuid($uuid);
             $text = 'https://login.weixin.qq.com/l/' . $uuid;
             $this->generateQRcode($text);
-            return ;
+            return;
         }
 
         Console::log("获取二维码失败", Console::ERROR);
