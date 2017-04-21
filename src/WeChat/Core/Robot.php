@@ -50,7 +50,7 @@ class Robot
     public function fixConfig($config)
     {
         if (!isset($config['tmp_path']) || empty($config['tmp_path'])) {
-            Console::log("没有设置临时文件路径，请设置。");
+            Console::log("没有设置临时文件路径，请设置。", Console::ERROR);
         }
 
         if (!isset($config['cookie_path']) || empty($config['cookie_path'])) {
