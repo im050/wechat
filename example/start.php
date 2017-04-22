@@ -18,9 +18,15 @@ $robot = new Robot([
     'json_path'   => BASE_PATH . DIRECTORY_SEPARATOR . 'json.txt',
 ]);
 
+$shut = [];
+
 $robot->onMessage(function (Message $message) use ($robot) {
 
+    $shut = & $GLOBALS['shut'];
+
     $targetUserName = $message->getFromUserName();
+
+    $member = null;
 
     //不给自己回复消息
     if ($message->getFromUserName() == Account::username()) {
@@ -30,6 +36,29 @@ $robot->onMessage(function (Message $message) use ($robot) {
         } else {
             return false;
         }
+    }
+
+    $member = $robot->getContact()->getByUserName($targetUserName);
+
+    if ($message->getFromUserName() == Account::username()) {
+        if ($message->string() == "#闭嘴") {
+            TaskQueue::run('SendMessage', [
+                'username' => $targetUserName,
+                'content' => '已经停止自动应答 [' . $member->getRemarkName() . '] 的消息'
+            ]);
+            $shut[$targetUserName] = true;
+        } else if ($message->string() == "#说话") {
+            TaskQueue::run('SendMessage', [
+                'username' => $targetUserName,
+                'content' => '机器人正在待命'
+            ]);
+            $shut[$targetUserName] = false;
+            return $shut;
+        }
+    }
+
+    if (isset($shut[$targetUserName]) && $shut[$targetUserName] == true) {
+        return $shut;
     }
 
     //只给体验群发消息
@@ -43,8 +72,6 @@ $robot->onMessage(function (Message $message) use ($robot) {
         '罗志晨',
         '张帆'
     ];
-
-    $member = $robot->getContact()->getByUserName($targetUserName);
 
     if (!$member) {
         return false;
