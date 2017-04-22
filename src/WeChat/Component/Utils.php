@@ -43,4 +43,11 @@ class Utils
         return 'e' . Utils::randomString(15, true);
     }
 
+    public static function json_encode($data, $flag = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) {
+        return json_encode($data, $flag);
+    }
+
+    public static function json_decode($json, $flag = JSON_OBJECT_AS_ARRAY) {
+        return json_decode($json, $flag);
+    }
 }
