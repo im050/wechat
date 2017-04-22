@@ -9,6 +9,7 @@
 namespace Im050\WeChat\Task;
 
 use Im050\WeChat\Component\Console;
+use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Task\Job\Job;
 
 class TaskQueue
@@ -41,7 +42,7 @@ class TaskQueue
     public function onTask(\swoole_process $worker)
     {
         while (($data = $worker->pop()) !== false) {
-            $data = json_decode($data, JSON_OBJECT_AS_ARRAY);
+            $data = Utils::json_decode($data);
             $job = $data['job'];
             $params = $data['params'];
             $class = __NAMESPACE__ . '\\Job\\' . $job;
@@ -74,7 +75,7 @@ class TaskQueue
             'job' => $job,
             'params' => $params
         );
-        $data = json_encode($data, JSON_UNESCAPED_UNICODE);
+        $data = Utils::json_encode($data);
         $process->push($data);
     }
 

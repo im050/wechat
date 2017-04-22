@@ -1,6 +1,7 @@
 <?php
 namespace Im050\WeChat\Message\Formatter;
 
+use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\MessageHandler;
 
 class Message
@@ -135,7 +136,7 @@ class Message
 
     public function __destruct() {
         $log = "TYPE: " .$this->getMessageType() . PHP_EOL;
-        $log .= "JSON: " . json_encode($this->message) . PHP_EOL;
+        $log .= "JSON: " . Utils::json_encode($this->message) . PHP_EOL;
         $log .= "TIME: " . date("Y-m-d H:i:s", time()) . PHP_EOL;
         file_put_contents(
             app()->config->json_path,

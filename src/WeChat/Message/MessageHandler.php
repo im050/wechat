@@ -10,6 +10,7 @@ namespace Im050\WeChat\Message;
 
 use Im050\WeChat\Collection\ContactPool;
 use Im050\WeChat\Component\Console;
+use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Message\Formatter\Text;
 
@@ -89,7 +90,7 @@ class MessageHandler
                 }
             } catch (\Exception $e) {
                 $log = "TYPE: Unknown Message Type, code: {$msg_type}" . PHP_EOL;
-                $log .= "JSON:" . json_encode($msg) . PHP_EOL;
+                $log .= "JSON:" . Utils::json_encode($msg) . PHP_EOL;
                 $log .= "TIME:" . date("Y-m-d H:i:s", time()) . PHP_EOL;
                 file_put_contents(
                     app()->config->log_path,

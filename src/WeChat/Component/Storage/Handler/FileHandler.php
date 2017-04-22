@@ -8,6 +8,8 @@
 
 namespace Im050\WeChat\Component\Storage\Handler;
 
+use Im050\WeChat\Component\Utils;
+
 class FileHandler implements Handler
 {
 
@@ -35,7 +37,7 @@ class FileHandler implements Handler
 
         if (file_exists($path)) {
             $content = file_get_contents($path, LOCK_SH);
-            $content = json_decode($content, JSON_OBJECT_AS_ARRAY);
+            $content = Utils::json_decode($content);
         } else {
             $content = [];
         }
@@ -51,7 +53,7 @@ class FileHandler implements Handler
     public function save()
     {
         $path = $this->config['path'];
-        file_put_contents($path, json_encode($this->data, JSON_UNESCAPED_UNICODE), LOCK_EX);
+        file_put_contents($path, Utils::json_encode($this->data), LOCK_EX);
     }
 
     public function __destruct()

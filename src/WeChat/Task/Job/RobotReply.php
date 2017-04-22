@@ -9,6 +9,7 @@
 namespace Im050\WeChat\Task\Job;
 
 use Im050\WeChat\Component\Console;
+use Im050\WeChat\Component\Utils;
 
 class RobotReply extends Job
 {
@@ -28,7 +29,7 @@ class RobotReply extends Job
         }
         $username = $this->username;
         try {
-            $content = json_decode($content, JSON_OBJECT_AS_ARRAY);
+            $content = Utils::json_decode($content);
             $content = $content['text'];
             if (app()->api->sendMessage($username, $content)) {
                 return true;

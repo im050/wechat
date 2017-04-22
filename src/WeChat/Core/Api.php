@@ -63,8 +63,8 @@ class Api
         ];
 
         $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxsync?' . http_build_query($query_string);
-        $content = http()->post($url, json_encode($payload));
-        $data = json_decode($content, JSON_OBJECT_AS_ARRAY);
+        $content = http()->post($url, Utils::json_encode($payload));
+        $data = Utils::json_decode($content);
 
         if (!checkBaseResponse($data)) {
             throw new \Exception("同步获取消息数据失败");
@@ -92,7 +92,7 @@ class Api
         ]);
         $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxgetcontact?' . $query_string;
         $content = http()->post($url);
-        $data = json_decode($content, JSON_OBJECT_AS_ARRAY);
+        $data = Utils::json_decode($content);
 
         if (!checkBaseResponse($data)) {
             throw new \Exception("获取联系人失败");
@@ -123,8 +123,8 @@ class Api
                 "ClientMsgId"  => $msg_id
             ]
         ];
-        $data = http()->post($url, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-        $data = json_decode($data, JSON_OBJECT_AS_ARRAY);
+        $data = http()->post($url, Utils::json_encode($payload));
+        $data = Utils::json_decode($data);
         $flag = checkBaseResponse($data);
         return $flag;
     }
@@ -169,8 +169,8 @@ class Api
             'pass_ticket' => app()->auth->pass_ticket
         ];
         $url = uri('base_uri') . "/cgi-bin/mmwebwx-bin/webwxstatusnotify?" . http_build_query($query_string);
-        $content = http()->post($url, json_encode($payload));
-        $data = json_decode($content, JSON_OBJECT_AS_ARRAY);
+        $content = http()->post($url, Utils::json_encode($payload));
+        $data = Utils::json_decode($content);
         if (checkBaseResponse($data)) {
             return true;
         } else {
@@ -200,10 +200,10 @@ class Api
             'pass_ticket' => $pass_ticket
         ];
 
-        $params = json_encode(['BaseRequest' => $base_request]);
+        $params = Utils::json_encode(['BaseRequest' => $base_request]);
         $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxinit?' . http_build_query($query_string);
         $content = http()->post($url, $params);
-        $base_response = json_decode($content, JSON_OBJECT_AS_ARRAY);
+        $base_response = Utils::json_decode($content);
 
         if (checkBaseResponse($base_response)) {
             $this->base_request = $base_request;
