@@ -25,7 +25,7 @@ $robot->onMessage(function (Message $message) use ($robot) {
     //不给自己回复消息
     if ($message->getFromUserName() == Account::username()) {
         $toUserName = $message->getToUserName();
-        if (stripos($toUserName, "@@")) {
+        if (stripos($toUserName, "@@") !== false) {
             $targetUserName = $toUserName;
         } else {
             return false;
