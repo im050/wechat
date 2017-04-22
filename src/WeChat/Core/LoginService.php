@@ -84,6 +84,9 @@ class LoginService
      */
     public function tryLogin()
     {
+
+        Console::log("正在尝试免扫码登录...");
+
         //加载上一次登录的用户数据
         app()->auth->loadTokenFromCache();
 
@@ -229,6 +232,15 @@ class LoginService
             }
 
             app()->auth->setUuid($uuid);
+
+            $img_url = 'https://login.weixin.qq.com/qrcode/' . $uuid;
+
+            call_user_func(function() use($img_url){
+                $content = file_get_contents($img_url);
+                $path = app()->config->qrcode_img_path;
+                file_put_contents($path . DIRECTORY_SEPARATOR . 'qrcode.png', $content);
+            });
+
             $text = 'https://login.weixin.qq.com/l/' . $uuid;
             $this->generateQRcode($text);
             return;

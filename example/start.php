@@ -16,6 +16,7 @@ $robot = new Robot([
     'cookie_path' => BASE_PATH,
     'log_path'    => BASE_PATH . DIRECTORY_SEPARATOR . 'message_log.txt',
     'json_path'   => BASE_PATH . DIRECTORY_SEPARATOR . 'json.txt',
+	'qrcode_img_path' => BASE_PATH
 ]);
 
 $shut = [];
