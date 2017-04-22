@@ -20,9 +20,16 @@ $robot = new Robot([
 
 $robot->onMessage(function (Message $message) use ($robot) {
 
+    $targetUserName = $message->getFromUserName();
+
     //不给自己回复消息
     if ($message->getFromUserName() == Account::username()) {
-        return false;
+        $toUserName = $message->getToUserName();
+        if (stripos($toUserName, "@@")) {
+            $targetUserName = $toUserName;
+        } else {
+            return false;
+        }
     }
 
     //只给体验群发消息
@@ -37,7 +44,7 @@ $robot->onMessage(function (Message $message) use ($robot) {
         '张帆'
     ];
 
-    $member = $robot->getContact()->getByUserName($message->getFromUserName());
+    $member = $robot->getContact()->getByUserName($targetUserName);
 
     if (!$member) {
         return false;
@@ -51,9 +58,9 @@ $robot->onMessage(function (Message $message) use ($robot) {
         try {
             //图灵机器人自动回复
             TaskQueue::run('RobotReply', [
-                'username'     => $message->getFromUserName(),
+                'username'     => $targetUserName,
                 'from_message' => $message->string(),
-                'userid'       => md5($message->getFromUserName())
+                'userid'       => md5($targetUserName)
             ]);
 
             //普通发送消息
