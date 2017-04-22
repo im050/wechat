@@ -106,7 +106,7 @@ class LoginService
             Account::getInstance()->setUser($response['User']);
             SyncKey::getInstance()->setSyncKey($response['SyncKey']['List']);
             //更新skey和登录时间
-            app()->auth->skey = $response['Skey'];
+            app()->auth->skey = isset($response['SKey']) ? $response['SKey'] : app()->auth->skey;
             app()->keymap->setMultiple([
                 'skey'       => app()->auth->skey,
                 'login_time' => time()
