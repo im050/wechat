@@ -33,7 +33,9 @@ class Utils
         }
         for ($i = 0; $i < $length; $i++) {
             $random = mt_rand(0, strlen($poor));
-            $string .= $poor{$random};
+            if (isset($poor{$random}) && empty($poor{$random})) {
+                $string .= $poor{$random};
+            }
         }
         return $string;
     }

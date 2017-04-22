@@ -46,7 +46,12 @@ class ContactPool implements Collection
         return self::$_instance;
     }
 
-    public function add(Element $item) {
+    public function add(Element $item)
+    {
+
+        if (isset($this->list[$item->UserName])) {
+            return false;
+        }
 
         $this->list[$item->UserName] = $item;
 
@@ -59,27 +64,30 @@ class ContactPool implements Collection
         }
     }
 
-    public function getByUserName($username) {
+    public function getByUserName($username)
+    {
         return isset($this->list[$username]) ? $this->list[$username] : null;
     }
 
-    public function getList() {
+    public function getList()
+    {
         return $this->list;
     }
 
-    public function getRandom($poor_type = 'all') {
-        switch($poor_type) {
+    public function getRandom($poor_type = 'all')
+    {
+        switch ($poor_type) {
             case ContactPool::CONTACT_POOR:
-                $list = & $this->contact_list;
+                $list = &$this->contact_list;
                 break;
             case ContactPool::GROUP_POOR:
-                $list = & $this->group_list;
+                $list = &$this->group_list;
                 break;
             case ContactPool::PUBLIC_USER_POOR:
-                $list = & $this->public_user_list;
+                $list = &$this->public_user_list;
                 break;
             default:
-                $list = & $this->list;
+                $list = &$this->list;
         }
         $username = array_rand($list);
         $user = $this->getByUserName($username);

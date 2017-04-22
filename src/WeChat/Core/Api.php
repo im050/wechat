@@ -255,11 +255,19 @@ class Api
             'timeout' => 35
         ]);
 
+        $code = -1;
+
         preg_match('/window.code=(\d+);/', $content, $matches);
-        $code = $matches[1];
+        if (isset($matches[1])) {
+            $code = $matches[1];
+        }
 
         preg_match('/window.redirect_uri="(\S+?)";/', $content, $matches);
-        $this->redirect_uri = $matches[1];
+
+        if (isset($matches[1])) {
+            $this->redirect_uri = $matches[1];
+        }
+
 
         return $code;
     }
