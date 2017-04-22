@@ -91,6 +91,7 @@ class LoginService
         app()->auth->loadTokenFromCache();
 
         if (empty(app()->auth->uin) || empty(app()->auth->sid)) {
+            Console::log("加载缓存通行证失败...");
             return false;
         }
 
@@ -100,6 +101,7 @@ class LoginService
         $this->init_response = $response;
 
         if (!checkBaseResponse($response)) {
+            Console::log("免扫码登录失败..." . $response['BaseResponse']['Ret']);
             return false;
         } else {
             //初始化成功更新数据
