@@ -18,6 +18,8 @@ class LoginService
 
     const LOGIN_CONFIRM = 201;
 
+    public $init_response = [];
+
     /**
      * 扫码登录
      *
@@ -58,6 +60,8 @@ class LoginService
 
             $response = app()->api->webWxInit($uin, $sid, $skey, $pass_ticket);
 
+            $this->init_response = $response;
+
             if (!checkBaseResponse($response)) {
                 Console::log("初始化失败，请重新运行本程序", Console::ERROR);
             } else {
@@ -89,6 +93,8 @@ class LoginService
 
         //尝试初始化
         $response = app()->api->webWxInit('xuin=' . app()->auth->uin, app()->auth->sid);
+
+        $this->init_response = $response;
 
         if (!checkBaseResponse($response)) {
             return false;
@@ -156,6 +162,12 @@ class LoginService
         $member_list = $data['MemberList'];
 
         foreach ($member_list as $key => $item) {
+            $contact_pool->add(ContactFactory::create($item));
+        }
+
+        $contact_list = $this->init_response['ContactList'];
+
+        foreach($contact_list as $key => $item) {
             $contact_pool->add(ContactFactory::create($item));
         }
     }
