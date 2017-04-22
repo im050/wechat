@@ -67,7 +67,7 @@ class Message
         $this->content = $content;
         $this->from_user_name = $this->message['FromUserName'];
         $this->to_user_name = $this->message['ToUserName'];
-        $this->create_time = $this->message['create_time'];
+        $this->create_time = $this->message['CreateTime'];
         $this->msg_type = $this->message['MsgType'];
         //判断是否群消息
         if (substr($this->getFromUserName(), 0, 2) == '@@') {
