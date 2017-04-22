@@ -13,24 +13,30 @@ use Im050\WeChat\Task\TaskQueue;
 class MemberElement extends Element
 {
 
-    public function __construct($obj)
+    public function __construct($element)
     {
-        parent::__construct($obj);
-        if (!isset($this->obj['RemarkName']) || $this->obj['RemarkName'] == '') {
-            $this->obj['RemarkName'] = $this->obj['NickName'];
+        parent::__construct($element);
+        if (!isset($this->element['RemarkName']) || $this->element['RemarkName'] == '') {
+            $this->element['RemarkName'] = $this->element['NickName'];
         }
     }
 
     public function getRemarkName()
     {
-        return $this->obj['RemarkName'];
+        return $this->element['RemarkName'];
     }
 
     public function getUserName()
     {
-        return $this->obj['UserName'];
+        return $this->element['UserName'];
     }
 
+    /**
+     * 发送消息
+     *
+     * @param $text
+     * @param bool $blocking 是否阻塞，否则用任务队列进行发送消息
+     */
     public function sendMessage($text, $blocking = false)
     {
         if ($blocking == false) {

@@ -12,20 +12,20 @@ namespace Im050\WeChat\Collection\Element;
 class Element
 {
 
-    public $obj = null;
+    public $element = [];
 
-    public function __construct($obj)
+    public function __construct($element)
     {
-        if (empty($obj)) {
+        if (empty($element)) {
             return;
         }
 
-        $this->obj = $obj;
+        $this->element = $element;
     }
 
     public function __get($params) {
-        if (isset($this->obj[$params])) {
-            return $this->obj[$params];
+        if (isset($this->element[$params])) {
+            return $this->element[$params];
         } else if (isset($this->$params)) {
             return $this->$params;
         } else {
