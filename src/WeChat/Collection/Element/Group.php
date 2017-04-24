@@ -10,5 +10,7 @@ namespace Im050\WeChat\Collection\Element;
 
 class Group extends MemberElement
 {
-
+    public function getMemberList() {
+        return [];
+    }
 }
