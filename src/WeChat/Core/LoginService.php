@@ -1,8 +1,7 @@
 <?php
 namespace Im050\WeChat\Core;
 
-use Im050\WeChat\Collection\ContactFactory;
-use Im050\WeChat\Collection\Contacts;
+use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 use PHPQRCode\QRcode;
@@ -154,7 +153,7 @@ class LoginService
 
         Console::log("正在初始化联系人...");
 
-        $contact_pool = Contacts::getInstance();
+        $members = Members::getInstance();
 
         $data = [];
 
@@ -167,13 +166,13 @@ class LoginService
         $member_list = $data['MemberList'];
 
         foreach ($member_list as $key => $item) {
-            $contact_pool->add(ContactFactory::create($item));
+            $members->push($item);
         }
 
         $contact_list = $this->init_response['ContactList'];
 
         foreach($contact_list as $key => $item) {
-            $contact_pool->add(ContactFactory::create($item));
+            $members->push($item);
         }
     }
 

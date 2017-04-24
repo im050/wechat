@@ -25,40 +25,39 @@ $robot->onMessage(function (Message $message) use ($robot) {
 
     $shut = & $GLOBALS['shut'];
 
-    $targetUserName = $message->getFromUserName();
+    $targetUser = $message->getMessenger();
 
-    $member = null;
-
-    //不给自己回复消息
     if ($message->getFromUserName() == Account::username()) {
-        $toUserName = $message->getToUserName();
-        if (stripos($toUserName, "@@") !== false) {
-            $targetUserName = $toUserName;
+        if ($message->isGroup()) {
+            $targetUser = $message->getReceiver();
         } else {
             return false;
         }
     }
 
-    $member = $robot->getContact()->getByUserName($targetUserName);
+    if (!$targetUser) {
+        return false;
+    }
 
+    //简单命令处理
     if ($message->getFromUserName() == Account::username()) {
         if ($message->string() == "#闭嘴") {
             TaskQueue::run('SendMessage', [
-                'username' => $targetUserName,
-                'content' => '已经停止自动应答 [' . $member->getRemarkName() . '] 的消息'
+                'username' => $targetUser->getUserName(),
+                'content' => '已经停止自动应答 [' . $targetUser->getRemarkName() . '] 的消息'
             ]);
-            $shut[$targetUserName] = true;
+            $shut[$targetUser->getUserName()] = true;
         } else if ($message->string() == "#说话") {
             TaskQueue::run('SendMessage', [
-                'username' => $targetUserName,
+                'username' => $targetUser->getUserName(),
                 'content' => '机器人正在待命'
             ]);
-            $shut[$targetUserName] = false;
+            $shut[$targetUser->getUserName()] = false;
             return $shut;
         }
     }
 
-    if (isset($shut[$targetUserName]) && $shut[$targetUserName] == true) {
+    if (isset($shut[$targetUser->getUserName()]) && $shut[$targetUser->getUserName()] == true) {
         return $shut;
     }
 
@@ -74,11 +73,7 @@ $robot->onMessage(function (Message $message) use ($robot) {
         '张帆'
     ];
 
-    if (!$member) {
-        return false;
-    }
-
-    if (!in_array($member->getRemarkName(), $white_list)) {
+    if (!in_array($targetUser->getRemarkName(), $white_list)) {
         return false;
     }
 
@@ -86,9 +81,9 @@ $robot->onMessage(function (Message $message) use ($robot) {
         try {
             //图灵机器人自动回复
             TaskQueue::run('RobotReply', [
-                'username'     => $targetUserName,
+                'username'     => $targetUser->getUserName(),
                 'from_message' => $message->string(),
-                'userid'       => md5($targetUserName)
+                'userid'       => md5($targetUser->getUserName())
             ]);
 
             //普通发送消息

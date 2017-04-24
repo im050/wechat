@@ -2,6 +2,7 @@
 namespace Im050\WeChat\Core;
 
 use Im050\WeChat\Collection\Contacts;
+use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Storage\Handler\FileHandler;
@@ -106,12 +107,25 @@ class Robot
 
     public function onMessage(\Closure $closure)
     {
-        MessageHandler::getInstance()->onMessage($closure);
+        MessageHandler::getInstance()->onMessage($closure, $this);
     }
 
     public function getContacts()
     {
-        return Contacts::getInstance();
+        return Members::getInstance()->getContacts();
+    }
+
+    public function getGroups()
+    {
+        return Members::getInstance()->getGroups();
+    }
+
+    public function getSpecials() {
+        return Members::getInstance()->getSpecials();
+    }
+
+    public function getOfficials() {
+        return Members::getInstance()->getOfficials();
     }
 
 }

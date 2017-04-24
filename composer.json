@@ -1,10 +1,24 @@
 {
     "name": "im050/wechat",
     "type": "library",
-    "description": "This is a wechat robot with personal wechat",
+    "description": "基于PHP开发自定义微信机器人，异步消息回复机制，消息记录，撤回消息保留",
+    "keywords": [
+        "微信",
+        "weixin",
+        "微信机器人",
+        "机器人"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "memory",
+            "email": "service@im050.com"
+        }
+    ],
     "require": {
         "symfony/console": "^3.2",
-        "aferrandini/phpqrcode": "^1.0"
+        "aferrandini/phpqrcode": "^1.0",
+        "illuminate/support": "^5.4"
     },
     "autoload": {
         "files": ["src/WeChat/helpers.php"],

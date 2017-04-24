@@ -8,7 +8,7 @@
 
 namespace Im050\WeChat\Message;
 
-use Im050\WeChat\Collection\Contacts;
+use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\Formatter\Message;
@@ -84,7 +84,7 @@ class MessageHandler
                 //控制台打印消息
                 $this->printMessage($message);
                 if (isset($this->events['message'])) {
-                    $this->events['message']($message);
+                    $this->events['message']['closure']($message, $this->events['message']['robot']);
                     //释放资源
                     unset($message);
                 }
@@ -94,7 +94,7 @@ class MessageHandler
                 $log .= "TIME:" . date("Y-m-d H:i:s", time()) . PHP_EOL;
                 file_put_contents(
                     app()->config->log_path,
-                    $log .PHP_EOL,
+                    $log . PHP_EOL,
                     FILE_APPEND | LOCK_EX
                 );
                 Console::log("收到未知消息格式的数据类型，[MSG_TYPE] : {$msg_type}", Console::DEBUG);
@@ -108,9 +108,9 @@ class MessageHandler
         if (!($message instanceof Text)) {
             return;
         }
-        $contact_pool = Contacts::getInstance();
-        $from_user = $contact_pool->getByUserName($message->getFromUserName());
-        $to_user = $contact_pool->getByUserName($message->getToUserName());
+        $members = Members::getInstance();
+        $from_user = $message->getMessenger();
+        $to_user = $message->getReceiver();
         if ($from_user) {
             $from_user_name = $from_user->getRemarkName();
         } else {
@@ -124,9 +124,10 @@ class MessageHandler
         Console::log("$from_user_name 对 $to_user_name 说 ：" . $message->string());
     }
 
-    public function onMessage(\Closure $closure)
+    public function onMessage(\Closure $closure, $robot)
     {
-        $this->events['message'] = $closure;
+        $this->events['message']['closure'] = $closure;
+        $this->events['message']['robot'] = $robot;
     }
 
     public static function parseMessageEntity($content)

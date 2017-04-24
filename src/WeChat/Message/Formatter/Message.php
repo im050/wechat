@@ -1,6 +1,7 @@
 <?php
 namespace Im050\WeChat\Message\Formatter;
 
+use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\MessageHandler;
 
@@ -116,6 +117,14 @@ class Message
         return $this->to_user_name;
     }
 
+    public function getMessenger() {
+        return Members::getInstance()->getContactByUserName($this->getFromUserName());
+    }
+
+    public function getReceiver() {
+        return Members::getInstance()->getContactByUserName($this->getToUserName());
+    }
+
     /**
      * 判断是否群消息
      *
@@ -123,7 +132,7 @@ class Message
      */
     public function isGroup()
     {
-        return substr($this->from_user_name, 0, 2) == '@@';
+        return substr($this->from_user_name, 0, 2) == '@@' || substr($this->to_user_name, 0, 2) == '@@';
     }
 
     public function getMessageID() {
