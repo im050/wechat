@@ -4,7 +4,7 @@ namespace Im050\WeChat\Collection;
 use Im050\WeChat\Collection\Element\Contact;
 use Im050\WeChat\Collection\Element\Element;
 use Im050\WeChat\Collection\Element\Group;
-use Im050\WeChat\Collection\Element\PublicUser;
+use Im050\WeChat\Collection\Element\Official;
 
 class Contacts implements Collection
 {
@@ -57,7 +57,7 @@ class Contacts implements Collection
 
         if ($item instanceof Group) {
             $this->group_list[$item->UserName] = &$this->list[$item->UserName];
-        } else if ($item instanceof PublicUser) {
+        } else if ($item instanceof Official) {
             $this->public_user_list[$item->UserName] = &$this->list[$item->UserName];
         } else if ($item instanceof Contact) {
             $this->contact_list[$item->UserName] = &$this->list[$item->UserName];
