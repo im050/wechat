@@ -9,7 +9,7 @@
 namespace Im050\WeChat\Collection;
 
 use Im050\WeChat\Collection\Element\Group;
-use Im050\WeChat\Collection\Element\PublicUser;
+use Im050\WeChat\Collection\Element\Official;
 use Im050\WeChat\Collection\Element\Contact;
 
 class ContactFactory
@@ -22,7 +22,7 @@ class ContactFactory
         } else {
             if (($item['VerifyFlag'] & 8) != 0) {
                 //公众号
-                return new PublicUser($item);
+                return new Official($item);
             } else {
                 return new Contact($item);
             }

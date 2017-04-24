@@ -8,7 +8,7 @@
 
 namespace Im050\WeChat\Collection\Element;
 
-class PublicUser extends MemberElement
+class Official extends MemberElement
 {
 
 }
