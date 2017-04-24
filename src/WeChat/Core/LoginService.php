@@ -2,7 +2,7 @@
 namespace Im050\WeChat\Core;
 
 use Im050\WeChat\Collection\ContactFactory;
-use Im050\WeChat\Collection\ContactPool;
+use Im050\WeChat\Collection\Contacts;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 use PHPQRCode\QRcode;
@@ -154,7 +154,7 @@ class LoginService
 
         Console::log("正在初始化联系人...");
 
-        $contact_pool = ContactPool::getInstance();
+        $contact_pool = Contacts::getInstance();
 
         $data = [];
 

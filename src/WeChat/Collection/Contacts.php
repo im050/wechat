@@ -6,7 +6,7 @@ use Im050\WeChat\Collection\Element\Element;
 use Im050\WeChat\Collection\Element\Group;
 use Im050\WeChat\Collection\Element\PublicUser;
 
-class ContactPool implements Collection
+class Contacts implements Collection
 {
 
     const GROUP_POOR = 'group';
@@ -77,13 +77,13 @@ class ContactPool implements Collection
     public function getRandom($poor_type = 'all')
     {
         switch ($poor_type) {
-            case ContactPool::CONTACT_POOR:
+            case Contacts::CONTACT_POOR:
                 $list = &$this->contact_list;
                 break;
-            case ContactPool::GROUP_POOR:
+            case Contacts::GROUP_POOR:
                 $list = &$this->group_list;
                 break;
-            case ContactPool::PUBLIC_USER_POOR:
+            case Contacts::PUBLIC_USER_POOR:
                 $list = &$this->public_user_list;
                 break;
             default:

@@ -8,7 +8,7 @@
 
 namespace Im050\WeChat\Message;
 
-use Im050\WeChat\Collection\ContactPool;
+use Im050\WeChat\Collection\Contacts;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\Formatter\Message;
@@ -108,7 +108,7 @@ class MessageHandler
         if (!($message instanceof Text)) {
             return;
         }
-        $contact_pool = ContactPool::getInstance();
+        $contact_pool = Contacts::getInstance();
         $from_user = $contact_pool->getByUserName($message->getFromUserName());
         $to_user = $contact_pool->getByUserName($message->getToUserName());
         if ($from_user) {

@@ -28,3 +28,8 @@ function uri($name) {
 function checkBaseResponse($data) {
     return intval($data['BaseResponse']['Ret']) == 0;
 }
+
+function config($param) {
+    $config = \Im050\WeChat\Component\Config::getInstance();
+    return $config->get($param);
+}

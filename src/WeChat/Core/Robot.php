@@ -1,7 +1,7 @@
 <?php
 namespace Im050\WeChat\Core;
 
-use Im050\WeChat\Collection\ContactPool;
+use Im050\WeChat\Collection\Contacts;
 use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Storage\Handler\FileHandler;
@@ -109,9 +109,9 @@ class Robot
         MessageHandler::getInstance()->onMessage($closure);
     }
 
-    public function getContact()
+    public function getContacts()
     {
-        return ContactPool::getInstance();
+        return Contacts::getInstance();
     }
 
 }
