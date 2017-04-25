@@ -38,10 +38,17 @@ class Members
 
     private function __construct()
     {
-        $var = ['specials', 'contacts', 'groups', 'officials'];
-        foreach ($var as $key => $val) {
-            $this->$val = new ContactCollection();
-        }
+        //初始化特殊用户列表容器
+        $this->specials = new ContactCollection();
+
+        //初始化联系人列表容器
+        $this->contacts = new ContactCollection();
+
+        //初始化群组列表容器
+        $this->groups = new ContactCollection();
+
+        //初始化公众号列表容器
+        $this->officials = new ContactCollection();
     }
 
     public static function getInstance()
@@ -74,26 +81,52 @@ class Members
         $list->put($item['UserName'], $item);
     }
 
+    /**
+     * 获取所有群组
+     *
+     * @return ContactCollection
+     */
     public function getGroups()
     {
         return $this->groups;
     }
 
+    /**
+     * 获取所有特殊账号
+     *
+     * @return ContactCollection
+     */
     public function getSpecials()
     {
         return $this->specials;
     }
 
+    /**
+     * 获取所有联系人
+     *
+     * @return ContactCollection
+     */
     public function getContacts()
     {
         return $this->contacts;
     }
 
+    /**
+     * 获取所有公众号
+     *
+     * @return ContactCollection
+     */
     public function getOfficials()
     {
         return $this->officials;
     }
 
+    /**
+     * 根据username得到联系人实例
+     * 
+     * @param $username
+     * @return null
+     */
     public function getContactByUserName($username)
     {
         if (substr($username, 0, 2) == '@@') {
@@ -111,6 +144,12 @@ class Members
         }
     }
 
+    /**
+     * 得到用户类型
+     *
+     * @param $item
+     * @return string
+     */
     public static function getUserType($item)
     {
         if (substr($item['UserName'], 0, 2) == "@@") {

@@ -18,6 +18,12 @@ class ContactFactory
 
     protected static $_instance = [];
 
+    /**
+     * 创建联系人实例
+     *
+     * @param $item
+     * @return mixed
+     */
     public static function create($item) {
         $username = $item['UserName'];
         if (!isset(self::$_instance[$username]) || empty(self::$_instance[$username])) {

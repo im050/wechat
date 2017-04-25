@@ -21,6 +21,10 @@ class MemberElement extends Element
         }
     }
 
+    public function getAlias() {
+        return $this->element['Alias'];
+    }
+
     public function getRemarkName()
     {
         return $this->element['RemarkName'];

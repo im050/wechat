@@ -14,6 +14,12 @@ use Illuminate\Support\Collection;
 class ContactCollection extends Collection
 {
 
+    /**
+     * 根据用户名获取具体联系人实例
+     *
+     * @param $username
+     * @return mixed|null
+     */
     public function getContactByUserName($username)
     {
         $member = $this->offsetGet($username);
@@ -22,6 +28,12 @@ class ContactCollection extends Collection
         return null;
     }
 
+    /**
+     * 根据微信账号获取具体联系人实例
+     *
+     * @param $alias
+     * @return mixed|null
+     */
     public function getContactByAlias($alias)
     {
         $member = $this->find($alias, 'Alias', true);
