@@ -25,7 +25,28 @@ class ContactCollection extends Collection
         $member = $this->offsetGet($username);
         if (!empty($member))
             return ContactFactory::create($member);
+        else {
+            try {
+                $contact = $this->findContactFromAPI($username);
+            } catch (\Exception $e) {
+                return null;
+            }
+            if ($contact != null) {
+                return ContactFactory::create($contact);
+            }
+        }
         return null;
+    }
+
+    public function findContactFromAPI($username)
+    {
+        $data = app()->api->getBatchContact($username);
+        $contact_list = $data['ContactList'];
+        if (!empty($contact_list)) {
+            return reset($contact_list);
+        } else {
+            return null;
+        }
     }
 
     /**
