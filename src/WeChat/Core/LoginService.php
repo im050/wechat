@@ -160,28 +160,32 @@ class LoginService
         try {
             $data = app()->api->getContact();
         } catch (\Exception $e) {
-            Console::log($e->getMessage(), Console::ERROR);
+            Console::log("获取联系人失败...错误信息：" . $e->getMessage(), Console::ERROR);
         }
 
+
+        //处理contact接口获取的用户列表
         $member_list = $data['MemberList'];
 
         foreach ($member_list as $key => $item) {
             $members->push($item);
         }
 
+        //处理wxwebinit接口获取的用户列表
         $contact_list = $this->init_response['ContactList'];
 
-        foreach($contact_list as $key => $item) {
+        foreach ($contact_list as $key => $item) {
             $members->push($item);
         }
 
         Console::log(
-            "您共有" .
+            "共初始化" .
             "联系人：" . members()->getContacts()->count() . "个," .
             "群组：" . members()->getGroups()->count() . "个," .
             "公众号：" . members()->getSpecials()->count() . "个, " .
             "特殊号：" . members()->getSpecials()->count() . "个。"
         );
+
     }
 
     /**
@@ -244,7 +248,7 @@ class LoginService
 
             $img_url = 'https://login.weixin.qq.com/qrcode/' . $uuid;
 
-            call_user_func(function() use($img_url){
+            call_user_func(function () use ($img_url) {
                 $content = file_get_contents($img_url);
                 $path = app()->config->qrcode_img_path;
                 file_put_contents($path . DIRECTORY_SEPARATOR . 'qrcode.png', $content);
