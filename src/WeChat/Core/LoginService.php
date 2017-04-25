@@ -174,6 +174,14 @@ class LoginService
         foreach($contact_list as $key => $item) {
             $members->push($item);
         }
+
+        Console::log(
+            "您共有" .
+            "联系人：" . members()->getContacts()->count() . "个," .
+            "群组：" . members()->getGroups()->count() . "个," .
+            "公众号：" . members()->getSpecials()->count() . "个, " .
+            "特殊号：" . members()->getSpecials()->count() . "个。"
+        );
     }
 
     /**
