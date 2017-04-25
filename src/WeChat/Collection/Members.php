@@ -125,7 +125,7 @@ class Members
      * 根据username得到联系人实例
      *
      * @param $username
-     * @return null
+     * @return mixed
      */
     public function getContactByUserName($username)
     {
