@@ -132,7 +132,7 @@ class Message
      */
     public function isGroup()
     {
-        return substr($this->from_user_name, 0, 2) == '@@' || substr($this->to_user_name, 0, 2) == '@@';
+        return Members::isGroup($this->from_user_name) || Members::isGroup($this->to_user_name);
     }
 
     public function getMessageID() {
