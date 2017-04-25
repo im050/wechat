@@ -123,7 +123,7 @@ class Members
 
     /**
      * 根据username得到联系人实例
-     * 
+     *
      * @param $username
      * @return null
      */
@@ -152,19 +152,74 @@ class Members
      */
     public static function getUserType($item)
     {
-        if (substr($item['UserName'], 0, 2) == "@@") {
+        if (self::isGroup($item['UserName'])) {
             return Members::TYPE_GROUP;
+        } else if (self::isContact($item['UserName'], $item['VerifyFlag'])) {
+            return Members::TYPE_CONTACT;
+        } else if (self::isOfficial($item['UserName'], $item['VerifyFlag'])) {
+            return Members::TYPE_OFFICIAL;
         } else {
-            if (($item['VerifyFlag'] & 8) != 0) {
-                if (in_array($item['UserName'], self::$special_username)) {
-                    return Members::TYPE_SPECIAL;
-                } else {
-                    return Members::TYPE_OFFICIAL;
-                }
-            } else {
-                return Members::TYPE_CONTACT;
-            }
+            return Members::TYPE_SPECIAL;
         }
+    }
+
+    /**
+     * 根据用户名判断是否是群组
+     *
+     * @param $username
+     * @return boolean
+     */
+    public static function isGroup($username)
+    {
+        return substr($username, 0, 2) == '@@';
+    }
+
+    /**
+     * 判断是否常规联系人
+     *
+     * @param $username
+     * @param int $verify_flag
+     * @return boolean;
+     */
+    public static function isContact($username, $verify_flag = 0)
+    {
+        return self::isContactOrOfficial($username, $verify_flag, true);
+    }
+
+    /**
+     * 判断是否公众号
+     *
+     * @param $username
+     * @param int $verify_flag
+     * @return bool
+     */
+    public static function isOfficial($username, $verify_flag = 0)
+    {
+        return self::isContactOrOfficial($username, $verify_flag, false);
+    }
+
+    /**
+     * 通用判断公众号或者常规联系人
+     *
+     * @param $username
+     * @param $verify_flag
+     * @param bool $type
+     * @return bool
+     */
+    public static function isContactOrOfficial($username, $verify_flag, $type = true)
+    {
+        $pattern = '/^(@[a-z0-9]{1})/';
+        preg_match($pattern, $username, $matches);
+        if (empty($matches)) {
+            return false;
+        }
+        $flag = (($verify_flag & 8) == 0);
+
+        if ($type == false) {
+            $flag = !$flag;
+        }
+
+        return $flag;
     }
 
 }
