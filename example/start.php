@@ -21,7 +21,7 @@ $robot = new Robot([
 
 $shut = [];
 
-$robot->onMessage(function (Message $message) use ($robot) {
+$robot->onMessage(function (Message $message, Robot $robot) {
 
     $shut = & $GLOBALS['shut'];
 
@@ -85,44 +85,26 @@ $robot->onMessage(function (Message $message) use ($robot) {
                 'from_message' => $message->string(),
                 'userid'       => md5($targetUser->getUserName())
             ]);
-
-            //普通发送消息
-            /*
-            TaskQueue::run('SendMessage', [
-                'username' => $message->getFromUserName(),
-                'content' => '消息主体'
-            ]);
-            */
+        } catch (Exception $e) {
+            Console::log("发送消息失败");
+        }
+    } else {
+        switch($message->getMessageType()) {
+            case Message::VOICE_MESSAGE:
+                $type_name = '语音';
+                break;
+            case Message::IMAGE_MESSAGE:
+                $type_name = '图片';
+                break;
+            default:
+                $type_name = '我不知道的东西';
+        }
+        try {
+            $targetUser->sendMessage("我猜你发的是" . $type_name);
         } catch (Exception $e) {
             Console::log("发送消息失败");
         }
     }
-//    } else {
-//        switch($message->getMessageType()) {
-//            case Message::VOICE_MESSAGE:
-//                $type_name = '语音';
-//                break;
-//            case Message::IMAGE_MESSAGE:
-//                $type_name = '图片';
-//                break;
-//            case Message::ANIMATE_MESSAGE:
-//                $type_name = '动图';
-//                break;
-//            case Message::VIDEO_MESSAGE:
-//                $type_name = '视频';
-//                break;
-//            default:
-//                $type_name = '我不知道的东西';
-//        }
-//        try {
-//            TaskQueue::run('SendMessage', [
-//                'username' => $message->getFromUserName(),
-//                'content'  => '我猜你发的是' . $type_name . '。'
-//            ]);
-//        } catch (Exception $e) {
-//            Console::log("发送消息失败");
-//        }
-//    }
 
     return true;
 });
