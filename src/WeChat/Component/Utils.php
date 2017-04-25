@@ -1,9 +1,21 @@
 <?php
 namespace Im050\WeChat\Component;
 
-
+/**
+ * Class Utils
+ * 工具方法类
+ *
+ * @package Im050\WeChat\Component
+ */
 class Utils
 {
+
+    /**
+     * XML转数组
+     *
+     * @param $xml
+     * @return mixed
+     */
     public static function xmlToArray($xml)
     {
         libxml_disable_entity_loader(true);
@@ -11,16 +23,33 @@ class Utils
         return $values;
     }
 
+    /**
+     * 时间戳
+     *
+     * @return float
+     */
     public static function timeStamp()
     {
         return round(microtime(true) * 1000);
     }
 
+    /**
+     * 判断是否win
+     *
+     * @return bool
+     */
     public static function isWin()
     {
         return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
     }
 
+    /**
+     * 生成随机字符
+     *
+     * @param int $length
+     * @param bool $is_number
+     * @return string
+     */
     public static function randomString($length = 16, $is_number = false)
     {
         $number_poor = "0123456789";
@@ -40,15 +69,34 @@ class Utils
         return $string;
     }
 
+    /**
+     * 生成设备号
+     *
+     * @return string
+     */
     public static function generateDeviceID()
     {
         return 'e' . Utils::randomString(15, true);
     }
 
+    /**
+     * 数组转JSON
+     *
+     * @param array $data
+     * @param int $flag
+     * @return string
+     */
     public static function json_encode($data, $flag = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) {
         return json_encode($data, $flag);
     }
 
+    /**
+     * JSON转数组
+     *
+     * @param string $json
+     * @param int $flag
+     * @return mixed
+     */
     public static function json_decode($json, $flag = JSON_OBJECT_AS_ARRAY) {
         return json_decode($json, $flag);
     }
