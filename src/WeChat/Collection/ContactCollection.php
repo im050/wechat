@@ -32,6 +32,7 @@ class ContactCollection extends Collection
                 return null;
             }
             if ($contact != null) {
+                $this->put($username, $contact);
                 return ContactFactory::create($contact);
             }
         }
