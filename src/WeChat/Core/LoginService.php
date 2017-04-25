@@ -4,6 +4,7 @@ namespace Im050\WeChat\Core;
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
+use Im050\WeChat\Task\TaskQueue;
 use PHPQRCode\QRcode;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\ConsoleOutput;

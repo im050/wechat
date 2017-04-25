@@ -19,7 +19,7 @@ class Robot
 
     protected $config = [
         'tmp_path'    => '',
-        'debug' => false,
+        'debug'       => false,
         'save_qrcode' => false
     ];
 
@@ -64,7 +64,18 @@ class Robot
     public function run()
     {
         if ((new LoginService())->start()) {
-            app()->message->listen();
+            if (config('daemonize')) {
+                (new \swoole_process(function ($worker) {
+                    $sid = posix_setsid();
+                    if ($sid < 0)
+                        $worker->exit(0);
+                    app()->message->listen();
+                    $worker->exit(0);
+                }, true))->start();
+                exit(0);
+            } else {
+                app()->message->listen();
+            }
         }
     }
 
@@ -120,11 +131,13 @@ class Robot
         return Members::getInstance()->getGroups();
     }
 
-    public function getSpecials() {
+    public function getSpecials()
+    {
         return Members::getInstance()->getSpecials();
     }
 
-    public function getOfficials() {
+    public function getOfficials()
+    {
         return Members::getInstance()->getOfficials();
     }
 

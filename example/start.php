@@ -14,7 +14,8 @@ use Im050\WeChat\Task\TaskQueue;
 $robot = new Robot([
     'tmp_path'    => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
     'debug' => true,
-	'save_qrcode' => true
+	'save_qrcode' => true,
+    'daemonize' => true
 ]);
 
 $shut = [];
