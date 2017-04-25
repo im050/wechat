@@ -1,5 +1,5 @@
+#!/usr/bin/env php
 <?php
-
 define('BASE_PATH', dirname(dirname(__FILE__)));
 
 include(BASE_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
@@ -15,7 +15,7 @@ $robot = new Robot([
     'tmp_path'    => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
     'debug' => true,
 	'save_qrcode' => true,
-    'daemonize' => true
+    'daemonize' => false
 ]);
 
 $shut = [];
