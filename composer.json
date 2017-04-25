@@ -21,7 +21,7 @@
         "illuminate/support": "^5.4"
     },
     "autoload": {
-        "files": ["src/WeChat/helpers.php"],
+        "files": ["src/helpers.php"],
         "psr-4": { "Im050\\WeChat\\": "src/WeChat/" }
     }
 }
