@@ -182,7 +182,7 @@ class LoginService
             "共初始化" .
             "联系人：" . members()->getContacts()->count() . "个," .
             "群组：" . members()->getGroups()->count() . "个," .
-            "公众号：" . members()->getSpecials()->count() . "个, " .
+            "公众号：" . members()->getOfficials()->count() . "个, " .
             "特殊号：" . members()->getSpecials()->count() . "个。"
         );
 
@@ -234,7 +234,6 @@ class LoginService
      */
     public function openQRcode()
     {
-
         $max_times = 10;
 
         for ($retry_times = 0; $retry_times <= $max_times; $retry_times++) {
@@ -246,14 +245,13 @@ class LoginService
 
             app()->auth->setUuid($uuid);
 
-            $img_url = 'https://login.weixin.qq.com/qrcode/' . $uuid;
+            if (config('save_qrcode')) {
+                //下载二维码图片
+                $img_url = 'https://login.weixin.qq.com/qrcode/' . $uuid;
+                FileSystem::download($img_url, config('tmp_path') . '/qrcode.png');
+            }
 
-            call_user_func(function () use ($img_url) {
-                $content = file_get_contents($img_url);
-                $path = app()->config->qrcode_img_path;
-                file_put_contents($path . DIRECTORY_SEPARATOR . 'qrcode.png', $content);
-            });
-
+            //生成二维码在控制台
             $text = 'https://login.weixin.qq.com/l/' . $uuid;
             $this->generateQRcode($text);
             return;

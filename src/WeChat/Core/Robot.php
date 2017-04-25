@@ -18,9 +18,9 @@ class Robot
     protected $events = [];
 
     protected $config = [
-        'cookie_path' => '',
-        'log_path'    => '',
         'tmp_path'    => '',
+        'debug' => false,
+        'save_qrcode' => false
     ];
 
     public function __construct($config = array())
@@ -41,7 +41,7 @@ class Robot
         $this->boot();
 
         //配置应用
-        $cookie_path = isset($config['cookie_path']) ? $config['cookie_path'] . DIRECTORY_SEPARATOR . 'cookies.txt' : __DIR__ . DIRECTORY_SEPARATOR . 'cookies.txt';
+        $cookie_path = config('tmp_path') . '/cookies.txt';
 
         //设置cookie路径
         http()->setConfig('cookiejar', $cookie_path);
@@ -100,7 +100,7 @@ class Robot
             $config = Config::getInstance();
             $tmp_path = $config->get('tmp_path');
             return new Storage(new FileHandler([
-                'path' => $tmp_path . DIRECTORY_SEPARATOR . 'keymap.json'
+                'file' => $tmp_path . DIRECTORY_SEPARATOR . 'keymap.json'
             ]));
         });
     }

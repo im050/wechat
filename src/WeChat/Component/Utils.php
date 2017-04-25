@@ -100,4 +100,18 @@ class Utils
     public static function json_decode($json, $flag = JSON_OBJECT_AS_ARRAY) {
         return json_decode($json, $flag);
     }
+
+    /**
+     * 获取当前时间
+     *
+     * @param string $time_zone
+     * @param string $format
+     * @return false|string
+     */
+    public static function now($time_zone = '', $format = 'Y-m-d H:i:s') {
+        if (!empty($time_zone)) {
+            date_default_timezone_set($time_zone);
+        }
+        return date($format, time());
+    }
 }

@@ -143,15 +143,4 @@ class Message
         return $this->msg_type;
     }
 
-    public function __destruct() {
-        $log = "TYPE: " .$this->getMessageType() . PHP_EOL;
-        $log .= "JSON: " . Utils::json_encode($this->message) . PHP_EOL;
-        $log .= "TIME: " . date("Y-m-d H:i:s", time()) . PHP_EOL;
-        file_put_contents(
-            app()->config->json_path,
-            $log .PHP_EOL,
-            FILE_APPEND | LOCK_EX
-        );
-    }
-
 }

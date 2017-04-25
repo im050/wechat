@@ -10,6 +10,7 @@ namespace Im050\WeChat\Message;
 
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Console;
+use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Message\Formatter\Text;
@@ -88,15 +89,25 @@ class MessageHandler
                     //释放资源
                     unset($message);
                 }
+                if (config('debug')) {
+                    $log = [
+                        '消息类型' => $msg_type,
+                        '消息数据' => Utils::json_encode($msg),
+                        '日志时间' => Utils::now()
+                    ];
+                    $path = config('tmp_path') . '/log/message.log';
+                    Logger::write($log, $path);
+                }
             } catch (\Exception $e) {
-                $log = "TYPE: Unknown Message Type, code: {$msg_type}" . PHP_EOL;
-                $log .= "JSON:" . Utils::json_encode($msg) . PHP_EOL;
-                $log .= "TIME:" . date("Y-m-d H:i:s", time()) . PHP_EOL;
-                file_put_contents(
-                    app()->config->log_path,
-                    $log . PHP_EOL,
-                    FILE_APPEND | LOCK_EX
-                );
+                if (config('debug')) {
+                    $log = [
+                        '消息类型' => $msg_type,
+                        '消息数据' => Utils::json_encode($msg),
+                        '日志时间' => Utils::now()
+                    ];
+                    $path = config('tmp_path') . '/log/error_message.log';
+                    Logger::write($log, $path);
+                }
                 Console::log("收到未知消息格式的数据类型，[MSG_TYPE] : {$msg_type}", Console::DEBUG);
             }
         }
@@ -108,7 +119,6 @@ class MessageHandler
         if (!($message instanceof Text)) {
             return;
         }
-        $members = Members::getInstance();
         $from_user = $message->getMessenger();
         $to_user = $message->getReceiver();
         if ($from_user) {

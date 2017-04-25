@@ -9,6 +9,7 @@
 namespace Im050\WeChat\Component\Storage\Handler;
 
 use Im050\WeChat\Component\Utils;
+use Im050\WeChat\Core\FileSystem;
 
 class FileHandler implements Handler
 {
@@ -23,7 +24,7 @@ class FileHandler implements Handler
     {
         $this->config = $config;
 
-        if (!isset($config['path'])) {
+        if (!isset($config['file'])) {
             throw new \Exception('未指定 FileHandle 存放路径');
         }
 
@@ -31,9 +32,12 @@ class FileHandler implements Handler
     }
 
 
+    /**
+     * 装载数据
+     */
     public function load()
     {
-        $path = $this->config['path'];
+        $path = $this->config['file'];
 
         if (file_exists($path)) {
             $content = file_get_contents($path, LOCK_SH);
@@ -52,13 +56,8 @@ class FileHandler implements Handler
      */
     public function save()
     {
-        $path = $this->config['path'];
-        file_put_contents($path, Utils::json_encode($this->data), LOCK_EX);
-    }
-
-    public function __destruct()
-    {
-        //
+        $file = $this->config['file'];
+        FileSystem::write(Utils::json_encode($this->data), $file);
     }
 
 }
