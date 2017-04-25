@@ -213,10 +213,11 @@ class Members
         if (empty($matches)) {
             return false;
         }
-        $flag = (($verify_flag & 8) == 0);
 
-        if ($type == false) {
-            $flag = !$flag;
+        if ($type == true) {
+            $flag = (($verify_flag & 8) == 0);
+        } else {
+            $flag = (($verify_flag & 8) != 0);
         }
 
         return $flag;
