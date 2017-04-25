@@ -8,9 +8,20 @@
 
 ## 特点
 
-1. 支持免扫码登录
+1. 支持扫码后5分钟内免扫码登录
 2. 异步回复消息（基于swoole的process）
 3. 未完待续...
+
+## 安装
+
+1. 下载
+```
+git clone https://github.com/im050/wechat_robot.git
+```
+2. 更新依赖包
+```
+composer update
+```
 
 ## 运行
 
