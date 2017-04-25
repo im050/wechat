@@ -330,6 +330,11 @@ class Api
 
     public function getBatchContact($users)
     {
+
+        if (is_string($users)) {
+            $users = (array) $users;
+        }
+
         $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxbatchgetcontact?' . http_build_query([
                 'type'        => 'ex',
                 'pass_ticket' => app()->auth->pass_ticket,
