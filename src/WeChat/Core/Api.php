@@ -6,8 +6,18 @@ use Im050\WeChat\Component\Utils;
 class Api
 {
 
+    /**
+     * 基础请求信息
+     *
+     * @var array
+     */
     public $base_request = [];
 
+    /**
+     * 授权信息获取uri
+     *
+     * @var string
+     */
     public $redirect_uri = '';
 
     /**
@@ -212,6 +222,11 @@ class Api
         return $base_response;
     }
 
+    /**
+     * 获取UUID
+     *
+     * @return bool
+     */
     public function getUuid()
     {
         $url = uri('login_uri') . '/jslogin';
@@ -238,6 +253,12 @@ class Api
         }
     }
 
+    /**
+     * 获取登录状态
+     *
+     * @return int
+     * @throws \Exception
+     */
     public function getLoginStatus()
     {
         if (empty(app()->auth->uuid)) {
@@ -272,6 +293,12 @@ class Api
         return $code;
     }
 
+    /**
+     * 获取权限信息
+     *
+     * @return array
+     * @throws \Exception
+     */
     public function getToken()
     {
 
@@ -299,6 +326,32 @@ class Api
         ];
 
         return $result;
+    }
+
+    public function getBatchContact($users)
+    {
+        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxbatchgetcontact?' . http_build_query([
+                'type'        => 'ex',
+                'pass_ticket' => app()->auth->pass_ticket,
+                'r'           => Utils::timeStamp()
+            ]);
+
+        $list = [];
+
+        foreach ($users as $username) {
+            $list[] = ["UserName" => $username, "EncryChatRoomId" => ""];
+        }
+
+        $payload = [
+            'BaseRequest' => $this->base_request,
+            "Count"       => count($users),
+            "List"        => $list
+        ];
+
+        $content = http()->post($url, Utils::json_encode($payload));
+        $content = Utils::json_decode($content);
+
+        return $content;
     }
 
 }
