@@ -40,12 +40,19 @@ class MessageHandler
 
         $api = app()->api;
 
+        $time = 0;
+
         while (true) {
 
             list($retcode, $selector) = $api->syncCheck();
 
             if ($retcode == 1100 || $retcode == 1101) {
                 Console::log("微信已经退出或在其他地方登录", Console::ERROR);
+            }
+
+            if (time() - $time > 60) {
+                app()->api->sendMessage('filehelper', '心跳 ' . Utils::now());
+                $time = time();
             }
 
             switch ($selector) {
