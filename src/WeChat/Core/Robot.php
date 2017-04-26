@@ -1,7 +1,6 @@
 <?php
 namespace Im050\WeChat\Core;
 
-use Im050\WeChat\Collection\Contacts;
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\Console;

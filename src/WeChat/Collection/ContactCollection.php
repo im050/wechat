@@ -39,6 +39,12 @@ class ContactCollection extends Collection
         return null;
     }
 
+    /**
+     * 通过username获取成员详细信息
+     *
+     * @param $username
+     * @return mixed|null
+     */
     public function findContactFromAPI($username)
     {
         $data = app()->api->getBatchContact($username);
