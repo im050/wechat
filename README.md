@@ -27,3 +27,7 @@ composer update
 ## 运行
 
 > php example/start.php
+
+## 截图
+
+ ![image](https://github.com/im050/wechat_robot/raw/master/screenshots/screenshot.png)
