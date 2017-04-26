@@ -10,7 +10,21 @@ namespace Im050\WeChat\Collection\Element;
 
 class Group extends MemberElement
 {
-    public function getMemberList() {
+
+    /**
+     * 成员处理
+     *
+     * @param $element
+     */
+    public function handleElement($element)
+    {
+        if ($element['RemarkName'] == '') {
+            $element['RemarkName'] = '未知群';
+        }
+    }
+
+    public function getMemberList()
+    {
         return [];
     }
 }
