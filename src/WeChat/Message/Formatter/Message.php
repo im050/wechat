@@ -23,6 +23,8 @@ class Message
 
     public $msg_type;
 
+    public $real_from_user_name;
+
     //文本消息
     const TEXT_MESSAGE = 1;
     //图片消息
@@ -58,7 +60,7 @@ class Message
     const MICROVIDEO_MESSAGE = 62;
     //消息撤回
     const RECALLED_MESSAGE = 10002;
-    //进入群
+    //群系统消息
     const SYS_MESSAGE = 10000;
 
     public function __construct($message)
@@ -74,6 +76,9 @@ class Message
         if (substr($this->getFromUserName(), 0, 2) == '@@') {
             $content = explode(':'.PHP_EOL, $this->content);
             $this->content = $content[1];
+            $this->real_from_user_name = $content[0];
+        } else {
+            $this->real_from_user_name = $this->from_user_name;
         }
         //其他信息交给handle处理
         $this->handleMessage();
@@ -95,6 +100,10 @@ class Message
     public function string()
     {
         return $this->string;
+    }
+
+    public function getRealFromUserName() {
+        return $this->real_from_user_name;
     }
 
     /**
