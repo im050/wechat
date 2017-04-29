@@ -9,12 +9,12 @@
 namespace Im050\WeChat\Message\Formatter;
 
 
-class Voice extends Message
+class Video extends Message
 {
     public function handleMessage()
     {
         $this->download();
 
-        $this->string = "语音";
+        $this->string = "视频";
     }
 }

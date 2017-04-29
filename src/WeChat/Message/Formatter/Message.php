@@ -2,6 +2,7 @@
 namespace Im050\WeChat\Message\Formatter;
 
 use Im050\WeChat\Collection\Members;
+use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\MessageHandler;
 use Im050\WeChat\Task\TaskQueue;
@@ -33,7 +34,7 @@ class Message
     //语音消息
     const VOICE_MESSAGE = 34;
     //视频消息
-    const VOIDE_MESSAGE = 43;
+    const VIDEO_MESSAGE = 43;
     //验证消息
     const VERIFYMSG_MESSAGE = 37;
     //好友请求消息
@@ -164,9 +165,12 @@ class Message
             $type = 'image';
         } else if ($this instanceof Voice) {
             $type = 'voice';
+        } else if ($this instanceof Video) {
+            $type = 'video';
         } else {
             return false;
         }
+        Console::log("正在下载[" . $type . "]资源，MsgId：" . $this->msg_id);
         TaskQueue::run('Download', [
             'type' => $type,
             'msg_id' => $this->msg_id

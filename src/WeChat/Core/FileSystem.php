@@ -56,7 +56,30 @@ class FileSystem
     public static function saveImage($msg_id) {
         $api = app()->api;
         $image = $api->getMessageImage($msg_id);
+        if (strlen($image) <= 0) {
+            return false;
+        }
         $file = self::getImagePath() . DIRECTORY_SEPARATOR . $msg_id . '.jpg';
         return self::write($image, $file);
+    }
+
+    public static function saveVoice($msg_id) {
+        $api = app()->api;
+        $voice = $api->getMessageVoice($msg_id);
+        if (strlen($voice) <= 0) {
+            return false;
+        }
+        $file = self::getVoicePath() . DIRECTORY_SEPARATOR . $msg_id . '.mp3';
+        return self::write($voice, $file);
+    }
+
+    public static function saveVideo($msg_id) {
+        $api = app()->api;
+        $video = $api->getMessageVideo($msg_id);
+        if (strlen($video) <= 0) {
+            return false;
+        }
+        $file = self::getVideoPath() . DIRECTORY_SEPARATOR . $msg_id . '.mp4';
+        return self::write($video, $file);
     }
 }

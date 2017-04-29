@@ -14,6 +14,8 @@ use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\Formatter\Image;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Message\Formatter\Text;
+use Im050\WeChat\Message\Formatter\Video;
+use Im050\WeChat\Message\Formatter\Voice;
 
 class MessageHandler
 {
@@ -65,7 +67,12 @@ class MessageHandler
                 case 6:
                 case 7:
                     //拉取新消息
-                    $message = $api->pullMessage();
+                    try {
+                        $message = $api->pullMessage();
+                    } catch (\Exception $e) {
+                        Console::log("同步获取消息失败...", Console::WARNING);
+                        continue;
+                    }
                     if (!checkBaseResponse($message)) {
                         Console::log("接收数据异常，程序结束", Console::ERROR);
                     }
@@ -141,6 +148,10 @@ class MessageHandler
             Console::log("$from_user_name 对 $to_user_name 说 ：" . $message->string());
         } else if ($message instanceof Image) {
             Console::log("$from_user_name 对 $to_user_name 发送了一张图片");
+        } else if ($message instanceof Voice) {
+            Console::log("$from_user_name 对 $to_user_name 发送了一段语音");
+        } else if ($message instanceof Video) {
+            Console::log("$from_user_name 对 $to_user_name 发送了一段视频");
         }
 
     }

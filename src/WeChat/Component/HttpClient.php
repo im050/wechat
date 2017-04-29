@@ -22,7 +22,7 @@ class HttpClient
      * @var array
      */
     public $config = [
-        'timeout' => 35,
+        'timeout' => 60,
         //'cookie' => '',
         //'header' => [],
         'useragent' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
@@ -40,6 +40,7 @@ class HttpClient
         'timeout' => CURLOPT_TIMEOUT,
         'cookie' => CURLOPT_COOKIE,
         'header' => CURLOPT_HEADER,
+        'headers' => CURLOPT_HTTPHEADER,
         'user_agent' => CURLOPT_USERAGENT,
         'return_transfer' => CURLOPT_RETURNTRANSFER,
         'referer' => CURLOPT_REFERER,

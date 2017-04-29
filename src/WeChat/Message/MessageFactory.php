@@ -27,7 +27,9 @@ class MessageFactory
     public static $factory = [
         Message::TEXT_MESSAGE => Text::class,
         Message::IMAGE_MESSAGE => Image::class,
-        Message::VOICE_MESSAGE => Voice::class
+        Message::VOICE_MESSAGE => Voice::class,
+        Message::MICROVIDEO_MESSAGE => Video::class,
+        Message::VIDEO_MESSAGE => Video::class
     ];
 
     public static function create($type, $msg)

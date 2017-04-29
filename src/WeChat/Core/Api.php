@@ -1,6 +1,7 @@
 <?php
 namespace Im050\WeChat\Core;
 
+use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 
 class Api
@@ -139,6 +140,46 @@ class Api
         return $flag;
     }
 
+    protected function getMessageResource($type, $msg_id)
+    {
+        if (!in_array($type, ['image', 'voice', 'video'])) {
+            return false;
+        }
+        if (empty($msg_id)) {
+            return false;
+        }
+        $path = [
+            'image' => 'webwxgetmsgimg',
+            'voice' => 'webwxgetvoice',
+            'video' => 'webwxgetvideo',
+        ];
+        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/' . $path[$type] . '?' . http_build_query([
+                'MsgID' => $msg_id,
+                'skey'  => app()->auth->skey
+            ]);
+
+        if ($type == 'video') {
+            $http_config = [
+                'timeout' => 300,
+                'headers' => [
+                    'Range: bytes=0-'
+                ]
+            ];
+        } else {
+            $http_config = [
+                'timeout' => 60,
+            ];
+        }
+
+        try {
+            $data = http()->get($url, [], $http_config);
+        } catch (\Exception $e) {
+            Console::log("下载资源超时", Console::WARNING);
+            return null;
+        }
+        return $data;
+    }
+
     /**
      * 获取图片数据
      *
@@ -147,12 +188,29 @@ class Api
      */
     public function getMessageImage($msg_id)
     {
-        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxgetmsgimg?' . http_build_query([
-                'MsgID' => $msg_id,
-                'skey'  => app()->auth->skey
-            ]);
-        $data = http()->get($url);
-        return $data;
+        return $this->getMessageResource('image', $msg_id);
+    }
+
+    /**
+     * 获取语音
+     *
+     * @param $msg_id
+     * @return array|bool|mixed
+     */
+    public function getMessageVoice($msg_id)
+    {
+        return $this->getMessageResource('voice', $msg_id);
+    }
+
+    /**
+     * 获取视频
+     *
+     * @param $msg_id
+     * @return array|bool|mixed
+     */
+    public function getMessageVideo($msg_id)
+    {
+        return $this->getMessageResource('video', $msg_id);
     }
 
     /**
@@ -338,7 +396,7 @@ class Api
     {
 
         if (is_string($users)) {
-            $users = (array) $users;
+            $users = (array)$users;
         }
 
         $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxbatchgetcontact?' . http_build_query([

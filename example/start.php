@@ -4,7 +4,6 @@ define('BASE_PATH', dirname(dirname(__FILE__)));
 
 include(BASE_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
-use Im050\WeChat\Component\Console;
 use Im050\WeChat\Core\Account;
 use Im050\WeChat\Core\Robot;
 use Im050\WeChat\Message\Formatter\Message;
@@ -13,16 +12,16 @@ use Im050\WeChat\Task\TaskQueue;
 
 $robot = new Robot([
     'tmp_path'    => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
-    'debug' => true,
-	'save_qrcode' => true,
-    'daemonize' => false
+    'debug'       => true,
+    'save_qrcode' => true,
+    'daemonize'   => false
 ]);
 
 $shut = [];
 
 $robot->onMessage(function (Message $message, Robot $robot) {
 
-    $shut = & $GLOBALS['shut'];
+    $shut = &$GLOBALS['shut'];
 
     $targetUser = $message->getMessenger();
 
@@ -43,13 +42,14 @@ $robot->onMessage(function (Message $message, Robot $robot) {
         if ($message->string() == "#闭嘴") {
             TaskQueue::run('SendMessage', [
                 'username' => $targetUser->getUserName(),
-                'content' => '已经停止自动应答 [' . $targetUser->getRemarkName() . '] 的消息'
+                'content'  => '已经停止自动应答 [' . $targetUser->getRemarkName() . '] 的消息'
             ]);
             $shut[$targetUser->getUserName()] = true;
         } else if ($message->string() == "#说话") {
+            \Im050\WeChat\Component\Console::log("接收到指令");
             TaskQueue::run('SendMessage', [
                 'username' => $targetUser->getUserName(),
-                'content' => '机器人正在待命'
+                'content'  => '机器人正在待命'
             ]);
             $shut[$targetUser->getUserName()] = false;
             return $shut;
@@ -64,7 +64,7 @@ $robot->onMessage(function (Message $message, Robot $robot) {
     $white_list = [
         '机器人体验群',
         '杨杰',
-        'happyday',
+        '202',
         '皮皮鳝，往里钻',
         '这样才是老子最酷灬',
         '史春阳',
@@ -78,32 +78,28 @@ $robot->onMessage(function (Message $message, Robot $robot) {
     }
 
     if ($message instanceof Text) {
-        try {
-            //图灵机器人自动回复
-            TaskQueue::run('RobotReply', [
-                'username'     => $targetUser->getUserName(),
-                'from_message' => $message->string(),
-                'userid'       => md5($targetUser->getUserName())
-            ]);
-        } catch (Exception $e) {
-            Console::log("发送消息失败");
-        }
+        //图灵机器人自动回复
+        TaskQueue::run('RobotReply', [
+            'username'     => $targetUser->getUserName(),
+            'from_message' => $message->string(),
+            'userid'       => md5($targetUser->getUserName())
+        ]);
     } else {
-        switch($message->getMessageType()) {
+        switch ($message->getMessageType()) {
             case Message::VOICE_MESSAGE:
                 $type_name = '语音';
                 break;
             case Message::IMAGE_MESSAGE:
                 $type_name = '图片';
                 break;
+            case Message::VIDEO_MESSAGE:
+            case Message::MICROVIDEO_MESSAGE:
+                $type_name = '视频';
+                break;
             default:
                 $type_name = '我不知道的东西';
         }
-        try {
-            $targetUser->sendMessage("我猜你发的是" . $type_name);
-        } catch (Exception $e) {
-            Console::log("发送消息失败");
-        }
+        $targetUser->sendMessage("我猜你发的是" . $type_name);
     }
 
     return true;
