@@ -140,7 +140,7 @@ class Api
     }
 
     /**
-     * 获取图片地址
+     * 获取图片数据
      *
      * @param $msg_id
      * @return array|mixed
@@ -328,6 +328,12 @@ class Api
         return $result;
     }
 
+    /**
+     * 批量获取用户资料
+     *
+     * @param $users
+     * @return mixed
+     */
     public function getBatchContact($users)
     {
 
