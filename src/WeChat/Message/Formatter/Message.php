@@ -4,6 +4,7 @@ namespace Im050\WeChat\Message\Formatter;
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\MessageHandler;
+use Im050\WeChat\Task\TaskQueue;
 
 class Message
 {
@@ -72,6 +73,7 @@ class Message
         $this->to_user_name = $this->message['ToUserName'];
         $this->create_time = $this->message['CreateTime'];
         $this->msg_type = $this->message['MsgType'];
+        $this->msg_id = $this->message['MsgId'];
         //判断是否群消息
         if (substr($this->getFromUserName(), 0, 2) == '@@') {
             $content = explode(':'.PHP_EOL, $this->content);
@@ -150,6 +152,26 @@ class Message
 
     public function getMessageType() {
         return $this->msg_type;
+    }
+
+    /**
+     * 下载消息资源
+     *
+     * @return bool
+     */
+    public function download() {
+        if ($this instanceof Image) {
+            $type = 'image';
+        } else if ($this instanceof Voice) {
+            $type = 'voice';
+        } else {
+            return false;
+        }
+        TaskQueue::run('Download', [
+            'type' => $type,
+            'msg_id' => $this->msg_id
+        ]);
+        return true;
     }
 
 }

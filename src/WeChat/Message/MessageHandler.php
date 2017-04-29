@@ -8,10 +8,10 @@
 
 namespace Im050\WeChat\Message;
 
-use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
+use Im050\WeChat\Message\Formatter\Image;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Message\Formatter\Text;
 
@@ -123,11 +123,9 @@ class MessageHandler
 
     public function printMessage(Message $message)
     {
-        if (!($message instanceof Text)) {
-            return;
-        }
         $from_user = $message->getMessenger();
         $to_user = $message->getReceiver();
+
         if ($from_user) {
             $from_user_name = $from_user->getRemarkName();
         } else {
@@ -138,7 +136,13 @@ class MessageHandler
         } else {
             $to_user_name = $message->getToUserName();
         }
-        Console::log("$from_user_name 对 $to_user_name 说 ：" . $message->string());
+
+        if ($message instanceof Text) {
+            Console::log("$from_user_name 对 $to_user_name 说 ：" . $message->string());
+        } else if ($message instanceof Image) {
+            Console::log("$from_user_name 对 $to_user_name 发送了一张图片");
+        }
+
     }
 
     public function onMessage(\Closure $closure, $robot)

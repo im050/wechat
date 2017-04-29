@@ -69,7 +69,8 @@ $robot->onMessage(function (Message $message, Robot $robot) {
         '这样才是老子最酷灬',
         '史春阳',
         '罗志晨',
-        '张帆'
+        '张帆',
+        'filehelper'
     ];
 
     if (!in_array($targetUser->getRemarkName(), $white_list)) {

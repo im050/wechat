@@ -13,6 +13,8 @@ class Image extends Message
 {
     public function handleMessage()
     {
+        $this->download();
+
         $this->string = "图片";
     }
 }
