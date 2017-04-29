@@ -36,6 +36,9 @@ class MessageHandler
         return self::$_instance;
     }
 
+    /**
+     * 监听消息
+     */
     public function listen()
     {
         Console::log("开始监听消息...");
@@ -45,16 +48,20 @@ class MessageHandler
         $time = 0;
 
         while (true) {
-
-            list($retcode, $selector) = $api->syncCheck();
-
+            try {
+                list($retcode, $selector) = $api->syncCheck();
+            } catch (\Exception $e) {
+                Console::log("监听消息失败，Exception：" . $e->getMessage(), Console::WARNING);
+                continue;
+            }
             if ($retcode == 1100 || $retcode == 1101) {
                 Console::log("微信已经退出或在其他地方登录", Console::ERROR);
             }
 
-            if (time() - $time > 60) {
-                app()->api->sendMessage('filehelper', '心跳 ' . Utils::now());
+            if (time() - $time > 180) {
                 $time = time();
+                app()->api->sendMessage('filehelper', '心跳 ' . Utils::now());
+                app()->keymap->set('login_time', $time)->save();
             }
 
             switch ($selector) {
@@ -84,6 +91,12 @@ class MessageHandler
         }
     }
 
+    /**
+     * 处理消息
+     *
+     * @param $message
+     * @return bool
+     */
     public function handleMessage($message)
     {
 
@@ -128,6 +141,11 @@ class MessageHandler
         return true;
     }
 
+    /**
+     * 控制台打印消息内容
+     *
+     * @param Message $message
+     */
     public function printMessage(Message $message)
     {
         $from_user = $message->getMessenger();
@@ -156,12 +174,24 @@ class MessageHandler
 
     }
 
+    /**
+     * 消息触发回调
+     *
+     * @param \Closure $closure
+     * @param $robot
+     */
     public function onMessage(\Closure $closure, $robot)
     {
         $this->events['message']['closure'] = $closure;
         $this->events['message']['robot'] = $robot;
     }
 
+    /**
+     * 解析消息内容
+     *
+     * @param $content
+     * @return mixed
+     */
     public static function parseMessageEntity($content)
     {
         return preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, html_entity_decode($content));
