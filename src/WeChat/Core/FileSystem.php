@@ -38,7 +38,7 @@ class FileSystem
 
     public static function getCurrentUserPath()
     {
-        return config('tmp_path') . DIRECTORY_SEPARATOR . app()->auth->uin;
+        return config('tmp_path') . DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . app()->auth->uin;
     }
 
     public static function getImagePath() {
