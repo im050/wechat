@@ -43,7 +43,8 @@ if (!function_exists('uri')) {
         static $servers = [
             'base_uri'  => 'https://wx.qq.com',
             'login_uri' => 'https://login.wx.qq.com',
-            'push_uri'  => 'https://webpush.wx.qq.com'
+            'push_uri'  => 'https://webpush.wx.qq.com',
+            'file_uri'  => 'https://file.wx.qq.com'
         ];
         if (isset($servers[$name])) {
             return $servers[$name];

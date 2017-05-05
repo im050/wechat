@@ -22,6 +22,35 @@ class Api
      */
     public $redirect_uri = '';
 
+
+    /**
+     * 基于swoole_atomic
+     *
+     * @var null
+     */
+    public $media_count = null;
+
+
+    public function __construct()
+    {
+        $this->media_count = new \swoole_atomic(0);
+    }
+
+    public function getMediaCount()
+    {
+        return $this->media_count->get();
+    }
+
+    public function addMediaCount()
+    {
+        $this->media_count->add();
+    }
+
+    public function subMediaCount()
+    {
+        $this->media_count->sub();
+    }
+
     /**
      * 同步检测
      *
@@ -297,7 +326,12 @@ class Api
         $base_response = Utils::json_decode($content);
 
         if (checkBaseResponse($base_response)) {
-            $this->base_request = $base_request;
+            $this->base_request = [
+                'Uin'      => app()->keymap->get('uin'),
+                'Sid'      => app()->keymap->get('sid'),
+                'Skey'     => app()->keymap->get('skey'),
+                'DeviceID' => Utils::generateDeviceID()
+            ];
         }
 
         return $base_response;
@@ -454,15 +488,27 @@ class Api
         return $content;
     }
 
+    /**
+     * 上传文件接口
+     *
+     * @param $username
+     * @param $file
+     * @return bool|mixed
+     */
     public function uploadMedia($username, $file)
     {
+
+        $url = uri('file_uri') . '/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json';
+
+        list($mime, $media_type) = $this->getMediaType($file);
+
         $data = [
-            'id'                 => 'WU_FILE_0',
+            'id'                 => 'WU_FILE_' . $this->getMediaCount(),
             'name'               => basename($file),
-            'type'               => 'image/jpeg',
+            'type'               => $mime,
             'lastModifieDate'    => gmdate('D M d Y H:i:s TO', filemtime($file)) . ' (CST)',
             'size'               => filesize($file),
-            'mediatype'          => 'pic',
+            'mediatype'          => $media_type,
             'uploadmediarequest' => Utils::json_encode([
                 'BaseRequest'   => $this->base_request,
                 'ClientMediaId' => time(),
@@ -475,10 +521,162 @@ class Api
                 'ToUserName'    => $username,
                 'FileMd5'       => md5_file($file)
             ]),
-            'webwx_data_ticket'  => '123456',
-            'pass_ticket'        => '654321',
-            'filename'           => new CURLFile($file),
+            'webwx_data_ticket'  => $this->getDataTicket(),
+            'pass_ticket'        => app()->auth->pass_ticket,
+            'filename'           => new \CURLFile($file),
         ];
+
+        try {
+            $content = http()->post($url, $data, [
+                'timeout' => 120
+            ]);
+        } catch (\Exception $e) {
+            Console::log("上传文件出现错误, Error:" . $e->getMessage(), Console::WARNING);
+            return false;
+        }
+
+        $this->debug($content);
+
+        $content = Utils::json_decode($content);
+
+        if (!checkBaseResponse($content)) {
+            return false;
+        }
+
+        $this->addMediaCount();
+
+        return $content;
+    }
+
+
+    /**
+     * 发送文件接口
+     *
+     * @param $username
+     * @param $file
+     * @return bool
+     */
+    public function sendFile($username, $file)
+    {
+        $response = $this->uploadMedia($username, $file);
+
+        if (!$response) {
+            return false;
+        }
+
+        $media_id = $response['MediaId'];
+        $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
+        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxsendappmsg?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
+        $payload = [
+            'BaseRequest' => $this->base_request,
+            'Msg'         => [
+                'Type'         => 6,
+                'Content'      => sprintf("<appmsg appid='wxeb7ec651dd0aefa9' sdkver=''><title>%s</title><des></des><action></action><type>6</type><content></content><url></url><lowurl></lowurl><appattach><totallen>%s</totallen><attachid>%s</attachid><fileext>%s</fileext></appattach><extinfo></extinfo></appmsg>", basename($file), filesize($file), $media_id, end(explode('.', $file))),
+                'FromUserName' => Account::username(),
+                'ToUserName'   => $username,
+                'LocalID'      => $msg_id,
+                'ClientMsgId'  => $msg_id
+            ]
+        ];
+
+        $result = http()->post($url, Utils::json_encode($payload));
+
+        $this->debug($result);
+
+        if (!checkBaseResponse(Utils::json_decode($result))) {
+            Console::log("发送文件失败");
+            return false;
+        }
+
+        Console::log("发送文件成功");
+
+        return true;
+    }
+
+    public function sendImage($username, $file)
+    {
+        $response = $this->uploadMedia($username, $file);
+
+        if (!$response) {
+            return false;
+        }
+
+        $media_id = $response['MediaId'];
+        $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
+        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxsendmsgimg?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
+        $payload = [
+            'BaseRequest' => $this->base_request,
+            'Msg'         => [
+                'Type'         => 3,
+                'Content'      => '',
+                'MediaId'      => $media_id,
+                'FromUserName' => Account::username(),
+                'ToUserName'   => $username,
+                'LocalID'      => $msg_id,
+                'ClientMsgId'  => $msg_id
+            ],
+            'Scene'       => 0
+        ];
+
+        $result = http()->post($url, Utils::json_encode($payload));
+
+        $this->debug($result);
+
+        if (!checkBaseResponse(Utils::json_decode($result))) {
+            Console::log("发送图片失败");
+            return false;
+        }
+
+        Console::log("发送图片成功");
+
+        return true;
+    }
+
+    /**
+     * 获取文件类型
+     *
+     * @param $file
+     * @return array
+     */
+    public function getMediaType($file)
+    {
+        $info = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($info, $file);
+        finfo_close($info);
+
+        if (stripos($mime, "image") !== false) {
+            $media_type = 'pic';
+        } else {
+            $media_type = 'doc';
+        }
+        return [$mime, $media_type];
+    }
+
+    /**
+     * 从Cookie中获取webwx_data_ticket
+     *
+     * @return bool
+     */
+    public function getDataTicket()
+    {
+        static $ticket = false;
+        if ($ticket != false) {
+            return $ticket;
+        }
+        $cookie_path = config('cookiefile_path');
+        if (file_exists($cookie_path)) {
+            $fp = fopen($cookie_path, 'r');
+            while ($line = fgets($fp)) {
+                if (strpos($line, 'webwx_data_ticket') !== false) {
+                    $meta_data = explode("\t", trim($line));
+                    $ticket = $meta_data[6];
+                    break;
+                }
+            }
+            fclose($fp);
+        }
+
+        return $ticket;
     }
 
     public function debug($data)
@@ -487,7 +685,7 @@ class Api
             return false;
         }
         $log = [
-            '代码位置' => __LINE__,
+            '代码追踪' => Utils::json_encode(debug_backtrace()),
             '消息数据' => is_array($data) ? Utils::json_encode($data) : $data,
             '日志时间' => Utils::now()
         ];

@@ -12,9 +12,9 @@ use Im050\WeChat\Task\TaskQueue;
 
 $robot = new Robot([
     'tmp_path'    => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
-    'debug'       => true,
-    'api_debug'   => true,
-    'save_qrcode' => true,
+    'debug'       => false,
+    'api_debug'   => false,
+    'save_qrcode' => false,
     'daemonize'   => false
 ]);
 
@@ -47,13 +47,14 @@ $robot->onMessage(function (Message $message, Robot $robot) {
             ]);
             $shut[$targetUser->getUserName()] = true;
         } else if ($message->string() == "#说话") {
-            \Im050\WeChat\Component\Console::log("接收到指令");
             TaskQueue::run('SendMessage', [
                 'username' => $targetUser->getUserName(),
                 'content'  => '机器人正在待命'
             ]);
             $shut[$targetUser->getUserName()] = false;
             return $shut;
+        } else if ($message->string() == "#图片") {
+            app()->api->sendImage($targetUser->getUserName(), __DIR__ . '/test.jpg');
         }
     }
 
