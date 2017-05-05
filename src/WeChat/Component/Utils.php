@@ -61,8 +61,8 @@ class Utils
             $poor = $number_poor;
         }
         for ($i = 0; $i < $length; $i++) {
-            $random = mt_rand(0, strlen($poor));
-            if (isset($poor{$random}) && empty($poor{$random})) {
+            $random = mt_rand(0, strlen($poor) - 1);
+            if (isset($poor{$random})) {
                 $string .= $poor{$random};
             }
         }
