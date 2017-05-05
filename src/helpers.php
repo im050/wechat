@@ -80,14 +80,20 @@ if (!function_exists('members')) {
 
 if (!function_exists('config')) {
     /**
-     * 获取配置
+     * 获取或设置配置
      *
      * @param $param
+     * @param $value
      * @return mixed|null
      */
-    function config($param)
+    function config($param, $value = '')
     {
         $config = \Im050\WeChat\Component\Config::getInstance();
-        return $config->get($param);
+        if (empty($value)) {
+            return $config->get($param);
+        } else {
+            $config->set($param, $value);
+            return true;
+        }
     }
 }

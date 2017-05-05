@@ -45,8 +45,20 @@ class Robot
         //设置cookie路径
         http()->setConfig('cookiejar', $cookie_path);
         http()->setConfig('cookiefile', $cookie_path);
+
+        config('cookiefile_path', $cookie_path);
+        config('exception_log_path', config('tmp_path') . '/log/exception.log');
+        config('api_debug_log_path', config('tmp_path') . '/log/api_debug.log');
+        config('message_log_path', config('tmp_path') . '/log/message.log');
+        config('unknown_message_log_path',  config('tmp_path') . '/log/unknown_message.log');
     }
 
+    /**
+     * 调整Config
+     *
+     * @param $config
+     * @return mixed
+     */
     public function fixConfig($config)
     {
         if (!isset($config['tmp_path']) || empty($config['tmp_path'])) {
@@ -60,6 +72,9 @@ class Robot
         return $config;
     }
 
+    /**
+     * 运行
+     */
     public function run()
     {
         if ((new LoginService())->start()) {
@@ -78,6 +93,9 @@ class Robot
         }
     }
 
+    /**
+     * 启动加载
+     */
     public function boot()
     {
         //初始化微信登录权限类
@@ -115,6 +133,11 @@ class Robot
         });
     }
 
+    /**
+     * 消息回调
+     *
+     * @param \Closure $closure
+     */
     public function onMessage(\Closure $closure)
     {
         MessageHandler::getInstance()->onMessage($closure, $this);

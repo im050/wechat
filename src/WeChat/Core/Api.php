@@ -186,7 +186,7 @@ class Api
             $data = http()->get($url, [], $http_config);
         } catch (\Exception $e) {
             if (config('debug')) {
-                $path = config('tmp_path') . '/log/exception.log';
+                $path = config('exception_log_path');
                 Logger::write($e, $path);
             }
             Console::log("下载资源超时", Console::WARNING);
@@ -454,7 +454,35 @@ class Api
         return $content;
     }
 
-    public function debug($data) {
+    public function uploadMedia($username, $file)
+    {
+        $data = [
+            'id'                 => 'WU_FILE_0',
+            'name'               => basename($file),
+            'type'               => 'image/jpeg',
+            'lastModifieDate'    => gmdate('D M d Y H:i:s TO', filemtime($file)) . ' (CST)',
+            'size'               => filesize($file),
+            'mediatype'          => 'pic',
+            'uploadmediarequest' => Utils::json_encode([
+                'BaseRequest'   => $this->base_request,
+                'ClientMediaId' => time(),
+                'TotalLen'      => filesize($file),
+                'StartPos'      => 0,
+                'DataLen'       => filesize($file),
+                'MediaType'     => 4,
+                'UploadType'    => 2,
+                'FromUserName'  => Account::username(),
+                'ToUserName'    => $username,
+                'FileMd5'       => md5_file($file)
+            ]),
+            'webwx_data_ticket'  => '123456',
+            'pass_ticket'        => '654321',
+            'filename'           => new CURLFile($file),
+        ];
+    }
+
+    public function debug($data)
+    {
         if (!config('api_debug')) {
             return false;
         }
@@ -463,7 +491,7 @@ class Api
             '消息数据' => is_array($data) ? Utils::json_encode($data) : $data,
             '日志时间' => Utils::now()
         ];
-        $path = config('tmp_path') . '/log/api_debug.log';
+        $path = config('api_debug_log_path');
         return Logger::write($log, $path);
     }
 

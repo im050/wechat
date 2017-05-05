@@ -49,7 +49,7 @@ class MessageHandler
                 list($retcode, $selector) = $api->syncCheck();
             } catch (\Exception $e) {
                 if (config('debug')) {
-                    $path = config('tmp_path') . '/log/exception.log';
+                    $path = config('exception_log_path');
                     Logger::write($e, $path);
                 }
                 Console::log("监听消息失败，Exception：" . $e->getMessage(), Console::WARNING);
@@ -79,7 +79,7 @@ class MessageHandler
                         $message = $api->pullMessage();
                     } catch (\Exception $e) {
                         if (config('debug')) {
-                            $path = config('tmp_path') . '/log/exception.log';
+                            $path = config('exception_log_path');
                             Logger::write($e, $path);
                         }
                         Console::log("同步获取消息失败...", Console::WARNING);
@@ -127,7 +127,7 @@ class MessageHandler
                         '消息数据' => Utils::json_encode($msg),
                         '日志时间' => Utils::now()
                     ];
-                    $path = config('tmp_path') . '/log/message.log';
+                    $path = config('message_log_path');
                     Logger::write($log, $path);
                 }
             } catch (\Exception $e) {
@@ -137,7 +137,7 @@ class MessageHandler
                         '消息数据' => Utils::json_encode($msg),
                         '日志时间' => Utils::now()
                     ];
-                    $path = config('tmp_path') . '/log/error_message.log';
+                    $path = config('unknown_message_log_path');
                     Logger::write($log, $path);
                 }
                 Console::log("收到未知消息格式的数据类型，[MSG_TYPE] : {$msg_type}", Console::DEBUG);

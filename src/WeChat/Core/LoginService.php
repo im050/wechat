@@ -163,7 +163,7 @@ class LoginService
             $data = app()->api->getContact();
         } catch (\Exception $e) {
             if (config('debug')) {
-                $path = config('tmp_path') . '/log/exception.log';
+                $path = config('exception_log_path');
                 Logger::write($e, $path);
             }
             Console::log("获取联系人失败...错误信息：" . $e->getMessage(), Console::ERROR);
