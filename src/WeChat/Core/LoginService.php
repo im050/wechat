@@ -8,6 +8,7 @@ use Im050\WeChat\Task\TaskQueue;
 use PHPQRCode\QRcode;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Im050\WeChat\Component\Logger;
 
 class LoginService
 {
@@ -161,6 +162,10 @@ class LoginService
         try {
             $data = app()->api->getContact();
         } catch (\Exception $e) {
+            if (config('debug')) {
+                $path = config('tmp_path') . '/log/exception.log';
+                Logger::write($e, $path);
+            }
             Console::log("获取联系人失败...错误信息：" . $e->getMessage(), Console::ERROR);
         }
 
@@ -177,6 +182,26 @@ class LoginService
 
         foreach ($contact_list as $key => $item) {
             $members->push($item);
+        }
+
+        Console::log("初始化群成员数据信息...");
+        //初始化群成员
+        $group_list = $members->getGroups();
+        $batch_username = [];
+        foreach($group_list as $key => $item) {
+            array_push($batch_username, $item['UserName']);
+        }
+
+        $batch_info = app()->api->getBatchContact($batch_username);
+        $batch_contact_list = $batch_info['ContactList'];
+        foreach ($batch_contact_list as $key => $item) {
+            $member_list = $item['MemberList'];
+            $group = $group_list->getContactByUserName($item['UserName']);
+            if ($group) {
+                $group->setMemberList($member_list);
+            } else {
+                Console::log("未找到群 " . $item['UserName'] . "...");
+            }
         }
 
         Console::log(

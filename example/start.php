@@ -13,6 +13,7 @@ use Im050\WeChat\Task\TaskQueue;
 $robot = new Robot([
     'tmp_path'    => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
     'debug'       => true,
+    'api_debug'   => true,
     'save_qrcode' => true,
     'daemonize'   => false
 ]);
@@ -70,6 +71,7 @@ $robot->onMessage(function (Message $message, Robot $robot) {
         '史春阳',
         '罗志晨',
         '张帆',
+        '考拉先生。',
         'filehelper'
     ];
 

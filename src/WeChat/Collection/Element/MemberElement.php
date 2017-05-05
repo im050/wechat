@@ -19,10 +19,10 @@ class MemberElement extends Element
         if (!isset($this->element['RemarkName']) || $this->element['RemarkName'] == '') {
             $this->element['RemarkName'] = $this->element['NickName'];
         }
-        $this->handleElement($element);
+        $this->handleElement();
     }
 
-    public function handleElement($element) {
+    public function handleElement() {
         //todo: nothing.
     }
 

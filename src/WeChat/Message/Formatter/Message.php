@@ -1,9 +1,9 @@
 <?php
 namespace Im050\WeChat\Message\Formatter;
 
+use Im050\WeChat\Collection\Element\Contact;
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Console;
-use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\MessageHandler;
 use Im050\WeChat\Task\TaskQueue;
 
@@ -77,7 +77,7 @@ class Message
         $this->msg_id = $this->message['MsgId'];
         //判断是否群消息
         if (substr($this->getFromUserName(), 0, 2) == '@@') {
-            $content = explode(':'.PHP_EOL, $this->content);
+            $content = explode(':' . PHP_EOL, $this->content);
             $this->content = $content[1];
             $this->real_from_user_name = $content[0];
         } else {
@@ -105,8 +105,47 @@ class Message
         return $this->string;
     }
 
-    public function getRealFromUserName() {
+    /**
+     * 获取实际发送用户的username
+     *
+     * @return mixed
+     */
+    public function getRealFromUserName()
+    {
         return $this->real_from_user_name;
+    }
+
+    /**
+     * 获取群的username
+     *
+     * @return mixed
+     */
+    public function getGroupUserName()
+    {
+        return (Members::isGroup($this->from_user_name)) ? $this->from_user_name : $this->to_user_name;
+    }
+
+    public function getGroupMember()
+    {
+        if (!$this->isGroup()) {
+            return false;
+        }
+        return $this->getGroupMemberByUserName($this->getGroupUserName(), $this->getRealFromUserName());
+    }
+
+    public function getGroupMemberByUserName($group_username, $username)
+    {
+        $group = members()->getGroups()->getContactByUserName($group_username);
+        if ($group) {
+            $member = $group->getMemberByUserName($username);
+        } else {
+            $member = new Contact([
+                'UserName'   => $username,
+                'NickName'   => '未知群成员' . $username,
+                'RemarkName' => '',
+            ]);
+        }
+        return $member;
     }
 
     /**
@@ -129,11 +168,13 @@ class Message
         return $this->to_user_name;
     }
 
-    public function getMessenger() {
+    public function getMessenger()
+    {
         return Members::getInstance()->getContactByUserName($this->getFromUserName());
     }
 
-    public function getReceiver() {
+    public function getReceiver()
+    {
         return Members::getInstance()->getContactByUserName($this->getToUserName());
     }
 
@@ -147,11 +188,13 @@ class Message
         return Members::isGroup($this->from_user_name) || Members::isGroup($this->to_user_name);
     }
 
-    public function getMessageID() {
+    public function getMessageID()
+    {
         return $this->msg_id;
     }
 
-    public function getMessageType() {
+    public function getMessageType()
+    {
         return $this->msg_type;
     }
 
@@ -160,7 +203,8 @@ class Message
      *
      * @return bool
      */
-    public function download() {
+    public function download()
+    {
         if ($this instanceof Image) {
             $type = 'image';
         } else if ($this instanceof Voice) {
@@ -172,7 +216,7 @@ class Message
         }
         Console::log("正在下载[" . $type . "]资源，MsgId：" . $this->msg_id);
         TaskQueue::run('Download', [
-            'type' => $type,
+            'type'   => $type,
             'msg_id' => $this->msg_id
         ]);
         return true;

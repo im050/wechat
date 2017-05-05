@@ -2,6 +2,7 @@
 namespace Im050\WeChat\Core;
 
 use Im050\WeChat\Component\Console;
+use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
 
 class Api
@@ -46,6 +47,7 @@ class Api
 
         $url = uri('push_uri') . '/cgi-bin/mmwebwx-bin/synccheck';
         $content = http()->get($url, $payload);
+        $this->debug($content);
         preg_match('/window.synccheck=\{retcode:"(\d+)",selector:"(\d+)"\}/', $content, $matches);
         return [$matches[1], $matches[2]];
     }
@@ -75,6 +77,9 @@ class Api
 
         $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxsync?' . http_build_query($query_string);
         $content = http()->post($url, Utils::json_encode($payload));
+
+        $this->debug($content);
+
         $data = Utils::json_decode($content);
 
         if (!checkBaseResponse($data)) {
@@ -103,6 +108,9 @@ class Api
         ]);
         $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxgetcontact?' . $query_string;
         $content = http()->post($url);
+
+        $this->debug($content);
+
         $data = Utils::json_decode($content);
 
         if (!checkBaseResponse($data)) {
@@ -135,6 +143,9 @@ class Api
             ]
         ];
         $data = http()->post($url, Utils::json_encode($payload));
+
+        $this->debug($data);
+
         $data = Utils::json_decode($data);
         $flag = checkBaseResponse($data);
         return $flag;
@@ -174,6 +185,10 @@ class Api
         try {
             $data = http()->get($url, [], $http_config);
         } catch (\Exception $e) {
+            if (config('debug')) {
+                $path = config('tmp_path') . '/log/exception.log';
+                Logger::write($e, $path);
+            }
             Console::log("下载资源超时", Console::WARNING);
             return null;
         }
@@ -237,8 +252,13 @@ class Api
             'pass_ticket' => app()->auth->pass_ticket
         ];
         $url = uri('base_uri') . "/cgi-bin/mmwebwx-bin/webwxstatusnotify?" . http_build_query($query_string);
+
         $content = http()->post($url, Utils::json_encode($payload));
+
+        $this->debug($content);
+
         $data = Utils::json_decode($content);
+
         if (checkBaseResponse($data)) {
             return true;
         } else {
@@ -271,6 +291,9 @@ class Api
         $params = Utils::json_encode(['BaseRequest' => $base_request]);
         $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxinit?' . http_build_query($query_string);
         $content = http()->post($url, $params);
+
+        $this->debug($content);
+
         $base_response = Utils::json_decode($content);
 
         if (checkBaseResponse($base_response)) {
@@ -294,6 +317,8 @@ class Api
             '_'     => round(microtime(true) * 1000)
         ];
         $content = http()->get($url, $payload);
+
+        $this->debug($content);
 
         $pattern = '/window.QRLogin.code = (\d+); window.QRLogin.uuid = "(\S+?)"/';
 
@@ -371,6 +396,9 @@ class Api
         );
 
         $content = http()->get($this->redirect_uri, $payload);
+
+        $this->debug($content);
+
         $data = Utils::xmlToArray($content);
         if (intval($data['ret']) != 0) {
             throw new \Exception("获取通行证失败");
@@ -418,9 +446,25 @@ class Api
         ];
 
         $content = http()->post($url, Utils::json_encode($payload));
+
+        $this->debug($content);
+
         $content = Utils::json_decode($content);
 
         return $content;
+    }
+
+    public function debug($data) {
+        if (!config('api_debug')) {
+            return false;
+        }
+        $log = [
+            '代码位置' => __LINE__,
+            '消息数据' => is_array($data) ? Utils::json_encode($data) : $data,
+            '日志时间' => Utils::now()
+        ];
+        $path = config('tmp_path') . '/log/api_debug.log';
+        return Logger::write($log, $path);
     }
 
 }

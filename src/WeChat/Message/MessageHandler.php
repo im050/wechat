@@ -8,14 +8,11 @@
 
 namespace Im050\WeChat\Message;
 
+use Im050\WeChat\Collection\Element\Group;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
-use Im050\WeChat\Message\Formatter\Image;
 use Im050\WeChat\Message\Formatter\Message;
-use Im050\WeChat\Message\Formatter\Text;
-use Im050\WeChat\Message\Formatter\Video;
-use Im050\WeChat\Message\Formatter\Voice;
 
 class MessageHandler
 {
@@ -51,6 +48,10 @@ class MessageHandler
             try {
                 list($retcode, $selector) = $api->syncCheck();
             } catch (\Exception $e) {
+                if (config('debug')) {
+                    $path = config('tmp_path') . '/log/exception.log';
+                    Logger::write($e, $path);
+                }
                 Console::log("监听消息失败，Exception：" . $e->getMessage(), Console::WARNING);
                 continue;
             }
@@ -77,6 +78,10 @@ class MessageHandler
                     try {
                         $message = $api->pullMessage();
                     } catch (\Exception $e) {
+                        if (config('debug')) {
+                            $path = config('tmp_path') . '/log/exception.log';
+                            Logger::write($e, $path);
+                        }
                         Console::log("同步获取消息失败...", Console::WARNING);
                         continue;
                     }
@@ -148,8 +153,14 @@ class MessageHandler
      */
     public function printMessage(Message $message)
     {
-        $from_user = $message->getMessenger();
+        $group_user = $from_user = $message->getMessenger();
         $to_user = $message->getReceiver();
+
+        if ($from_user instanceof Group) {
+            $from_user = $message->getGroupMember();
+        } else {
+            $group_user = $to_user;
+        }
 
         if ($from_user) {
             $from_user_name = $from_user->getRemarkName();
@@ -162,14 +173,33 @@ class MessageHandler
             $to_user_name = $message->getToUserName();
         }
 
-        if ($message instanceof Text) {
-            Console::log("$from_user_name 对 $to_user_name 说 ：" . $message->string());
-        } else if ($message instanceof Image) {
-            Console::log("$from_user_name 对 $to_user_name 发送了一张图片");
-        } else if ($message instanceof Voice) {
-            Console::log("$from_user_name 对 $to_user_name 发送了一段语音");
-        } else if ($message instanceof Video) {
-            Console::log("$from_user_name 对 $to_user_name 发送了一段视频");
+        $message_of = "[个人消息]";
+
+        if ($message->isGroup()) {
+            $message_of = "[群组消息][" . $group_user->getRemarkName() . "]";
+        }
+
+        switch ($message->getMessageType()) {
+            case Message::TEXT_MESSAGE:
+                Console::log($message_of . " $from_user_name 对 $to_user_name 说 ：" . $message->string());
+                break;
+            case Message::IMAGE_MESSAGE:
+                Console::log($message_of . " $from_user_name 对 $to_user_name 发送了一张图片");
+                break;
+            case Message::VOICE_MESSAGE:
+                Console::log($message_of . " $from_user_name 对 $to_user_name 发送了一段语音");
+                break;
+            case Message::MICROVIDEO_MESSAGE:
+            case Message::VIDEO_MESSAGE:
+                Console::log($message_of . " $from_user_name 对 $to_user_name 发送了一段视频");
+                break;
+            case Message::SYS_MESSAGE:
+                if ($message->isRedPacket()) {
+                    Console::log($message_of . " $from_user_name 对 $to_user_name 发送了一个红包");
+                } else {
+                    Console::log($message_of . " 来自 $from_user_name 的系统消息：" . $message->string());
+                }
+                break;
         }
 
     }

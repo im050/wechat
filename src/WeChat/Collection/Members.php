@@ -36,6 +36,9 @@ class Members
         'userexperience_alarm', 'notification_messages'
     ];
 
+    /**
+     * Members constructor.
+     */
     private function __construct()
     {
         //初始化特殊用户列表容器
@@ -51,6 +54,11 @@ class Members
         $this->officials = new ContactCollection();
     }
 
+    /**
+     * Single instance
+     *
+     * @return Members|null
+     */
     public static function getInstance()
     {
         if (self::$_instance === null) {
@@ -59,6 +67,12 @@ class Members
         return self::$_instance;
     }
 
+    /**
+     * 增加成员
+     *
+     * @param $item
+     * @throws \Exception
+     */
     public function push($item)
     {
         switch (Members::getUserType($item)) {
