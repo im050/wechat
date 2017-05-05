@@ -88,5 +88,15 @@ class TaskQueue
         }
     }
 
+    public static function shutdown()
+    {
+        if (app()->hasInstance('task_queue')) {
+            $task_queue = app()->get('task_queue');
+        }
+        foreach($task_queue->process_pool as $process) {
+            $process->exit(0);
+        }
+    }
+
 
 }
