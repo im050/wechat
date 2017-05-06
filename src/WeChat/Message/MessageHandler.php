@@ -55,11 +55,6 @@ class MessageHandler
             try {
                 list($retcode, $selector) = $api->syncCheck();
             } catch (\Exception $e) {
-                if (config('debug')) {
-                    $path = config('exception_log_path');
-                    Logger::write($e, $path);
-                }
-
                 $failed_times++;
                 if ($failed_times == 10) {
                     Console::log("监听消息失败超过 10 次，程序退出。", Console::ERROR);
@@ -94,10 +89,6 @@ class MessageHandler
                     try {
                         $message = $api->pullMessage();
                     } catch (\Exception $e) {
-                        if (config('debug')) {
-                            $path = config('exception_log_path');
-                            Logger::write($e, $path);
-                        }
                         Console::log("同步获取消息失败...", Console::WARNING);
                         continue;
                     }
@@ -107,7 +98,7 @@ class MessageHandler
                     $this->handleMessage($message);
                     break;
                 default:
-                    Console::log("未知数据类型, selector:" . $selector);
+                    Console::log("未知数据类型, selector:" . $selector, Console::DEBUG);
             }
         }
     }

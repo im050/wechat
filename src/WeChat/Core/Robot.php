@@ -59,6 +59,7 @@ class Robot
 
         config('cookiefile_path', $cookie_path);
         config('exception_log_path', config('tmp_path') . '/log/exception.log');
+        config('exception_log_path', config('tmp_path') . '/log/warning.log');
         config('api_debug_log_path', config('tmp_path') . '/log/api_debug.log');
         config('message_log_path', config('tmp_path') . '/log/message.log');
         config('unknown_message_log_path', config('tmp_path') . '/log/unknown_message.log');

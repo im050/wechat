@@ -84,7 +84,7 @@ class TaskQueue
         if (app()->hasInstance('task_queue')) {
             app()->get('task_queue')->task($job, $params);
         } else {
-            Console::log("尚未创建任务队列");
+            Console::log("尚未创建任务队列", Console::ERROR);
         }
     }
 
@@ -92,6 +92,8 @@ class TaskQueue
     {
         if (app()->hasInstance('task_queue')) {
             $task_queue = app()->get('task_queue');
+        } else {
+            Console::log("尚未创建任务队列", Console::ERROR);
         }
         reset($task_queue->process_pool);
         foreach($task_queue->process_pool as $pid => $process) {
