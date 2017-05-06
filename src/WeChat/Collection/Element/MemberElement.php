@@ -22,11 +22,13 @@ class MemberElement extends Element
         $this->handleElement();
     }
 
-    public function handleElement() {
+    public function handleElement()
+    {
         //todo: nothing.
     }
 
-    public function getAlias() {
+    public function getAlias()
+    {
         return $this->element['Alias'];
     }
 
@@ -51,10 +53,43 @@ class MemberElement extends Element
         if ($blocking == false) {
             TaskQueue::run('SendMessage', [
                 'username' => $this->getUserName(),
-                'content' => $text
+                'type'     => 'text',
+                'content'  => $text
             ]);
         } else {
             app()->api->sendMessage($this->getUserName(), $text);
+        }
+    }
+
+    /**
+     * 发送图片
+     *
+     * @param $file
+     * @param bool $blocking
+     */
+    public function sendImage($file, $blocking = false)
+    {
+        if ($blocking == false) {
+            TaskQueue::run('SendMessage', [
+                'type'     => 'image',
+                'file'     => $file,
+                'username' => $this->getUserName(),
+            ]);
+        } else {
+            app()->api->sendImage($this->getUserName(), $file);
+        }
+    }
+
+    public function sendFile($file, $blocking = false)
+    {
+        if ($blocking == false) {
+            TaskQueue::run('SendMessage', [
+                'type'     => 'file',
+                'file'     => $file,
+                'username' => $this->getUserName(),
+            ]);
+        } else {
+            app()->api->sendFile($this->getUserName(), $file);
         }
     }
 

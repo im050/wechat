@@ -214,11 +214,7 @@ class Api
         try {
             $data = http()->get($url, [], $http_config);
         } catch (\Exception $e) {
-            if (config('debug')) {
-                $path = config('exception_log_path');
-                Logger::write($e, $path);
-            }
-            Console::log("下载资源超时", Console::WARNING);
+            Console::log("下载 [{$msg_id}] 资源超时, 类型： {$type}", Console::WARNING);
             return null;
         }
         return $data;
@@ -500,6 +496,11 @@ class Api
     public function uploadMedia($username, $file)
     {
 
+        if (!file_exists($file)) {
+            Console::log("上传文件 {$file} 不存在!", Console::WARNING);
+            return false;
+        }
+
         $url = uri('file_uri') . '/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json';
 
         list($mime, $media_type) = $this->getMediaType($file);
@@ -586,15 +587,20 @@ class Api
         $this->debug($result);
 
         if (!checkBaseResponse(Utils::json_decode($result))) {
-            Console::log("发送文件失败");
+            Console::log("发送文件失败, File: " . $file, Console::WARNING);
             return false;
         }
-
-        Console::log("发送文件成功");
 
         return true;
     }
 
+    /**
+     * 发送图片
+     *
+     * @param $username
+     * @param $file
+     * @return bool
+     */
     public function sendImage($username, $file)
     {
         $response = $this->uploadMedia($username, $file);
@@ -625,11 +631,45 @@ class Api
         $this->debug($result);
 
         if (!checkBaseResponse(Utils::json_decode($result))) {
-            Console::log("发送图片失败");
+            Console::log("发送图片失败, File: " . $file, Console::WARNING);
             return false;
         }
 
-        Console::log("发送图片成功");
+        return true;
+    }
+
+    public function sendEmoticon($username, $file)
+    {
+        $response = $this->uploadMedia($username, $file);
+
+        if (!$response) {
+            return false;
+        }
+
+        $media_id = $response['MediaId'];
+        $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
+        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxsendemoticon?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
+        $payload = [
+            'BaseRequest' => $this->base_request,
+            'Msg' => [
+                'Type' => 47,
+                "EmojiFlag" => 2,
+                'MediaId' => $media_id,
+                'FromUserName' => Account::username(),
+                'ToUserName' => $username,
+                'LocalID' => $msg_id,
+                'ClientMsgId' => $msg_id
+            ]
+        ];
+
+        $result = http()->post($url, Utils::json_encode($payload));
+
+        $this->debug($result);
+
+        if (!checkBaseResponse(Utils::json_decode($result))) {
+            Console::log("发送表情失败, File: " . $file, Console::WARNING);
+            return false;
+        }
 
         return true;
     }

@@ -17,8 +17,30 @@ class SendMessage extends Job
     {
         $username = $this->username;
         $content = $this->content;
+        $type = $this->type;
         try {
-            if (app()->api->sendMessage($username, $content)) {
+            $flag = false;
+            switch ($type) {
+                case 'text':
+                    $flag = app()->api->sendMessage($username, $content);
+                    break;
+                case 'image':
+                    $file = $this->file;
+                    $flag = app()->api->sendImage($username, $file);
+                    break;
+                case 'file':
+                    $file = $this->file;
+                    $flag = app()->api->sendFile($username, $file);
+                    break;
+                case 'emoticon':
+                    $file = $this->file;
+                    $flag = app()->api->sendEmoticon($username, $file);
+                    break;
+                default:
+                    Console::log("不存在的发送数据类型, Type: {$type}", Console::WARNING);
+                    break;
+            }
+            if ($flag) {
                 return true;
             } else {
                 return false;
