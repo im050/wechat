@@ -80,6 +80,25 @@ class MemberElement extends Element
         }
     }
 
+    /**
+     * 发送表情
+     *
+     * @param $file
+     * @param bool $blocking
+     */
+    public function sendEmoticon($file, $blocking = false)
+    {
+        if ($blocking == false) {
+            TaskQueue::run('SendMessage', [
+                'type'     => 'emoticon',
+                'file'     => $file,
+                'username' => $this->getUserName(),
+            ]);
+        } else {
+            app()->api->sendEmoticon($this->getUserName(), $file);
+        }
+    }
+
     public function sendFile($file, $blocking = false)
     {
         if ($blocking == false) {
