@@ -393,6 +393,8 @@ class Api
             'timeout' => 35
         ]);
 
+        $this->debug($content);
+
         $code = -1;
 
         preg_match('/window.code=(\d+);/', $content, $matches);
