@@ -50,7 +50,7 @@ class Robot
         config('exception_log_path', config('tmp_path') . '/log/exception.log');
         config('api_debug_log_path', config('tmp_path') . '/log/api_debug.log');
         config('message_log_path', config('tmp_path') . '/log/message.log');
-        config('unknown_message_log_path',  config('tmp_path') . '/log/unknown_message.log');
+        config('unknown_message_log_path', config('tmp_path') . '/log/unknown_message.log');
     }
 
     /**

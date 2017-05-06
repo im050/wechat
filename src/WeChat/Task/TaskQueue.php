@@ -93,8 +93,9 @@ class TaskQueue
         if (app()->hasInstance('task_queue')) {
             $task_queue = app()->get('task_queue');
         }
-        foreach($task_queue->process_pool as $process) {
-            $process->exit(0);
+        reset($task_queue->process_pool);
+        foreach($task_queue->process_pool as $pid => $process) {
+            posix_kill($pid, SIGTERM);
         }
     }
 
