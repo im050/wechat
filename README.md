@@ -1,10 +1,28 @@
-# 微信机器人 for 个人号
+<p align="center">
+  <b>雨林寒舍</b>
+  <br/>
+  <br/>
+  <a target="_blank" href="https://www.im050.com">
+    <img src="http://www.im050.com/wp-content/themes/simplehome/images/face.png" width=130>
+  </a>
+</p>
+
+# WeChat Robot
+一款基于PHP开发的微信机器人程序（个人号非公众号）
+
+<p align="center">
+<a href="http://hanc.cc"><img src="https://img.shields.io/badge/contact-@Im050-orange.svg?style=flat"></a>
+<img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat">
+</p>
+
 ## 依赖
 
 | 环境          | 版本           |
-| ------------- |:-------------:|
-| PHP           | \>=5.6 | 
-| Swoole        | \>=1.9.*      |
+| ------------- | ------------- |
+| [PHP](http://www.php.net)           | \>=5.6 | 
+| [Swoole 扩展](http://www.swoole.com/)    | \>=1.9.*      |
+| [Fileinfo 扩展](http://php.net/manual/en/book.fileinfo.php)  | \>=1.0.*      |
+| [Posix 扩展](http://www.php.net/manual/en/book.posix.php)     | -             |
 
 ## 特点
 
@@ -25,8 +43,21 @@ composer update
 ```
 
 ## 运行
+```
+php example/start.php
+```
 
-> php example/start.php
+## 关于
+
+本程序仅是我一时兴趣所筑，由于时间问题，截至目前为止，很多功能均为完善，以下有更好的作品可供使用，同时也为本程序在开发过程中遇到的疑问提供了参考。
+
+1. [littlecodersh/ItChat](https://github.com/littlecodersh/ItChat) 参考登录流程
+2. [HanSon/vbot](https://github.com/HanSon/vbot) 参考了微信协议
+3. [lbbniu/WebWechat](https://github.com/lbbniu/WebWechat) 参考了微信协议
+
+感谢以上项目作者的无私奉献，我也会坚持将WeChatRobot完善下去。
+
+
 
 ## 截图
 
