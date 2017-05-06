@@ -38,15 +38,19 @@ php example/start.php
 
 ## 关于
 
-本程序仅是我一时兴趣所筑，由于时间问题，截至目前为止，很多功能均为完善，并且由于使用了`swoole`扩展，该程序请在`linux`环境下运行。另外，以下有更好的作品可供使用，同时也为本程序在开发过程中遇到的疑问提供了参考。
+项目开始之初，在网上无意发现基于`python`开发的微信机器人（ItChat），于是想以学习的目的使用PHP开发一个微信机器人。由于时间的关系，截至目前为止，很多功能均未完善，另外，由于使用了`swoole`扩展，所以请在`linux`环境下运行该程序。以下同类型的项目给予了我莫大的帮助，其次以下项目也更加健全，推荐大家使用。
 
-1. [littlecodersh/ItChat](https://github.com/littlecodersh/ItChat) 参考登录流程
-2. [HanSon/vbot](https://github.com/HanSon/vbot) 参考了微信协议
-3. [lbbniu/WebWechat](https://github.com/lbbniu/WebWechat) 参考了微信协议
+1. [littlecodersh/ItChat](https://github.com/littlecodersh/ItChat) 
+2. [HanSon/vbot](https://github.com/HanSon/vbot) 
+3. [lbbniu/WebWechat](https://github.com/lbbniu/WebWechat) 
 
-感谢以上项目作者的无私奉献，我也会坚持将WeChatRobot完善下去。
+在此，感谢以上项目作者的无私奉献，我也会坚持将自己的微信机器人完善下去。
 
+## 联系
 
+    Email: service@im050.com
+    QQ: 52619941
+    WeChat: cnmemory
 
 ## 截图
 
