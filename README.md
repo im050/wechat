@@ -1,12 +1,3 @@
-<p align="center">
-  <b>雨林寒舍</b>
-  <br/>
-  <br/>
-  <a target="_blank" href="https://www.im050.com">
-    <img src="http://www.im050.com/wp-content/themes/simplehome/images/face.png" width=130>
-  </a>
-</p>
-
 # WeChat Robot
 一款基于PHP开发的微信机器人程序（个人号非公众号）
 
