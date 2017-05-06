@@ -91,22 +91,55 @@ $robot->onMessage(function (Message $message, Robot $robot) {
     } else {
         switch ($message->getMessageType()) {
             case Message::VOICE_MESSAGE:
-                $type_name = '语音';
+                $text = '不要发语音，老夫听不懂。';
                 break;
             case Message::IMAGE_MESSAGE:
-                $type_name = '图片';
+            case Message::EMOTICON_MESSAGE:
+                $file = getRandomFileName(__DIR__ . '/pic');
+                if ($file) {
+                    return $targetUser->sendImage($file) || $targetUser->sendMessage("是不是要斗图！奉陪到底！");
+                }
                 break;
             case Message::VIDEO_MESSAGE:
             case Message::MICROVIDEO_MESSAGE:
-                $type_name = '视频';
+                $text = '不要发视频，老夫不爱看。';
+                break;
+            case Message::SYS_MESSAGE:
+                if ($message->isRedPacket()) {
+                    $text = '谢谢老板打赏，不过我不一定抢。';
+                } else {
+                    $text = $message->string();
+                }
                 break;
             default:
-                $type_name = '我不知道的东西';
+                $text = '你发的是什么鬼东西，我看不懂耶';
+                break;
         }
-        $targetUser->sendMessage("我猜你发的是" . $type_name);
+        $targetUser->sendMessage($text);
     }
 
     return true;
 });
+
+
+/**
+ * 获取随机文件名
+ *
+ * @param $path
+ * @return bool|string
+ */
+function getRandomFileName($path)
+{
+    $files = scandir($path);
+    unset($files[0], $files[1]);
+
+    if (count($files)) {
+        $file = $files[array_rand($files)];
+    } else {
+        return false;
+    }
+
+    return $path . DIRECTORY_SEPARATOR . $file;
+}
 
 $robot->run();
