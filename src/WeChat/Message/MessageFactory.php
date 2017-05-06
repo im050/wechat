@@ -11,6 +11,7 @@ namespace Im050\WeChat\Message;
 use Im050\WeChat\Message\Formatter\Animate;
 use Im050\WeChat\Message\Formatter\Card;
 use Im050\WeChat\Message\Formatter\DestoryMessage;
+use Im050\WeChat\Message\Formatter\Emoticon;
 use Im050\WeChat\Message\Formatter\Friend;
 use Im050\WeChat\Message\Formatter\Image;
 use Im050\WeChat\Message\Formatter\JoinGroup;
@@ -31,7 +32,8 @@ class MessageFactory
         Message::VOICE_MESSAGE => Voice::class,
         Message::MICROVIDEO_MESSAGE => Video::class,
         Message::VIDEO_MESSAGE => Video::class,
-        Message::SYS_MESSAGE => SysMessage::class
+        Message::SYS_MESSAGE => SysMessage::class,
+        Message::EMOTICON_MESSAGE => Emoticon::class
     ];
 
     public static function create($type, $msg)

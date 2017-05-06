@@ -125,6 +125,11 @@ class Message
         return (Members::isGroup($this->from_user_name)) ? $this->from_user_name : $this->to_user_name;
     }
 
+    /**
+     * 获得当前发送消息的实际组成员
+     *
+     * @return bool|Contact
+     */
     public function getGroupMember()
     {
         if (!$this->isGroup()) {
@@ -133,6 +138,13 @@ class Message
         return $this->getGroupMemberByUserName($this->getGroupUserName(), $this->getRealFromUserName());
     }
 
+    /**
+     * 获取组成员
+     *
+     * @param $group_username
+     * @param $username
+     * @return Contact
+     */
     public function getGroupMemberByUserName($group_username, $username)
     {
         $group = members()->getGroups()->getContactByUserName($group_username);
@@ -168,11 +180,21 @@ class Message
         return $this->to_user_name;
     }
 
+    /**
+     * 获取消息发送者
+     *
+     * @return mixed
+     */
     public function getMessenger()
     {
         return Members::getInstance()->getContactByUserName($this->getFromUserName());
     }
 
+    /**
+     * 获取消息接收者
+     *
+     * @return mixed
+     */
     public function getReceiver()
     {
         return Members::getInstance()->getContactByUserName($this->getToUserName());
@@ -188,11 +210,21 @@ class Message
         return Members::isGroup($this->from_user_name) || Members::isGroup($this->to_user_name);
     }
 
+    /**
+     * 获取msg_id
+     *
+     * @return mixed
+     */
     public function getMessageID()
     {
         return $this->msg_id;
     }
 
+    /**
+     * 获取消息类型
+     *
+     * @return mixed
+     */
     public function getMessageType()
     {
         return $this->msg_type;
@@ -205,16 +237,24 @@ class Message
      */
     public function download()
     {
+
+        if (!config('auto_download')) {
+            return false;
+        }
+
         if ($this instanceof Image) {
             $type = 'image';
         } else if ($this instanceof Voice) {
             $type = 'voice';
         } else if ($this instanceof Video) {
             $type = 'video';
+        } else if ($this instanceof Emoticon) {
+            $type = 'emoticon';
         } else {
             return false;
         }
-        Console::log("正在下载[" . $type . "]资源，MsgId：" . $this->msg_id);
+        Console::log("正在下载 [" . $type . "] 资源，MsgId：" . $this->msg_id);
+        // 执行下载任务
         TaskQueue::run('Download', [
             'type'   => $type,
             'msg_id' => $this->msg_id

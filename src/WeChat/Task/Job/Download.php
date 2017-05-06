@@ -26,13 +26,16 @@ class Download extends Job
             case 'voice':
                 $flag = FileSystem::saveVoice($msg_id);
                 break;
+            case 'emoticon':
+                $flag = FileSystem::saveEmoticon($msg_id);
+                break;
             default:
                 break;
         }
         if ($flag) {
-            Console::log("下载[$msg_id]资源完成");
+            Console::log("下载 [$msg_id] 资源完成");
         } else {
-            Console::log("下载[$msg_id]资源失败, 资源地址:" . http()->getQueryURI());
+            Console::log("下载 [$msg_id] 资源失败, 资源地址:" . http()->getQueryURI());
         }
     }
 }
