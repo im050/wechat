@@ -12,14 +12,25 @@ use Im050\WeChat\Task\TaskQueue;
 class Robot
 {
 
+    /**
+     * 存放公共对象的容器
+     *
+     * @var Application|null
+     */
     protected $app = null;
 
-    protected $events = [];
-
+    /**
+     * 默认配置参数
+     *
+     * @var array
+     */
     protected $config = [
-        'tmp_path'    => '',
-        'debug'       => false,
-        'save_qrcode' => false
+        'tmp_path'      => '',
+        'debug'         => false,
+        'api_debug'     => false,
+        'save_qrcode'   => true,
+        'auto_download' => true,
+        'daemonize'     => false,
     ];
 
     public function __construct($config = array())
@@ -143,21 +154,61 @@ class Robot
         MessageHandler::getInstance()->onMessage($closure, $this);
     }
 
+    /**
+     * 登录成功回调事件
+     *
+     * @param \Closure $closure
+     */
+    public function onLoginSuccess(\Closure $closure)
+    {
+        MessageHandler::getInstance()->onLoginSuccess($closure, $this);
+    }
+
+    /**
+     * 退出登录回调事件
+     *
+     * @param \Closure $closure
+     */
+    public function onLogout(\Closure $closure)
+    {
+        MessageHandler::getInstance()->onLogout($closure, $this);
+    }
+
+    /**
+     * 获取联系人列表
+     *
+     * @return \Im050\WeChat\Collection\ContactCollection
+     */
     public function getContacts()
     {
         return Members::getInstance()->getContacts();
     }
 
+    /**
+     * 获取群组列表
+     *
+     * @return \Im050\WeChat\Collection\ContactCollection
+     */
     public function getGroups()
     {
         return Members::getInstance()->getGroups();
     }
 
+    /**
+     * 获取特殊账号列表
+     *
+     * @return \Im050\WeChat\Collection\ContactCollection
+     */
     public function getSpecials()
     {
         return Members::getInstance()->getSpecials();
     }
 
+    /**
+     * 获取公众号列表
+     *
+     * @return \Im050\WeChat\Collection\ContactCollection
+     */
     public function getOfficials()
     {
         return Members::getInstance()->getOfficials();

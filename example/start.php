@@ -11,11 +11,12 @@ use Im050\WeChat\Message\Formatter\Text;
 use Im050\WeChat\Task\TaskQueue;
 
 $robot = new Robot([
-    'tmp_path'    => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
-    'debug'       => false,
-    'api_debug'   => false,
-    'save_qrcode' => false,
-    'daemonize'   => false
+    'tmp_path'      => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
+    'debug'         => false,
+    'api_debug'     => false,
+    'save_qrcode'   => false,
+    'auto_download' => true,
+    'daemonize'     => false
 ]);
 
 $shut = [];

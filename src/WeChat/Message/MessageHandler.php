@@ -40,9 +40,16 @@ class MessageHandler
     {
         Console::log("开始监听消息...");
 
+        //执行登录成功回调
+        if (isset($this->events['login_success'])) {
+            $this->events['login_success']['closure']($this->events['login_success']['robot']);
+        }
+
         $api = app()->api;
 
         $time = 0;
+
+        $failed_times = 0;
 
         while (true) {
             try {
@@ -52,10 +59,19 @@ class MessageHandler
                     $path = config('exception_log_path');
                     Logger::write($e, $path);
                 }
+
+                $failed_times++;
+                if ($failed_times == 10) {
+                    Console::log("监听消息失败超过 10 次，程序退出。", Console::ERROR);
+                }
+
                 Console::log("监听消息失败，Exception：" . $e->getMessage(), Console::WARNING);
                 continue;
             }
             if ($retcode == 1100 || $retcode == 1101) {
+                if (isset($this->events['logout']['closure'])) {
+                    $this->events['logout']['closure']($this->events['exit']['robot']);
+                }
                 Console::log("微信已经退出或在其他地方登录", Console::ERROR);
             }
 
@@ -205,7 +221,7 @@ class MessageHandler
     }
 
     /**
-     * 消息触发回调
+     * 消息触发回调事件
      *
      * @param \Closure $closure
      * @param $robot
@@ -214,6 +230,29 @@ class MessageHandler
     {
         $this->events['message']['closure'] = $closure;
         $this->events['message']['robot'] = $robot;
+    }
+
+    /**
+     * 登录成功回调事件
+     *
+     * @param \Closure $closure
+     * @param $robot
+     */
+    public function onLoginSuccess(\Closure $closure, $robot)
+    {
+        $this->events['login_success']['closure'] = $closure;
+        $this->events['login_success']['robot'] = $robot;
+    }
+
+    /**
+     * 微信退出回调事件
+     *
+     * @param \Closure $closure
+     * @param $robot
+     */
+    public function onLogout(\Closure $closure, $robot) {
+        $this->events['logout']['closure'] = $closure;
+        $this->events['logout']['robot'] = $robot;
     }
 
     /**
