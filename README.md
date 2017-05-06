@@ -10,8 +10,8 @@
 # WeChat Robot
 一款基于PHP开发的微信机器人程序（个人号非公众号）
 
-<p align="center">
-<a href="http://hanc.cc"><img src="https://img.shields.io/badge/contact-@Im050-orange.svg?style=flat"></a>
+<p align="left">
+<a href="http://im050.com"><img src="https://img.shields.io/badge/contact-@Im050-orange.svg?style=flat"></a>
 <img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat">
 </p>
 
