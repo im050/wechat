@@ -11,7 +11,7 @@
 一款基于PHP开发的微信机器人程序（个人号非公众号）
 
 <p align="left">
-<a href="http://im050.com"><img src="https://img.shields.io/badge/contact-@Im050-orange.svg?style=flat"></a>
+<a href="http://im050.com"><img src="https://img.shields.io/badge/PHP-5.6-orange.svg?style=flat"></a>
 <img src="https://img.shields.io/badge/license-MIT-green.svg?style=flat">
 </p>
 
@@ -49,7 +49,7 @@ php example/start.php
 
 ## 关于
 
-本程序仅是我一时兴趣所筑，由于时间问题，截至目前为止，很多功能均为完善，以下有更好的作品可供使用，同时也为本程序在开发过程中遇到的疑问提供了参考。
+本程序仅是我一时兴趣所筑，由于时间问题，截至目前为止，很多功能均为完善，并且由于使用了`swoole`扩展，该程序请在`linux`环境下运行。另外，以下有更好的作品可供使用，同时也为本程序在开发过程中遇到的疑问提供了参考。
 
 1. [littlecodersh/ItChat](https://github.com/littlecodersh/ItChat) 参考登录流程
 2. [HanSon/vbot](https://github.com/HanSon/vbot) 参考了微信协议
