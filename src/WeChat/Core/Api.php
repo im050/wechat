@@ -30,10 +30,20 @@ class Api
      */
     public $media_count = null;
 
+    public static $uri = [
+        'base_uri'  => 'https://wx.qq.com',
+        'login_uri' => 'https://login.wx.qq.com',
+        'push_uri'  => 'https://webpush.wx.qq.com',
+        'file_uri'  => 'https://file.wx.qq.com'
+    ];
 
     public function __construct()
     {
         $this->media_count = new \swoole_atomic(0);
+    }
+
+    public function getUri($type) {
+        return isset(self::$uri[$type]) ? self::$uri[$type] : '';
     }
 
     public function getMediaCount()
