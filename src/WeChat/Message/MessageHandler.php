@@ -72,7 +72,10 @@ class MessageHandler
 
             if (time() - $time > 180) {
                 $time = time();
-                app()->api->sendMessage('filehelper', '心跳 ' . Utils::now());
+                $filehelper = members()->getSpecials()->getContactByUserName('filehelper');
+                if ($filehelper) {
+                    $filehelper->sendMessage('心跳 ' . Utils::now());
+                }
                 app()->keymap->set('login_time', $time)->save();
             }
 
