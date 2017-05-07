@@ -1,4 +1,11 @@
 <?php
+
+use Im050\WeChat\Collection\Members;
+use Im050\WeChat\Component\Config;
+use Im050\WeChat\Component\HttpClient;
+use Im050\WeChat\Core\Api;
+use Im050\WeChat\Core\Application;
+
 /*
  * 自定义快捷函数
  */
@@ -11,11 +18,11 @@ if (!function_exists('http')) {
      */
     function http()
     {
-        static $http_client = null;
-        if ($http_client == null) {
-            $http_client = new \Im050\WeChat\Component\HttpClient();
+        static $http = null;
+        if ($http == null) {
+            $http = new HttpClient();
         }
-        return $http_client;
+        return $http;
     }
 }
 
@@ -27,7 +34,7 @@ if (!function_exists('app')) {
      */
     function app()
     {
-        return \Im050\WeChat\Core\Application::getInstance();
+        return Application::getInstance();
     }
 }
 
@@ -40,17 +47,7 @@ if (!function_exists('uri')) {
      */
     function uri($name)
     {
-        static $servers = [
-            'base_uri'  => 'https://wx.qq.com',
-            'login_uri' => 'https://login.wx.qq.com',
-            'push_uri'  => 'https://webpush.wx.qq.com',
-            'file_uri'  => 'https://file.wx.qq.com'
-        ];
-        if (isset($servers[$name])) {
-            return $servers[$name];
-        } else {
-            return null;
-        }
+        return Api::uri($name);
     }
 }
 
@@ -63,7 +60,11 @@ if (!function_exists('checkBaseResponse')) {
      */
     function checkBaseResponse($data)
     {
-        return intval($data['BaseResponse']['Ret']) == 0;
+        if (isset($data['BaseResponse']['Ret'])) {
+            return intval($data['BaseResponse']['Ret']) == 0;
+        } else {
+            return false;
+        }
     }
 }
 
@@ -75,7 +76,7 @@ if (!function_exists('members')) {
      */
     function members()
     {
-        return \Im050\WeChat\Collection\Members::getInstance();
+        return Members::getInstance();
     }
 }
 
@@ -89,7 +90,7 @@ if (!function_exists('config')) {
      */
     function config($param, $value = '')
     {
-        $config = \Im050\WeChat\Component\Config::getInstance();
+        $config = Config::getInstance();
         if (empty($value)) {
             return $config->get($param);
         } else {
