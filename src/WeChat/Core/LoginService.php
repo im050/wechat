@@ -114,6 +114,8 @@ class LoginService
                 'skey'       => app()->auth->skey,
                 'login_time' => time()
             ])->save();
+            //更新接口host信息
+            app()->api->modifyUri(app()->keymap->get('uri_host'));
             return true;
         }
     }

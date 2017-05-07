@@ -31,10 +31,9 @@ class Api
     public $media_count = null;
 
     public static $uri = [
-        'base_uri'  => 'https://wx.qq.com',
-        'login_uri' => 'https://login.wx.qq.com',
-        'push_uri'  => 'https://webpush.wx.qq.com',
-        'file_uri'  => 'https://file.wx.qq.com'
+        'base_uri'  => 'https://wx.qq.com/cgi-bin/mmwebwx-bin',
+        'push_uri'  => 'https://webpush.wx.qq.com/cgi-bin/mmwebwx-bin',
+        'file_uri'  => 'https://file.wx.qq.com/cgi-bin/mmwebwx-bin'
     ];
 
     public function __construct()
@@ -42,21 +41,33 @@ class Api
         $this->media_count = new \swoole_atomic(0);
     }
 
-    public function getUri($type) {
+    public static function uri($type)
+    {
         return isset(self::$uri[$type]) ? self::$uri[$type] : '';
     }
 
+    /**
+     * 获取 MediaCount
+     *
+     * @return mixed
+     */
     public function getMediaCount()
     {
         return $this->media_count->get();
     }
 
-    public function addMediaCount()
+    /**
+     * 增加 MediaCount
+     */
+    protected function addMediaCount()
     {
         $this->media_count->add();
     }
 
-    public function subMediaCount()
+    /**
+     * 减少 MediaCount
+     */
+    protected function subMediaCount()
     {
         $this->media_count->sub();
     }
@@ -84,7 +95,7 @@ class Api
             'synckey'  => SyncKey::getInstance()->string(),
         ];
 
-        $url = uri('push_uri') . '/cgi-bin/mmwebwx-bin/synccheck';
+        $url = uri('push_uri') . '/synccheck';
         $content = http()->get($url, $payload);
         $this->debug($content);
         preg_match('/window.synccheck=\{retcode:"(\d+)",selector:"(\d+)"\}/', $content, $matches);
@@ -114,7 +125,7 @@ class Api
             'pass_ticket' => app()->auth->pass_ticket
         ];
 
-        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxsync?' . http_build_query($query_string);
+        $url = uri('base_uri') . '/webwxsync?' . http_build_query($query_string);
         $content = http()->post($url, Utils::json_encode($payload));
 
         $this->debug($content);
@@ -145,7 +156,7 @@ class Api
             'skey'        => $auth->skey,
             'r'           => Utils::timeStamp()
         ]);
-        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxgetcontact?' . $query_string;
+        $url = uri('base_uri') . '/webwxgetcontact?' . $query_string;
         $content = http()->post($url);
 
         $this->debug($content);
@@ -168,7 +179,7 @@ class Api
      */
     public function sendMessage($username, $text)
     {
-        $url = uri("base_uri") . '/cgi-bin/mmwebwx-bin/webwxsendmsg?pass_ticket=' . app()->auth->pass_ticket;
+        $url = uri("base_uri") . '/webwxsendmsg?pass_ticket=' . app()->auth->pass_ticket;
         $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
         $payload = [
             'BaseRequest' => $this->base_request,
@@ -203,7 +214,7 @@ class Api
             'voice' => 'webwxgetvoice',
             'video' => 'webwxgetvideo',
         ];
-        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/' . $path[$type] . '?' . http_build_query([
+        $url = uri('base_uri') . '/' . $path[$type] . '?' . http_build_query([
                 'MsgID' => $msg_id,
                 'skey'  => app()->auth->skey
             ]);
@@ -286,7 +297,7 @@ class Api
             'lang'        => 'zh_CN',
             'pass_ticket' => app()->auth->pass_ticket
         ];
-        $url = uri('base_uri') . "/cgi-bin/mmwebwx-bin/webwxstatusnotify?" . http_build_query($query_string);
+        $url = uri('base_uri') . "/webwxstatusnotify?" . http_build_query($query_string);
 
         $content = http()->post($url, Utils::json_encode($payload));
 
@@ -324,7 +335,7 @@ class Api
         ];
 
         $params = Utils::json_encode(['BaseRequest' => $base_request]);
-        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxinit?' . http_build_query($query_string);
+        $url = uri('base_uri') . '/webwxinit?' . http_build_query($query_string);
         $content = http()->post($url, $params);
 
         $this->debug($content);
@@ -350,7 +361,7 @@ class Api
      */
     public function getUuid()
     {
-        $url = uri('login_uri') . '/jslogin';
+        $url = 'https://login.wx.qq.com/jslogin';
         $payload = [
             'appid' => 'wx782c26e4c19acffb',
             'fun'   => 'new',
@@ -388,7 +399,7 @@ class Api
             throw new \Exception("缺少UUID");
         }
 
-        $url = uri('login_uri') . '/cgi-bin/mmwebwx-bin/login';
+        $url = 'https://login.wx.qq.com/cgi-bin/mmwebwx-bin/login';
         $payload = [
             'uuid' => app()->auth->uuid,
             'tip'  => 1,
@@ -412,10 +423,25 @@ class Api
 
         if (isset($matches[1])) {
             $this->redirect_uri = $matches[1];
+            //获取主机地址
+            $url_parser = parse_url($this->redirect_uri);
+            $host = $url_parser['host'];
+            //记录uri的host
+            app()->keymap->set('uri_host', $host)->save();
+            //变更uri的host
+            $this->modifyUri($host);
         }
 
 
         return $code;
+    }
+
+    public function modifyUri($host) {
+        $url = 'https://%s/cgi-bin/mmwebwx-bin';
+        //替换默认域名
+        self::$uri['file_uri'] = sprintf($url, 'file.' . $host);
+        self::$uri['push_uri'] = sprintf($url, 'webpush.' . $host);
+        self::$uri['base_uri'] = sprintf($url, $host);
     }
 
     /**
@@ -469,7 +495,7 @@ class Api
             $users = (array)$users;
         }
 
-        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxbatchgetcontact?' . http_build_query([
+        $url = uri('base_uri') . '/webwxbatchgetcontact?' . http_build_query([
                 'type'        => 'ex',
                 'pass_ticket' => app()->auth->pass_ticket,
                 'r'           => Utils::timeStamp()
@@ -511,7 +537,7 @@ class Api
             return false;
         }
 
-        $url = uri('file_uri') . '/cgi-bin/mmwebwx-bin/webwxuploadmedia?f=json';
+        $url = uri('file_uri') . '/webwxuploadmedia?f=json';
 
         list($mime, $media_type) = $this->getMediaType($file);
 
@@ -579,7 +605,7 @@ class Api
 
         $media_id = $response['MediaId'];
         $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
-        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxsendappmsg?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
+        $url = uri('base_uri') . '/webwxsendappmsg?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
         $payload = [
             'BaseRequest' => $this->base_request,
             'Msg'         => [
@@ -621,7 +647,7 @@ class Api
 
         $media_id = $response['MediaId'];
         $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
-        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxsendmsgimg?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
+        $url = uri('base_uri') . '/webwxsendmsgimg?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
         $payload = [
             'BaseRequest' => $this->base_request,
             'Msg'         => [
@@ -658,17 +684,17 @@ class Api
 
         $media_id = $response['MediaId'];
         $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
-        $url = uri('base_uri') . '/cgi-bin/mmwebwx-bin/webwxsendemoticon?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
+        $url = uri('base_uri') . '/webwxsendemoticon?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
         $payload = [
             'BaseRequest' => $this->base_request,
-            'Msg' => [
-                'Type' => 47,
-                "EmojiFlag" => 2,
-                'MediaId' => $media_id,
+            'Msg'         => [
+                'Type'         => 47,
+                "EmojiFlag"    => 2,
+                'MediaId'      => $media_id,
                 'FromUserName' => Account::username(),
-                'ToUserName' => $username,
-                'LocalID' => $msg_id,
-                'ClientMsgId' => $msg_id
+                'ToUserName'   => $username,
+                'LocalID'      => $msg_id,
+                'ClientMsgId'  => $msg_id
             ]
         ];
 
@@ -731,6 +757,12 @@ class Api
         return $ticket;
     }
 
+    /**
+     * 调试日志
+     *
+     * @param $data
+     * @return bool|int
+     */
     public function debug($data)
     {
         if (!config('api_debug')) {
