@@ -92,7 +92,7 @@ class MessageHandler
                     try {
                         $message = $api->pullMessage();
                     } catch (\Exception $e) {
-                        Console::log("同步获取消息失败...", Console::WARNING);
+                        Console::log("同步获取消息失败，Exception: " . $e->getMessage(), Console::WARNING);
                         continue;
                     }
                     if (!checkBaseResponse($message)) {
