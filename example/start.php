@@ -26,9 +26,7 @@ $shut = [];
 $robot->onLoginSuccess(function (Robot $robot) {
     $filehelper = members()->getSpecials()->getContactByUserName("filehelper");
     if ($filehelper) {
-        if (file_exists(__DIR__ . '/pic/thanks_boss.gif')) {
-            $filehelper->sendMessage("登录成功 " . Utils::now());
-        }
+        $filehelper->sendMessage("登录成功 " . Utils::now());
     }
 });
 
