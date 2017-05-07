@@ -47,9 +47,18 @@ class MessageHandler
 
         $api = app()->api;
 
-        $time = 0;
-
         $failed_times = 0;
+
+        (new \swoole_process(function(){
+            swoole_timer_tick(60 * 1000 * 3, function(){
+                $time = time();
+                $filehelper = members()->getSpecials()->getContactByUserName('filehelper');
+                if ($filehelper) {
+                    $filehelper->sendMessage('心跳 ' . Utils::now());
+                }
+                app()->keymap->set('login_time', $time)->save();
+            });
+        }))->start();
 
         while (true) {
             try {
@@ -68,15 +77,6 @@ class MessageHandler
                     $this->events['logout']['closure']($this->events['exit']['robot']);
                 }
                 Console::log("微信已经退出或在其他地方登录", Console::ERROR);
-            }
-
-            if (time() - $time > 180) {
-                $time = time();
-                $filehelper = members()->getSpecials()->getContactByUserName('filehelper');
-                if ($filehelper) {
-                    $filehelper->sendMessage('心跳 ' . Utils::now());
-                }
-                app()->keymap->set('login_time', $time)->save();
             }
 
             switch ($selector) {

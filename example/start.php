@@ -12,7 +12,7 @@ use Im050\WeChat\Task\TaskQueue;
 
 $robot = new Robot([
     'tmp_path'      => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
-    'debug'         => false,
+    'debug'         => true,
     'api_debug'     => false,
     'save_qrcode'   => false,
     'auto_download' => true,
