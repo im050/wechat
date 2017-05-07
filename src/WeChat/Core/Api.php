@@ -684,7 +684,7 @@ class Api
 
         $media_id = $response['MediaId'];
         $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
-        $url = uri('base_uri') . '/webwxsendemoticon?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
+        $url = uri('base_uri') . '/webwxsendemoticon?fun=sys&f=json&pass_ticket=' . app()->auth->pass_ticket;
         $payload = [
             'BaseRequest' => $this->base_request,
             'Msg'         => [
