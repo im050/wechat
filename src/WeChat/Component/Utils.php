@@ -86,7 +86,8 @@ class Utils
      * @param int $flag
      * @return string
      */
-    public static function json_encode($data, $flag = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) {
+    public static function json_encode($data, $flag = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+    {
         return json_encode($data, $flag);
     }
 
@@ -97,7 +98,8 @@ class Utils
      * @param int $flag
      * @return mixed
      */
-    public static function json_decode($json, $flag = JSON_OBJECT_AS_ARRAY) {
+    public static function json_decode($json, $flag = JSON_OBJECT_AS_ARRAY)
+    {
         return json_decode($json, $flag);
     }
 
@@ -108,10 +110,32 @@ class Utils
      * @param string $format
      * @return false|string
      */
-    public static function now($time_zone = '', $format = 'Y-m-d H:i:s') {
+    public static function now($time_zone = '', $format = 'Y-m-d H:i:s')
+    {
         if (!empty($time_zone)) {
             date_default_timezone_set($time_zone);
         }
         return date($format, time());
     }
+
+    /**
+     * 获取随机文件名
+     *
+     * @param $path
+     * @return bool|string
+     */
+    public static function getRandomFileName($path)
+    {
+        $files = scandir($path);
+        unset($files[0], $files[1]);
+
+        if (count($files)) {
+            $file = $files[array_rand($files)];
+        } else {
+            return false;
+        }
+
+        return $path . DIRECTORY_SEPARATOR . $file;
+    }
+
 }

@@ -4,6 +4,8 @@ define('BASE_PATH', dirname(dirname(__FILE__)));
 
 include(BASE_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
+use Im050\WeChat\Component\Console;
+use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Core\Account;
 use Im050\WeChat\Core\Robot;
 use Im050\WeChat\Message\Formatter\Message;
@@ -13,13 +15,26 @@ use Im050\WeChat\Task\TaskQueue;
 $robot = new Robot([
     'tmp_path'      => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
     'debug'         => true,
-    'api_debug'     => false,
+    'api_debug'     => true,
     'save_qrcode'   => false,
     'auto_download' => true,
     'daemonize'     => false
 ]);
 
 $shut = [];
+
+$robot->onLoginSuccess(function (Robot $robot) {
+    $filehelper = members()->getSpecials()->getContactByUserName("filehelper");
+    if ($filehelper) {
+        if (file_exists(__DIR__ . '/pic/thanks_boss.gif')) {
+            $filehelper->sendMessage("登录成功 " . Utils::now());
+        }
+    }
+});
+
+$robot->onLogout(function (Robot $robot) {
+    Console::log("程序已经退出.");
+});
 
 $robot->onMessage(function (Message $message, Robot $robot) {
 
@@ -95,18 +110,18 @@ $robot->onMessage(function (Message $message, Robot $robot) {
                 break;
             case Message::IMAGE_MESSAGE:
             case Message::EMOTICON_MESSAGE:
-                $file = getRandomFileName(__DIR__ . '/pic');
+                $file = Utils::getRandomFileName(__DIR__ . '/pic');
                 if ($file) {
-                    return $targetUser->sendImage($file) || $targetUser->sendMessage("是不是要斗图！奉陪到底！");
+                    return $targetUser->sendImage($file);
                 }
                 break;
             case Message::VIDEO_MESSAGE:
             case Message::MICROVIDEO_MESSAGE:
-                $text = '不要发视频，老夫不爱看。';
+                $text = '你是不是又发黄黄的小电影！！';
                 break;
             case Message::SYS_MESSAGE:
                 if ($message->isRedPacket()) {
-                    $text = '谢谢老板打赏，不过我不一定抢。';
+                    return $targetUser->sendEmoticon(__DIR__ . '/pic/thanks_boss.gif');
                 } else {
                     $text = $message->string();
                 }
@@ -121,25 +136,5 @@ $robot->onMessage(function (Message $message, Robot $robot) {
     return true;
 });
 
-
-/**
- * 获取随机文件名
- *
- * @param $path
- * @return bool|string
- */
-function getRandomFileName($path)
-{
-    $files = scandir($path);
-    unset($files[0], $files[1]);
-
-    if (count($files)) {
-        $file = $files[array_rand($files)];
-    } else {
-        return false;
-    }
-
-    return $path . DIRECTORY_SEPARATOR . $file;
-}
-
+//运行
 $robot->run();
