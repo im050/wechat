@@ -112,7 +112,7 @@ $robot->onMessage(function (Message $message, Robot $robot) {
             case Message::EMOTICON_MESSAGE:
                 $file = Utils::getRandomFileName(__DIR__ . '/pic');
                 if ($file) {
-                    return $targetUser->sendImage($file);
+                    return $targetUser->sendEmoticon($file);
                 }
                 break;
             case Message::VIDEO_MESSAGE:
