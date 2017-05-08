@@ -16,6 +16,7 @@ use Im050\WeChat\Message\Formatter\Friend;
 use Im050\WeChat\Message\Formatter\Image;
 use Im050\WeChat\Message\Formatter\JoinGroup;
 use Im050\WeChat\Message\Formatter\Message;
+use Im050\WeChat\Message\Formatter\MicroVideo;
 use Im050\WeChat\Message\Formatter\SysMessage;
 use Im050\WeChat\Message\Formatter\Text;
 use Im050\WeChat\Message\Formatter\UnRead;
@@ -33,7 +34,8 @@ class MessageFactory
         Message::MICROVIDEO_MESSAGE => Video::class,
         Message::VIDEO_MESSAGE => Video::class,
         Message::SYS_MESSAGE => SysMessage::class,
-        Message::EMOTICON_MESSAGE => Emoticon::class
+        Message::EMOTICON_MESSAGE => Emoticon::class,
+        Message::MICROVIDEO_MESSAGE => MicroVideo::class
     ];
 
     public static function create($type, $msg)

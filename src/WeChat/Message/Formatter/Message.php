@@ -4,7 +4,7 @@ namespace Im050\WeChat\Message\Formatter;
 use Im050\WeChat\Collection\Element\Contact;
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Console;
-use Im050\WeChat\Message\MessageHandler;
+use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Task\TaskQueue;
 
 class Message
@@ -68,7 +68,7 @@ class Message
     public function __construct($message)
     {
         $this->message = $message;
-        $content = MessageHandler::parseMessageEntity($this->message['Content']);
+        $content = Utils::formatContent($this->message['Content']);
         $this->content = $content;
         $this->from_user_name = $this->message['FromUserName'];
         $this->to_user_name = $this->message['ToUserName'];

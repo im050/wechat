@@ -249,15 +249,6 @@ class MessageHandler
         $this->events['logout']['robot'] = $robot;
     }
 
-    /**
-     * 解析消息内容
-     *
-     * @param $content
-     * @return mixed
-     */
-    public static function parseMessageEntity($content)
-    {
-        return preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, html_entity_decode($content));
-    }
+
 
 }
