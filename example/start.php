@@ -55,7 +55,9 @@ $robot->onMessage(function (Message $message, Robot $robot) {
         if ($message->isGroup()) {
             $targetUser = $message->getReceiver();
         } else {
-            return false;
+            if (substr($message->string(), 0, 1) != '#') {
+                return false;
+            }
         }
     }
 
