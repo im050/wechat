@@ -27,6 +27,10 @@ class MemberElement extends Element
         //todo: nothing.
     }
 
+    public function getNickName() {
+        return $this->element['NickName'];
+    }
+
     public function getAlias()
     {
         return $this->element['Alias'];
