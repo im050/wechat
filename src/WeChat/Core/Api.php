@@ -436,6 +436,11 @@ class Api
         return $code;
     }
 
+    /**
+     * 修改接口主机名
+     *
+     * @param $host
+     */
     public function modifyUri($host) {
         $url = 'https://%s/cgi-bin/mmwebwx-bin';
         //替换默认域名
@@ -674,6 +679,13 @@ class Api
         return true;
     }
 
+    /**
+     * 发送表情
+     *
+     * @param $username
+     * @param $file
+     * @return bool
+     */
     public function sendEmoticon($username, $file)
     {
         $response = $this->uploadMedia($username, $file);
