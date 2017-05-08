@@ -74,7 +74,7 @@ class MessageHandler
             }
             if ($retcode == 1100 || $retcode == 1101) {
                 if (isset($this->events['logout']['closure'])) {
-                    $this->events['logout']['closure']($this->events['exit']['robot']);
+                    $this->events['logout']['closure']($this->events['logout']['robot']);
                 }
                 Console::log("微信已经退出或在其他地方登录", Console::ERROR);
             }
