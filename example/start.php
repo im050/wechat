@@ -35,10 +35,10 @@ $robot->onLoginSuccess(function () {
     $males = $contacts->getMaleContacts();
     $females = $contacts->getFemaleContacts();
     Console::log("共有男性联系人: " . $males->count() . " 个， 女性联系人: " . $females->count() . " 个");
-    $females->each(function (MemberElement $contact) use($filehelper) {
-        $filehelper->sendMessage($contact->getNickName(), true);
-        sleep(1);
-    });
+//    $females->each(function (MemberElement $contact) use($filehelper) {
+//        $filehelper->sendMessage($contact->getNickName(), true);
+//        sleep(1);
+//    });
 });
 
 $robot->onLogout(function (Robot $robot) {
