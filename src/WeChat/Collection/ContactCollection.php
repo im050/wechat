@@ -77,6 +77,33 @@ class ContactCollection extends Collection
     }
 
     /**
+     * 获取女性联系人
+     *
+     * @return ContactCollection|mixed
+     */
+    public function getFemaleContacts() {
+        return $this->find(2, 'Sex', false);
+    }
+
+    /**
+     * 获取男性联系人
+     *
+     * @return ContactCollection|mixed
+     */
+    public function getMaleContacts() {
+        return $this->find(1, 'Sex', false);
+    }
+
+    /**
+     * 获取未知性别联系人
+     *
+     * @return ContactCollection|mixed
+     */
+    public function getUnknownSexContacts() {
+        return $this->find(0, 'Sex', false);
+    }
+
+    /**
      * 获取整个数组
      *
      * @param $search
@@ -85,6 +112,7 @@ class ContactCollection extends Collection
      * @param bool $blur
      * @return mixed|static
      *
+     * @link http://github.com/HanSon/Vbot
      * @via Vbot
      */
     public function find($search, $key, $first = false, $blur = false)
@@ -103,6 +131,23 @@ class ContactCollection extends Collection
         });
 
         return $first ? $objects->first() : $objects;
+    }
+
+    /**
+     * 遍历元素
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function each(callable $callback)
+    {
+        foreach ($this->items as $key => $item) {
+            if ($callback(ContactFactory::create($item), $key) === false) {
+                break;
+            }
+        }
+
+        return $this;
     }
 
 }
