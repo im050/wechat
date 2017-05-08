@@ -1,6 +1,8 @@
 <?php
 namespace Im050\WeChat\Message\Formatter;
 
+use Im050\WeChat\Core\Account;
+
 class Text extends Message
 {
 
