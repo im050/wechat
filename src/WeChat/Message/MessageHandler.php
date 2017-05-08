@@ -109,17 +109,26 @@ class MessageHandler
     /**
      * 处理消息
      *
-     * @param $message
+     * @param $response
      * @return bool
      */
-    public function handleMessage($message)
+    public function handleMessage($response)
     {
 
-        if ($message['AddMsgCount'] < 0) {
+        if (config('debug')) {
+            $log = [
+                '日志类型' => 'handleMessage',
+                '日志数据' => Utils::json_encode($response),
+                '记录时间' => Utils::now()
+            ];
+            Logger::write($log, config("message_log_path"));
+        }
+
+        if ($response['AddMsgCount'] < 0) {
             return false;
         }
 
-        $msg_list = $message['AddMsgList'];
+        $msg_list = $response['AddMsgList'];
         foreach ($msg_list as $key => $msg) {
             $msg_type = $msg['MsgType'];
             try {
