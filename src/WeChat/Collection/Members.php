@@ -1,5 +1,6 @@
 <?php
 namespace Im050\WeChat\Collection;
+use Im050\WeChat\Collection\Element\MemberElement;
 use Im050\WeChat\Component\Utils;
 
 /**
@@ -144,7 +145,7 @@ class Members
      * 根据username得到联系人实例
      *
      * @param $username
-     * @return mixed
+     * @return MemberElement
      */
     public function getContactByUserName($username)
     {

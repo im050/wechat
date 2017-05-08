@@ -2,6 +2,8 @@
 namespace Im050\WeChat\Message\Formatter;
 
 use Im050\WeChat\Collection\Element\Contact;
+use Im050\WeChat\Collection\Element\Group;
+use Im050\WeChat\Collection\Element\MemberElement;
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
@@ -26,6 +28,8 @@ class Message
     public $msg_type;
 
     public $real_from_user_name;
+
+    public static $is_group_message = null;
 
     //文本消息
     const TEXT_MESSAGE = 1;
@@ -75,16 +79,35 @@ class Message
         $this->create_time = $this->message['CreateTime'];
         $this->msg_type = $this->message['MsgType'];
         $this->msg_id = $this->message['MsgId'];
-        //判断是否群消息
+        //群消息逻辑处理
+        if ($this->isGroup()) {
+            self::$is_group_message = true;
+        }
+        //处理具体发信人
         if (substr($this->getFromUserName(), 0, 2) == '@@') {
             $content = explode(':' . PHP_EOL, $this->content);
-            $this->content = $content[1];
-            $this->real_from_user_name = $content[0];
+            $this->content = isset($content[1]) ? $content[1] : $this->content;
+            $this->real_from_user_name = isset($content[0]) ? $content[0] : $this->from_user_name;
         } else {
             $this->real_from_user_name = $this->from_user_name;
         }
         //其他信息交给handle处理
         $this->handleMessage();
+    }
+
+    /**
+     * 获取消息源数据
+     *
+     * @param string $field
+     * @return array|mixed|null
+     */
+    public function raw($field = '')
+    {
+        if (empty($field)) {
+            return $this->message;
+        } else {
+            return isset($this->message[$field]) ? $this->message[$field] : null;
+        }
     }
 
     /**
@@ -122,6 +145,9 @@ class Message
      */
     public function getGroupUserName()
     {
+        if (!$this->isGroup()) {
+            return false;
+        }
         return (Members::isGroup($this->from_user_name)) ? $this->from_user_name : $this->to_user_name;
     }
 
@@ -138,6 +164,14 @@ class Message
         return $this->getGroupMemberByUserName($this->getGroupUserName(), $this->getRealFromUserName());
     }
 
+    public function getGroup()
+    {
+        if (!$this->isGroup()) {
+            return false;
+        }
+        return members()->getGroups()->getContactByUserName($this->getGroupUserName());
+    }
+
     /**
      * 获取组成员
      *
@@ -147,6 +181,7 @@ class Message
      */
     public function getGroupMemberByUserName($group_username, $username)
     {
+        /** @var Group $group */
         $group = members()->getGroups()->getContactByUserName($group_username);
         if ($group) {
             $member = $group->getMemberByUserName($username);
@@ -183,21 +218,21 @@ class Message
     /**
      * 获取消息发送者
      *
-     * @return mixed
+     * @return MemberElement
      */
     public function getMessenger()
     {
-        return Members::getInstance()->getContactByUserName($this->getFromUserName());
+        return members()->getContactByUserName($this->getFromUserName());
     }
 
     /**
      * 获取消息接收者
      *
-     * @return mixed
+     * @return MemberElement
      */
     public function getReceiver()
     {
-        return Members::getInstance()->getContactByUserName($this->getToUserName());
+        return members()->getContactByUserName($this->getToUserName());
     }
 
     /**
@@ -207,7 +242,10 @@ class Message
      */
     public function isGroup()
     {
-        return Members::isGroup($this->from_user_name) || Members::isGroup($this->to_user_name);
+        if (self::$is_group_message === null) {
+            self::$is_group_message = Members::isGroup($this->from_user_name) || Members::isGroup($this->to_user_name);
+        }
+        return self::$is_group_message;
     }
 
     /**
@@ -231,14 +269,35 @@ class Message
     }
 
     /**
+     * 打印消息在控制台
+     */
+    public function printMessage()
+    {
+        $group_name = false;
+        $receiver = $this->getReceiver()->getRemarkName();
+        if ($this->isGroup()) {
+            $group_name = $this->getGroup();
+            $messenger = $this->getGroupMember()->getRemarkName();
+        } else {
+            $messenger = $this->getMessenger()->getRemarkName();
+        }
+        if ($group_name !== false) {
+            $response = '[群][' . $group_name . '] ' . $messenger . " 发送了 [" . $this->string() . "]";
+        } else {
+            $response = $messenger . ' 对 ' . $receiver . ' 发送了 [' . $this->string() . ']';
+        }
+        return $response;
+    }
+
+    /**
      * 下载消息资源
      *
+     * @param bool $ignore_config 忽略自动下载的配置
      * @return bool
      */
-    public function download()
+    public function download($ignore_config = false)
     {
-
-        if (!config('auto_download')) {
+        if (!config('auto_download') && !$ignore_config) {
             return false;
         }
 
@@ -246,7 +305,7 @@ class Message
             $type = 'image';
         } else if ($this instanceof Voice) {
             $type = 'voice';
-        } else if ($this instanceof Video) {
+        } else if ($this instanceof Video || $this instanceof MicroVideo) {
             $type = 'video';
         } else if ($this instanceof Emoticon) {
             $type = 'emoticon';

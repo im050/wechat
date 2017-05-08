@@ -17,6 +17,7 @@ use Im050\WeChat\Message\Formatter\Image;
 use Im050\WeChat\Message\Formatter\JoinGroup;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Message\Formatter\MicroVideo;
+use Im050\WeChat\Message\Formatter\Recalled;
 use Im050\WeChat\Message\Formatter\SysMessage;
 use Im050\WeChat\Message\Formatter\Text;
 use Im050\WeChat\Message\Formatter\UnRead;
@@ -35,9 +36,16 @@ class MessageFactory
         Message::VIDEO_MESSAGE => Video::class,
         Message::SYS_MESSAGE => SysMessage::class,
         Message::EMOTICON_MESSAGE => Emoticon::class,
-        Message::MICROVIDEO_MESSAGE => MicroVideo::class
+        Message::MICROVIDEO_MESSAGE => MicroVideo::class,
+        Message::RECALLED_MESSAGE => Recalled::class
     ];
 
+    /**
+     * @param $type
+     * @param $msg
+     * @return Message
+     * @throws \Exception
+     */
     public static function create($type, $msg)
     {
         if (isset(self::$factory[$type])) {

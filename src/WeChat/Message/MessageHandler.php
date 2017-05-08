@@ -133,6 +133,8 @@ class MessageHandler
             $msg_type = $msg['MsgType'];
             try {
                 $message = MessageFactory::create($msg_type, $msg);
+                //将消息加入记录集合
+                messages()->add($message);
                 //控制台打印消息
                 $this->printMessage($message);
                 if (isset($this->events['message'])) {
@@ -172,55 +174,8 @@ class MessageHandler
      */
     public function printMessage(Message $message)
     {
-        $group_user = $from_user = $message->getMessenger();
-        $to_user = $message->getReceiver();
-
-        if ($from_user instanceof Group) {
-            $from_user = $message->getGroupMember();
-        } else {
-            $group_user = $to_user;
-        }
-
-        if ($from_user) {
-            $from_user_name = $from_user->getRemarkName();
-        } else {
-            $from_user_name = $message->getFromUserName();
-        }
-        if ($to_user) {
-            $to_user_name = $to_user->getRemarkName();
-        } else {
-            $to_user_name = $message->getToUserName();
-        }
-
-        $message_of = "[个人消息]";
-
-        if ($message->isGroup()) {
-            $message_of = "[群组消息][" . $group_user->getRemarkName() . "]";
-        }
-
-        switch ($message->getMessageType()) {
-            case Message::TEXT_MESSAGE:
-                Console::log($message_of . " $from_user_name 对 $to_user_name 说 ：" . $message->string());
-                break;
-            case Message::IMAGE_MESSAGE:
-                Console::log($message_of . " $from_user_name 对 $to_user_name 发送了一张图片");
-                break;
-            case Message::VOICE_MESSAGE:
-                Console::log($message_of . " $from_user_name 对 $to_user_name 发送了一段语音");
-                break;
-            case Message::MICROVIDEO_MESSAGE:
-            case Message::VIDEO_MESSAGE:
-                Console::log($message_of . " $from_user_name 对 $to_user_name 发送了一段视频");
-                break;
-            case Message::SYS_MESSAGE:
-                if ($message->isRedPacket()) {
-                    Console::log($message_of . " $from_user_name 对 $to_user_name 发送了一个红包");
-                } else {
-                    Console::log($message_of . " 来自 $from_user_name 的系统消息：" . $message->string());
-                }
-                break;
-        }
-
+        $print_message = $message->printMessage();
+        Console::log($print_message);
     }
 
     /**

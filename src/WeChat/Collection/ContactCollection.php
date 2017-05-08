@@ -10,6 +10,7 @@ namespace Im050\WeChat\Collection;
 
 
 use Illuminate\Support\Collection;
+use Im050\WeChat\Collection\Element\MemberElement;
 use Im050\WeChat\Component\Logger;
 
 class ContactCollection extends Collection
@@ -19,7 +20,7 @@ class ContactCollection extends Collection
      * 根据用户名获取具体联系人实例
      *
      * @param $username
-     * @return mixed|null
+     * @return MemberElement
      */
     public function getContactByUserName($username)
     {
@@ -104,7 +105,7 @@ class ContactCollection extends Collection
     }
 
     /**
-     * 获取整个数组
+     * 根据键值对应查找
      *
      * @param $search
      * @param $key

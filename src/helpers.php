@@ -5,6 +5,7 @@ use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\HttpClient;
 use Im050\WeChat\Core\Api;
 use Im050\WeChat\Core\Application;
+use Im050\WeChat\Collection\MessageCollection;
 
 /*
  * 自定义快捷函数
@@ -97,5 +98,16 @@ if (!function_exists('config')) {
             $config->set($param, $value);
             return true;
         }
+    }
+}
+
+if (!function_exists('messages')) {
+    /**
+     * 消息记录集合
+     *
+     * @return MessageCollection|null
+     */
+    function messages() {
+        return MessageCollection::getInstance();
     }
 }
