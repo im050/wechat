@@ -48,7 +48,7 @@ php example/start.php
 
 ## 关于
 
-项目开始之初，在网上无意发现基于`python`开发的微信机器人（ItChat），于是想以学习的目的使用PHP开发一个微信机器人。由于时间的关系，截至目前为止，很多功能均未完善，另外，由于使用了`swoole`扩展，所以请在`linux`环境下运行该程序。以下同类型的项目给予了我莫大的帮助，其次以下项目也更加健全，推荐大家使用。
+项目开始之初，在网上无意发现基于`python`开发的微信机器人（ItChat），于是想以学习的目的使用PHP开发一个微信机器人。由于时间的关系，截至目前为止，很多功能均未完善，另外，由于使用了`swoole`扩展，所以请在`linux`环境下运行该程序。以下同类型的项目在处理微信协议上给予了我莫大的帮助，其次以下项目也更加健全，更适合要求高的朋友们使用。
 
 1. [littlecodersh/ItChat](https://github.com/littlecodersh/ItChat) 
 2. [HanSon/vbot](https://github.com/HanSon/vbot) 
