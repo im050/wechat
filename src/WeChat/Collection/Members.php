@@ -1,5 +1,6 @@
 <?php
 namespace Im050\WeChat\Collection;
+use Im050\WeChat\Component\Utils;
 
 /**
  * Class Members
@@ -92,6 +93,10 @@ class Members
                 throw new \Exception("未能识别的用户类型");
         }
 
+        $item['NickName'] = Utils::formatContent($item['NickName']);
+        $item['RemarkName'] = Utils::formatContent($item['RemarkName']);
+        $item['Signature'] = Utils::formatContent($item['Signature']);
+
         $list->put($item['UserName'], $item);
     }
 
@@ -166,6 +171,11 @@ class Members
      */
     public static function getUserType($item)
     {
+
+        if (!isset($item['VerifyFlag'])) {
+            $item['VerifyFlag'] = 0;
+        }
+
         if (self::isGroup($item['UserName'])) {
             return Members::TYPE_GROUP;
         } else if (self::isContact($item['UserName'], $item['VerifyFlag'])) {

@@ -10,6 +10,18 @@ namespace Im050\WeChat\Component;
 class Utils
 {
 
+    const EMOJI_MAP = [
+        '1f63c' => '1f601',
+        '1f639' => '1f602',
+        '1f63a' => '1f603',
+        '1f4ab' => '1f616',
+        '1f64d' => '1f614',
+        '1f63b' => '1f60d',
+        '1f63d' => '1f618',
+        '1f64e' => '1f621',
+        '1f63f' => '1f622',
+    ];
+
     /**
      * XML转数组
      *
@@ -136,6 +148,54 @@ class Utils
         }
 
         return $path . DIRECTORY_SEPARATOR . $file;
+    }
+
+    /**
+     * Emoji表情处理
+     *
+     * @param $content
+     * @return mixed
+     */
+    public static function emojiTransfer($content)
+    {
+        // via Vbot
+        $content = str_replace('<span class="emoji emoji1f450"></span', '<span class="emoji emoji1f450"></span>', $content);
+        preg_match_all('/<span class="emoji emoji(.{1,10})"><\/span>/', $content, $match);
+
+        foreach ($match[1] as &$unicode) {
+            $unicode = array_get(self::EMOJI_MAP, $unicode, $unicode);
+            if (strlen($unicode) > 5) {
+                $unicode = "&#x" . substr($unicode, 0, 5) . ";&#x" . substr($unicode, 5, 10) . ";";
+            } else {
+                $unicode = "&#x{$unicode};";
+            }
+            $unicode = html_entity_decode($unicode);
+        }
+        return str_replace($match[0], $match[1], $content);
+    }
+
+    /**
+     * HTML内容转换
+     *
+     * @param $content
+     * @return mixed
+     */
+    public static function htmlTransfer($content)
+    {
+        return preg_replace('/\<br(\s*)?\/?\>/i', PHP_EOL, html_entity_decode($content));
+    }
+
+    /**
+     * 格式化数据
+     *
+     * @param $content
+     * @return string
+     */
+    public static function formatContent($content)
+    {
+        $content = self::emojiTransfer($content);
+        $content = self::htmlTransfer($content);
+        return $content;
     }
 
 }
