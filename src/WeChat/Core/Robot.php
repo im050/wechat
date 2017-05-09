@@ -31,6 +31,7 @@ class Robot
         'save_qrcode'   => true,
         'auto_download' => true,
         'daemonize'     => false,
+        'task_process_num' => 10
     ];
 
     public function __construct($config = array())
@@ -132,7 +133,9 @@ class Robot
 
         //任务队列
         app()->singleton('task_queue', function () {
-            return new TaskQueue();
+            return new TaskQueue([
+                'max_process_num' => config('task_process_num')
+            ]);
         });
 
         //文件键值对管理
