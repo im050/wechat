@@ -8,23 +8,40 @@
 
 namespace Im050\WeChat\Message;
 
-use Im050\WeChat\Collection\Element\Group;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\Formatter\Message;
+use Im050\WeChat\Task\TaskQueue;
 
 class MessageHandler
 {
 
     protected static $_instance = null;
 
+    /**
+     * 心跳检测进程
+     *
+     * @var null
+     */
+    protected $heart_process = null;
+
+    /**
+     * 存放回调事件
+     *
+     * @var array
+     */
     protected $events = [];
 
     private function __construct()
     {
     }
 
+    /**
+     * 单例模式
+     *
+     * @return MessageHandler|null
+     */
     public static function getInstance()
     {
         if (self::$_instance === null) {
@@ -38,6 +55,7 @@ class MessageHandler
      */
     public function listen()
     {
+
         Console::log("开始监听消息...");
 
         //执行登录成功回调
@@ -49,18 +67,10 @@ class MessageHandler
 
         $failed_times = 0;
 
-        (new \swoole_process(function(){
-            swoole_timer_tick(60 * 1000 * 3, function(){
-                $time = time();
-                $filehelper = members()->getSpecials()->getContactByUserName('filehelper');
-                if ($filehelper) {
-                    $filehelper->sendMessage('心跳 ' . Utils::now());
-                }
-                app()->keymap->set('login_time', $time)->save();
-            });
-        }))->start();
+        $this->heartCheck();
 
         while (true) {
+
             try {
                 list($retcode, $selector) = $api->syncCheck();
             } catch (\Exception $e) {
@@ -68,10 +78,10 @@ class MessageHandler
                 if ($failed_times == 10) {
                     Console::log("监听消息失败超过 10 次，程序退出。", Console::ERROR);
                 }
-
                 Console::log("监听消息失败，Exception：" . $e->getMessage(), Console::WARNING);
                 continue;
             }
+
             if ($retcode == 1100 || $retcode == 1101) {
                 if (isset($this->events['logout']['closure'])) {
                     $this->events['logout']['closure']($this->events['logout']['robot']);
@@ -79,30 +89,27 @@ class MessageHandler
                 Console::log("微信已经退出或在其他地方登录", Console::ERROR);
             }
 
-            switch ($selector) {
-                case 0:
-                    sleep(1);
-                    break;
-                case 2:
-                case 3:
-                case 4:
-                case 6:
-                case 7:
-                    //拉取新消息
-                    try {
-                        $message = $api->pullMessage();
-                    } catch (\Exception $e) {
-                        Console::log("同步获取消息失败，Exception: " . $e->getMessage(), Console::WARNING);
-                        continue;
-                    }
-                    if (!checkBaseResponse($message)) {
-                        Console::log("接收数据异常，程序结束", Console::ERROR);
-                    }
-                    $this->handleMessage($message);
-                    break;
-                default:
-                    Console::log("未知数据类型, selector:" . $selector, Console::DEBUG);
+            if ($retcode != 0) {
+                Console::log("微信客户端异常退出", Console::ERROR);
             }
+
+            if ($selector == 0) {
+                sleep(1);
+                continue;
+            }
+
+            try {
+                $message = $api->pullMessage();
+            } catch (\Exception $e) {
+                Console::log("同步获取消息失败，Exception: " . $e->getMessage(), Console::WARNING);
+                continue;
+            }
+
+            if (!checkBaseResponse($message)) {
+                Console::log("接收数据异常，程序结束", Console::ERROR);
+            }
+
+            $this->handleMessage($message);
         }
     }
 
@@ -208,11 +215,48 @@ class MessageHandler
      * @param \Closure $closure
      * @param $robot
      */
-    public function onLogout(\Closure $closure, $robot) {
+    public function onLogout(\Closure $closure, $robot)
+    {
         $this->events['logout']['closure'] = $closure;
         $this->events['logout']['robot'] = $robot;
     }
 
+    /**
+     * 心跳检测
+     *
+     * @param int $time
+     */
+    protected function heartCheck($time = 180000)
+    {
+        $parent_pid = posix_getpid();
+        $this->heart_process = new \swoole_process(function ($worker) use ($time, $parent_pid) {
+            swoole_timer_tick($time, function () use ($worker, $parent_pid) {
+                $time = time();
+                $filehelper = members()->getSpecials()->getContactByUserName('filehelper');
+                $ppid = posix_getppid();
+                if ($ppid != $parent_pid) {
+                    $filehelper->sendMessage('你的父进程异常GG了，赶快去服务器上看一下吧。', true);
+                    call_user_func(array($this, '__destruct'));
+                } else {
+                    $filehelper->sendMessage("心跳正常\n内存使用情况：" . Utils::convert(memory_get_usage()) . "\n时间：" . Utils::now());
+                }
+                app()->keymap->set('login_time', $time)->save();
+            });
+        });
+        $this->heart_process->start();
+    }
 
+    /**
+     * 清理进程
+     */
+    public function __destruct()
+    {
+        //关闭任务进程
+        TaskQueue::shutdown();
+        //关闭心跳进程
+        $this->heart_process->exit(0);
+        //关闭自己
+        exit(0);
+    }
 
 }

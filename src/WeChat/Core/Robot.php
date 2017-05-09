@@ -215,9 +215,4 @@ class Robot
         return Members::getInstance()->getOfficials();
     }
 
-    public function __destruct()
-    {
-        TaskQueue::shutdown();
-    }
-
 }
