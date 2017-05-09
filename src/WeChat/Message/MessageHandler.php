@@ -236,7 +236,7 @@ class MessageHandler
                 $ppid = posix_getppid();
                 if ($ppid != $parent_pid) {
                     $filehelper->sendMessage('你的父进程异常GG了，赶快去服务器上看一下吧。', true);
-                    call_user_func(array($this, '__destruct'));
+                    call_user_func(array($this, 'clear'));
                 } else {
                     $filehelper->sendMessage("心跳正常\n内存使用情况：" . Utils::convert(memory_get_usage()) . "\n时间：" . Utils::now());
                 }
@@ -249,7 +249,7 @@ class MessageHandler
     /**
      * 清理进程
      */
-    public function __destruct()
+    public function clear()
     {
         //关闭任务进程
         TaskQueue::shutdown();
