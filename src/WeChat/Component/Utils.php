@@ -198,4 +198,17 @@ class Utils
         return $content;
     }
 
+    /**
+     * 计算机容量单位转换
+     *
+     * @param $size
+     * @return string
+     */
+    public static function convert($size)
+    {
+        $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
+    }
+
+
 }
