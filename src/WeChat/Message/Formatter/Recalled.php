@@ -1,7 +1,6 @@
 <?php
 namespace Im050\WeChat\Message\Formatter;
 
-use Illuminate\Support\Facades\File;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Core\FileSystem;
 use Im050\WeChat\Message\MessageFactory;
@@ -10,6 +9,8 @@ class Recalled extends Message
 {
 
     public $origin = 0;
+
+    public $recall_message = null;
 
     /**
      * 解析message获取msgId
@@ -37,27 +38,36 @@ class Recalled extends Message
     public function backup()
     {
         $this->origin = $this->parseMsgId($this->content);
-        $recall_message = messages()->get($this->origin);
+        $this->recall_message = messages()->get($this->origin);
         try {
-            $recall_message = MessageFactory::create($recall_message['MsgType'], $recall_message);
+            $this->recall_message = MessageFactory::create($this->recall_message['MsgType'], $this->recall_message);
         } catch (\Exception $e) {
             return false;
         }
         //下载资源
         if (in_array(
-            $recall_message->getMessageType(), array(
+            $this->recall_message->getMessageType(), array(
             Message::EMOTICON_MESSAGE,
             Message::IMAGE_MESSAGE,
             Message::VIDEO_MESSAGE,
             Message::MICROVIDEO_MESSAGE,
             Message::VOICE_MESSAGE
         ))) {
-            return $recall_message->download(true);
+            return $this->recall_message->download(true);
         } else {
             $string = "[" . Utils::now() . "] ";
-            $string .= $recall_message->printMessage();
+            $string .= $this->recall_message->printMessage();
             return FileSystem::append($string, FileSystem::getCurrentUserPath() . '/撤回消息记录.log');
         }
+    }
+
+    /**
+     * 获取被撤回消息的源纪录
+     *
+     * @return null
+     */
+    public function getOriginMessage() {
+        return $this->recall_message;
     }
 
     public function printMessage()
