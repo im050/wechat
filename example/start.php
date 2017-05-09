@@ -4,7 +4,6 @@ define('BASE_PATH', dirname(dirname(__FILE__)));
 
 include(BASE_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 
-use Im050\WeChat\Collection\Element\MemberElement;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Core\Account;
@@ -24,27 +23,30 @@ $robot = new Robot([
 
 $shut = [];
 
+/**
+ * 登录成功事件
+ */
 $robot->onLoginSuccess(function () {
-
     $filehelper = members()->getSpecials()->getContactByUserName("filehelper");
     if ($filehelper) {
         $filehelper->sendMessage("登录成功 " . Utils::now());
     }
-
     $contacts = members()->getContacts();
     $males = $contacts->getMaleContacts();
     $females = $contacts->getFemaleContacts();
     Console::log("共有男性联系人: " . $males->count() . " 个， 女性联系人: " . $females->count() . " 个");
-//    $females->each(function (MemberElement $contact) use($filehelper) {
-//        $filehelper->sendMessage($contact->getNickName(), true);
-//        sleep(1);
-//    });
 });
 
+/**
+ * 微信退出事件
+ */
 $robot->onLogout(function (Robot $robot) {
-    Console::log("程序已经退出.");
+    Console::log("微信已经退出.");
 });
 
+/**
+ * 消息事件
+ */
 $robot->onMessage(function (Message $message, Robot $robot) {
 
     $shut = &$GLOBALS['shut'];

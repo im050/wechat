@@ -1,11 +1,11 @@
 <?php
 
 use Im050\WeChat\Collection\Members;
+use Im050\WeChat\Collection\MessageCollection;
 use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\HttpClient;
 use Im050\WeChat\Core\Api;
 use Im050\WeChat\Core\Application;
-use Im050\WeChat\Collection\MessageCollection;
 
 /*
  * 自定义快捷函数
@@ -87,15 +87,24 @@ if (!function_exists('config')) {
      *
      * @param $param
      * @param $value
+     * @param bool $force 强制重写，如果为false，则配置值存在时，不进行更改
      * @return mixed|null
      */
-    function config($param, $value = '')
+    function config($param, $value = '', $force = false)
     {
         $config = Config::getInstance();
         if (empty($value)) {
             return $config->get($param);
         } else {
-            $config->set($param, $value);
+            if (isset($config->config[$param])) {
+                if ($force) {
+                    $config->set($param, $value);
+                } else {
+                    return false;
+                }
+            } else {
+                $config->set($param, $value);
+            }
             return true;
         }
     }
@@ -107,7 +116,8 @@ if (!function_exists('messages')) {
      *
      * @return MessageCollection|null
      */
-    function messages() {
+    function messages()
+    {
         return MessageCollection::getInstance();
     }
 }

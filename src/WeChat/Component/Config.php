@@ -28,23 +28,37 @@ class Config
         return self::$_instance;
     }
 
-    public function setConfig($config) {
+    public function setConfig($config)
+    {
         $this->config = $config;
     }
 
-    public function get($param) {
+    public function get($param)
+    {
         return $this->__get($param);
     }
 
-    public function set($param, $value) {
+    public function set($param, $value)
+    {
         $this->__set($param, $value);
     }
 
-    public function __set($param, $value) {
+    public function __set($param, $value)
+    {
         $this->config[$param] = $value;
     }
 
-    public function __get($param) {
+    public function __get($param)
+    {
         return isset($this->config[$param]) ? $this->config[$param] : null;
+    }
+
+    public function toJSON() {
+        return Utils::json_encode($this->config);
+    }
+
+    public function __toString()
+    {
+        return $this->toJSON();
     }
 }
