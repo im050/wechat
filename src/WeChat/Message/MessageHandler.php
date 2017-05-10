@@ -73,6 +73,9 @@ class MessageHandler
 
             try {
                 list($retcode, $selector) = $api->syncCheck();
+                if ($failed_times > 0) {
+                    $failed_times--;
+                }
             } catch (\Exception $e) {
                 $failed_times++;
                 if ($failed_times == 10) {
