@@ -79,10 +79,6 @@ class Message
         $this->create_time = $this->message['CreateTime'];
         $this->msg_type = $this->message['MsgType'];
         $this->msg_id = $this->message['MsgId'];
-        //群消息逻辑处理
-        if ($this->isGroup()) {
-            self::$is_group_message = true;
-        }
         //处理具体发信人
         if (substr($this->getFromUserName(), 0, 2) == '@@') {
             $content = explode(':' . PHP_EOL, $this->content);
