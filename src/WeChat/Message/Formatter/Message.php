@@ -29,7 +29,7 @@ class Message
 
     public $real_from_user_name;
 
-    public static $is_group_message = null;
+    public $is_group_message = null;
 
     //文本消息
     const TEXT_MESSAGE = 1;
@@ -238,10 +238,10 @@ class Message
      */
     public function isGroup()
     {
-        if (self::$is_group_message === null) {
-            self::$is_group_message = Members::isGroup($this->from_user_name) || Members::isGroup($this->to_user_name);
+        if ($this->is_group_message === null) {
+            $this->is_group_message = Members::isGroup($this->from_user_name) || Members::isGroup($this->to_user_name);
         }
-        return self::$is_group_message;
+        return $this->is_group_message;
     }
 
     /**
