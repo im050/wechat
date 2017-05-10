@@ -24,19 +24,23 @@ class Console
     public static function log($message, $level = 'INFO')
     {
         $string = "[" . date("Y-m-d H:i:s", time()) . "][" . $level . "] " . $message . PHP_EOL;
+
         echo $string;
-        if ($level == self::WARNING) {
+
+        if ($level == self::WARNING || $level == self::ERROR) {
             if (config('debug')) {
                 $log = [
-                    '错误说明' => $string,
+                    '日志内容' => $message,
+                    '日志级别' => $level,
                     '日志时间' => Utils::now()
                 ];
 
                 Logger::write($log, config('warning_log_path'));
             }
         }
+
         if ($level == self::ERROR) {
-            exit;
+            exit(0);
         }
     }
 
