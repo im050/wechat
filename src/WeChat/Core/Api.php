@@ -100,7 +100,7 @@ class Api
         $this->debug($content);
         preg_match('/window.synccheck=\{retcode:"(\d+)",selector:"(\d+)"\}/', $content, $matches);
 
-        if ($matches) {
+        if (isset($matches[1]) && isset($matches[2])) {
             return [$matches[1], $matches[2]];
         }
 
