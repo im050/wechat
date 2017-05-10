@@ -32,9 +32,9 @@ $robot = new \Im050\WeChat\Core\Robot([
  * 登录事件回调
  */
 $robot->onLoginSuccess(function () {
-    $filehelper = members()->getContactByUserName('filehelper');
+    $fileHelper = members()->getContactByUserName('filehelper');
     //第二个参数以阻塞方式发送消息
-    $filehelper->sendMessage("机器人启动成功", true);
+    $fileHelper->sendMessage("机器人启动成功", true);
     Console::log("登录成功！");
     //获取男性，女性好友列表
     $contacts = members()->getContacts();
@@ -79,8 +79,8 @@ $robot->onMessage(function(Message $message, $robot){
         //获取消息具体的群
         $group = $message->getGroup();
         //具体的发信群成员
-        $messenger = $message->getGroupMessenger();
-        Console::log("群：" . $group->getNickName() . ", 群成员：" . $messenger->getNickName());
+        $groupMessenger = $message->getGroupMessenger();
+        Console::log("群：" . $group->getNickName() . ", 群成员：" . $groupMessenger->getNickName());
     }
 
     //消息的接收者
@@ -102,6 +102,17 @@ $robot->onMessage(function(Message $message, $robot){
     $messenger->sendImage($file);
     //传输文件
     $messenger->sendFile($file);
+
+    //允许回复的列表
+    $whiteContacts = [
+        '机器人体验群',
+        '皮皮鳝，往里钻',
+        '这样才是老子最酷灬'
+    ];
+
+    if (!in_array($messenger->getRemarkName(), $whiteContacts)) {
+        return ;
+    }
 
     //任务队列
     $job = 'RobotReply'; //内置的图灵机器人回复任务
