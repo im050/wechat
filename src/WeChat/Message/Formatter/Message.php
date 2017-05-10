@@ -152,7 +152,7 @@ class Message
      *
      * @return bool|Contact
      */
-    public function getGroupMember()
+    public function getGroupMessenger()
     {
         if (!$this->isGroup()) {
             return false;
@@ -273,7 +273,7 @@ class Message
         $receiver = $this->getReceiver()->getRemarkName();
         if ($this->isGroup()) {
             $group_name = $this->getGroup();
-            $messenger = $this->getGroupMember()->getRemarkName();
+            $messenger = $this->getGroupMessenger()->getRemarkName();
         } else {
             $messenger = $this->getMessenger()->getRemarkName();
         }
