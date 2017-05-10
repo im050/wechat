@@ -31,9 +31,9 @@ class Api
     public $media_count = null;
 
     public static $uri = [
-        'base_uri'  => 'https://wx.qq.com/cgi-bin/mmwebwx-bin',
-        'push_uri'  => 'https://webpush.wx.qq.com/cgi-bin/mmwebwx-bin',
-        'file_uri'  => 'https://file.wx.qq.com/cgi-bin/mmwebwx-bin'
+        'base_uri' => 'https://wx.qq.com/cgi-bin/mmwebwx-bin',
+        'push_uri' => 'https://webpush.wx.qq.com/cgi-bin/mmwebwx-bin',
+        'file_uri' => 'https://file.wx.qq.com/cgi-bin/mmwebwx-bin'
     ];
 
     public function __construct()
@@ -99,7 +99,12 @@ class Api
         $content = http()->get($url, $payload);
         $this->debug($content);
         preg_match('/window.synccheck=\{retcode:"(\d+)",selector:"(\d+)"\}/', $content, $matches);
-        return [$matches[1], $matches[2]];
+
+        if ($matches) {
+            return [$matches[1], $matches[2]];
+        }
+
+        return [-1, -1];
     }
 
     /**
@@ -441,7 +446,8 @@ class Api
      *
      * @param $host
      */
-    public function modifyUri($host) {
+    public function modifyUri($host)
+    {
         $url = 'https://%s/cgi-bin/mmwebwx-bin';
         //替换默认域名
         self::$uri['file_uri'] = sprintf($url, 'file.' . $host);
