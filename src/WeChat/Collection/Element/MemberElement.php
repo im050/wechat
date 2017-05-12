@@ -51,6 +51,7 @@ class MemberElement extends Element
      *
      * @param $text
      * @param bool $blocking 是否阻塞，否则用任务队列进行发送消息
+     * @return MemberElement
      */
     public function sendMessage($text, $blocking = false)
     {
@@ -63,6 +64,7 @@ class MemberElement extends Element
         } else {
             app()->api->sendMessage($this->getUserName(), $text);
         }
+        return $this;
     }
 
     /**
@@ -70,6 +72,7 @@ class MemberElement extends Element
      *
      * @param $file
      * @param bool $blocking
+     * @return MemberElement
      */
     public function sendImage($file, $blocking = false)
     {
@@ -82,6 +85,7 @@ class MemberElement extends Element
         } else {
             app()->api->sendImage($this->getUserName(), $file);
         }
+        return $this;
     }
 
     /**
@@ -89,6 +93,7 @@ class MemberElement extends Element
      *
      * @param $file
      * @param bool $blocking
+     * @return MemberElement
      */
     public function sendEmoticon($file, $blocking = false)
     {
@@ -101,8 +106,16 @@ class MemberElement extends Element
         } else {
             app()->api->sendEmoticon($this->getUserName(), $file);
         }
+        return $this;
     }
 
+    /**
+     * 发送文件
+     *
+     * @param $file
+     * @param bool $blocking
+     * @return MemberElement
+     */
     public function sendFile($file, $blocking = false)
     {
         if ($blocking == false) {
@@ -114,6 +127,7 @@ class MemberElement extends Element
         } else {
             app()->api->sendFile($this->getUserName(), $file);
         }
+        return $this;
     }
 
     public function __toString()

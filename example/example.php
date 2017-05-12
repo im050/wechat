@@ -115,7 +115,7 @@ $robot->onMessage(function(Message $message, $robot){
     }
 
     //任务队列
-    $job = 'RobotReply'; //内置的图灵机器人回复任务
+    $job = 'RobotReply'; //内置的图灵机器人回复任务, 也可以写成 RobotReply::class
     //任务需要的参数
     $params = [
         'username'     => $messenger->getUserName(),
@@ -124,3 +124,5 @@ $robot->onMessage(function(Message $message, $robot){
     ];
     TaskQueue::run($job, $params); //equals "app()->task_queue->task($job, $params)";
 });
+
+$robot->run();
