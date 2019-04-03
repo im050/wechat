@@ -13,6 +13,7 @@ use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Task\TaskQueue;
+use Swoole\Process;
 
 class MessageHandler
 {
@@ -222,11 +223,11 @@ class MessageHandler
      *
      * @param int $time
      */
-    protected function heartCheck($time = 180000)
+    protected function heartCheck($time = 600)
     {
         $parentPid = posix_getpid();
-        $this->heartProcess = new \swoole_process(function ($worker) use ($time, $parentPid) {
-            swoole_timer_tick($time, function () use ($worker, $parentPid) {
+        $this->heartProcess = new Process(function ($worker) use ($time, $parentPid) {
+            while (true) {
                 $time = time();
                 $filehelper = members()->getSpecials()->getContactByUserName('filehelper');
                 $ppid = posix_getppid();
@@ -237,7 +238,8 @@ class MessageHandler
                     $filehelper->sendMessage("心跳正常\n内存使用情况：" . Utils::convert(memory_get_usage()) . "\n时间：" . Utils::now());
                 }
                 app()->keymap->set('login_time', $time)->save();
-            });
+                sleep($time);
+            }
         });
         $this->heartProcess->start();
     }

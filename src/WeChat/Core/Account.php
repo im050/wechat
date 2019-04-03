@@ -34,6 +34,18 @@ class Account
         $this->uin = $user['Uin'];
     }
 
+    public static function username() {
+        return self::getInstance()->username;
+    }
+
+    public static function nickname() {
+        return self::getInstance()->nickname;
+    }
+
+    public static function uin() {
+        return self::getInstance()->uin;
+    }
+
     public static function __callStatic($name, $arguments)
     {
         $account = self::getInstance();

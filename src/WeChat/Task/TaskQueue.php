@@ -10,6 +10,7 @@ namespace Im050\WeChat\Task;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Task\Job\Job;
+use Swoole\Process;
 
 class TaskQueue
 {
@@ -54,7 +55,7 @@ class TaskQueue
     public function createProcess()
     {
         for ($i = 0; $i < $this->processNum; $i++) {
-            $process = new \swoole_process(array($this, "onTask"));
+            $process = new Process(array($this, "onTask"));
             $process->useQueue();
             $pid = $process->start();
             $this->processPool[$pid] = &$process;
@@ -64,10 +65,10 @@ class TaskQueue
     /**
      * 任务事件
      *
-     * @param \swoole_process $worker
+     * @param Process $worker
      * @throws \Exception
      */
-    public function onTask(\swoole_process $worker)
+    public function onTask(Process $worker)
     {
         while (($data = $worker->pop()) !== false) {
             $data = Utils::json_decode($data);

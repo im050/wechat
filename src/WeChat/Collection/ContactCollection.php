@@ -24,7 +24,7 @@ class ContactCollection extends Collection
      */
     public function getContactByUserName($username)
     {
-        $member = $this->offsetGet($username);
+        $member = @$this->offsetGet($username);
         if (!empty($member))
             return ContactFactory::create($member);
         else {

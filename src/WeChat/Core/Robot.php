@@ -8,6 +8,7 @@ use Im050\WeChat\Component\Storage\Handler\FileHandler;
 use Im050\WeChat\Component\Storage\Storage;
 use Im050\WeChat\Message\MessageHandler;
 use Im050\WeChat\Task\TaskQueue;
+use Swoole\Process;
 
 class Robot
 {
@@ -92,7 +93,7 @@ class Robot
     {
         if ((new LoginService())->start()) {
             if (config('daemonize')) {
-                (new \swoole_process(function ($worker) {
+                (new Process(function (Process $worker) {
                     $sid = posix_setsid();
                     if ($sid < 0)
                         $worker->exit(0);

@@ -4,6 +4,7 @@ namespace Im050\WeChat\Core;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
+use Swoole\Atomic;
 
 class Api
 {
@@ -38,7 +39,7 @@ class Api
 
     public function __construct()
     {
-        $this->mediaCount = new \swoole_atomic(0);
+        $this->mediaCount = new Atomic(0);
     }
 
     public static function uri($type)
@@ -61,7 +62,7 @@ class Api
      */
     protected function addMediaCount()
     {
-        $this->mediaCount->add();
+        $this->mediaCount->add(1);
     }
 
     /**
@@ -69,7 +70,7 @@ class Api
      */
     protected function subMediaCount()
     {
-        $this->mediaCount->sub();
+        $this->mediaCount->sub(1);
     }
 
     /**

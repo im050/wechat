@@ -1,5 +1,4 @@
 <?php
-error_reporting(E_ALL^E_NOTICE);
 define('BASE_PATH', dirname(dirname(__FILE__)));
 
 include(BASE_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');

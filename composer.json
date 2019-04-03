@@ -23,5 +23,8 @@
     "autoload": {
         "files": ["src/helpers.php"],
         "psr-4": { "Im050\\WeChat\\": "src/WeChat/" }
+    },
+    "require-dev": {
+        "eaglewu/swoole-ide-helper": "dev-master"
     }
 }
