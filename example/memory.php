@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL^E_NOTICE);
 define('BASE_PATH', dirname(dirname(__FILE__)));
 
 include(BASE_PATH . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
@@ -12,8 +13,9 @@ use Im050\WeChat\Core\Account;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Task\Job\RobotReply;
 use Im050\WeChat\Task\TaskQueue;
+use Im050\WeChat\Core\Robot;
 
-$robot = new \Im050\WeChat\Core\Robot([
+$robot = new Robot([
     //临时文件夹
     'tmp_path'         => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
     //debug日志
@@ -27,7 +29,7 @@ $robot = new \Im050\WeChat\Core\Robot([
     //守护进程
     'daemonize'        => false,
     //任务处理进程数量
-    'task_process_num' => 2,
+    'task_process_num' => 1,
 ]);
 
 /**
@@ -74,6 +76,9 @@ $robot->onLoginSuccess(function () {
 $robot->onMessage(function (Message $message, $robot) {
     $messageType = $message->getMessageType();
     $messenger = $message->getMessenger();
+    if ($messenger == null) {
+        return ;
+    }
 
     if (!($messenger instanceof Group) && !($messenger instanceof Contact)) {
         return;

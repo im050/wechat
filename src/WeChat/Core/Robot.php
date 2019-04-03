@@ -31,7 +31,7 @@ class Robot
         'save_qrcode'   => true,
         'auto_download' => true,
         'daemonize'     => false,
-        'task_process_num' => 10
+        'task_process_num' => 1
     ];
 
     public function __construct($config = array())
