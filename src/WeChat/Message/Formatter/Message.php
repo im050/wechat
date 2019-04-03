@@ -15,21 +15,21 @@ class Message
 
     public $content;
 
-    public $from_user_name;
+    public $fromUserName;
 
-    public $to_user_name;
+    public $toUserName;
 
-    public $msg_id;
+    public $msgId;
 
-    public $create_time;
+    public $createTime;
 
     public $string;
 
-    public $msg_type;
+    public $msgType;
 
-    public $real_from_user_name;
+    public $realFromUserName;
 
-    public $is_group_message = null;
+    public $isGroupMessage = null;
 
     //文本消息
     const TEXT_MESSAGE = 1;
@@ -74,18 +74,18 @@ class Message
         $this->message = $message;
         $content = Utils::formatContent($this->message['Content']);
         $this->content = $content;
-        $this->from_user_name = $this->message['FromUserName'];
-        $this->to_user_name = $this->message['ToUserName'];
-        $this->create_time = $this->message['CreateTime'];
-        $this->msg_type = $this->message['MsgType'];
-        $this->msg_id = $this->message['MsgId'];
+        $this->fromUserName = $this->message['FromUserName'];
+        $this->toUserName = $this->message['ToUserName'];
+        $this->createTime = $this->message['CreateTime'];
+        $this->msgType = $this->message['MsgType'];
+        $this->msgId = $this->message['MsgId'];
         //处理具体发信人
         if (substr($this->getFromUserName(), 0, 2) == '@@') {
             $content = explode(':' . PHP_EOL, $this->content);
             $this->content = isset($content[1]) ? $content[1] : $this->content;
-            $this->real_from_user_name = isset($content[0]) ? $content[0] : $this->from_user_name;
+            $this->realFromUserName = isset($content[0]) && substr($content[0], 0, 1) == "@" ? $content[0] : $this->fromUserName;
         } else {
-            $this->real_from_user_name = $this->from_user_name;
+            $this->realFromUserName = $this->fromUserName;
         }
         //其他信息交给handle处理
         $this->handleMessage();
@@ -131,7 +131,7 @@ class Message
      */
     public function getRealFromUserName()
     {
-        return $this->real_from_user_name;
+        return $this->realFromUserName;
     }
 
     /**
@@ -144,7 +144,7 @@ class Message
         if (!$this->isGroup()) {
             return false;
         }
-        return (Members::isGroup($this->from_user_name)) ? $this->from_user_name : $this->to_user_name;
+        return (Members::isGroup($this->fromUserName)) ? $this->fromUserName : $this->toUserName;
     }
 
     /**
@@ -171,14 +171,14 @@ class Message
     /**
      * 获取组成员
      *
-     * @param $group_username
+     * @param $groupUsername
      * @param $username
      * @return Contact
      */
-    public function getGroupMemberByUserName($group_username, $username)
+    public function getGroupMemberByUserName($groupUsername, $username)
     {
         /** @var Group $group */
-        $group = members()->getGroups()->getContactByUserName($group_username);
+        $group = members()->getGroups()->getContactByUserName($groupUsername);
         if ($group) {
             $member = $group->getMemberByUserName($username);
         } else {
@@ -198,7 +198,7 @@ class Message
      */
     public function getFromUserName()
     {
-        return $this->from_user_name;
+        return $this->fromUserName;
     }
 
     /**
@@ -208,7 +208,7 @@ class Message
      */
     public function getToUserName()
     {
-        return $this->to_user_name;
+        return $this->toUserName;
     }
 
     /**
@@ -238,10 +238,10 @@ class Message
      */
     public function isGroup()
     {
-        if ($this->is_group_message === null) {
-            $this->is_group_message = Members::isGroup($this->from_user_name) || Members::isGroup($this->to_user_name);
+        if ($this->isGroupMessage === null) {
+            $this->isGroupMessage = Members::isGroup($this->fromUserName) || Members::isGroup($this->toUserName);
         }
-        return $this->is_group_message;
+        return $this->isGroupMessage;
     }
 
     /**
@@ -251,7 +251,7 @@ class Message
      */
     public function getMessageID()
     {
-        return $this->msg_id;
+        return $this->msgId;
     }
 
     /**
@@ -261,7 +261,7 @@ class Message
      */
     public function getMessageType()
     {
-        return $this->msg_type;
+        return $this->msgType;
     }
 
     /**
@@ -269,18 +269,22 @@ class Message
      */
     public function printMessage()
     {
-        $group_name = false;
+        $groupName = false;
         $receiver = $this->getReceiver()->getRemarkName();
-        if ($this->isGroup()) {
-            $group_name = $this->getGroup();
-            $messenger = $this->getGroupMessenger()->getRemarkName();
+        if ($this->getMessageType() == Message::SYS_MESSAGE) {
+            $response = $this->string();
         } else {
-            $messenger = $this->getMessenger()->getRemarkName();
-        }
-        if ($group_name !== false) {
-            $response = '[群][' . $group_name . '] ' . $messenger . " 发送了 [" . $this->string() . "]";
-        } else {
-            $response = $messenger . ' 对 ' . $receiver . ' 发送了 [' . $this->string() . ']';
+            if ($this->isGroup()) {
+                $groupName = $this->getGroup();
+                $messenger = $this->getGroupMessenger()->getRemarkName();
+            } else {
+                $messenger = $this->getMessenger()->getRemarkName();
+            }
+            if ($groupName !== false) {
+                $response = '[群][' . $groupName . '] ' . $messenger . " 发送了 [" . $this->string() . "]";
+            } else {
+                $response = $messenger . ' 对 ' . $receiver . ' 发送了 [' . $this->string() . ']';
+            }
         }
         return $response;
     }
@@ -288,12 +292,12 @@ class Message
     /**
      * 下载消息资源
      *
-     * @param bool $ignore_config 忽略自动下载的配置
+     * @param bool $ignoreConfig 忽略自动下载的配置
      * @return bool
      */
-    public function download($ignore_config = false)
+    public function download($ignoreConfig = false)
     {
-        if (!config('auto_download') && !$ignore_config) {
+        if (!config('auto_download') && !$ignoreConfig) {
             return false;
         }
 
@@ -308,11 +312,11 @@ class Message
         } else {
             return false;
         }
-        Console::log("正在下载 [" . $type . "] 资源，MsgId：" . $this->msg_id);
+        Console::log("正在下载 [" . $type . "] 资源，MsgId：" . $this->msgId);
         // 执行下载任务
         TaskQueue::run('Download', [
             'type'   => $type,
-            'msg_id' => $this->msg_id
+            'msg_id' => $this->msgId
         ]);
         return true;
     }

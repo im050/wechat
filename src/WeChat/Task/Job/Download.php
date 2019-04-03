@@ -14,28 +14,28 @@ use Im050\WeChat\Core\FileSystem;
 class Download extends Job
 {
     public function run() {
-        $msg_id = $this->msg_id;
+        $msgId = $this->params['msg_id'];
         $flag = false;
         switch($this->type) {
             case 'image':
-                $flag = FileSystem::saveImage($msg_id);
+                $flag = FileSystem::saveImage($msgId);
                 break;
             case 'video':
-                $flag = FileSystem::saveVideo($msg_id);
+                $flag = FileSystem::saveVideo($msgId);
                 break;
             case 'voice':
-                $flag = FileSystem::saveVoice($msg_id);
+                $flag = FileSystem::saveVoice($msgId);
                 break;
             case 'emoticon':
-                $flag = FileSystem::saveEmoticon($msg_id);
+                $flag = FileSystem::saveEmoticon($msgId);
                 break;
             default:
                 break;
         }
         if ($flag) {
-            Console::log("下载 [$msg_id] 资源完成");
+            Console::log("下载 [$msgId] 资源完成");
         } else {
-            Console::log("下载 [$msg_id] 资源失败, 资源地址:" . http()->getQueryURI());
+            Console::log("下载 [$msgId] 资源失败, 资源地址:" . http()->getQueryURI());
         }
     }
 }

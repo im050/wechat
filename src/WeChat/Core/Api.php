@@ -13,14 +13,14 @@ class Api
      *
      * @var array
      */
-    public $base_request = [];
+    public $baseRequest = [];
 
     /**
      * 授权信息获取uri
      *
      * @var string
      */
-    public $redirect_uri = '';
+    public $redirectURI = '';
 
 
     /**
@@ -28,7 +28,7 @@ class Api
      *
      * @var null
      */
-    public $media_count = null;
+    public $mediaCount = null;
 
     public static $uri = [
         'base_uri' => 'https://wx.qq.com/cgi-bin/mmwebwx-bin',
@@ -38,7 +38,7 @@ class Api
 
     public function __construct()
     {
-        $this->media_count = new \swoole_atomic(0);
+        $this->mediaCount = new \swoole_atomic(0);
     }
 
     public static function uri($type)
@@ -53,7 +53,7 @@ class Api
      */
     public function getMediaCount()
     {
-        return $this->media_count->get();
+        return $this->mediaCount->get();
     }
 
     /**
@@ -61,7 +61,7 @@ class Api
      */
     protected function addMediaCount()
     {
-        $this->media_count->add();
+        $this->mediaCount->add();
     }
 
     /**
@@ -69,7 +69,7 @@ class Api
      */
     protected function subMediaCount()
     {
-        $this->media_count->sub();
+        $this->mediaCount->sub();
     }
 
     /**
@@ -83,7 +83,7 @@ class Api
         $sid = app()->auth->sid;
         $skey = app()->auth->skey;
         $uin = app()->auth->uin;
-        $device_id = app()->auth->device_id;
+        $deviceId = app()->auth->deviceId;
 
         $payload = [
             'r'        => Utils::timeStamp(),
@@ -91,7 +91,7 @@ class Api
             'skey'     => $skey,
             'sid'      => $sid,
             'uin'      => $uin,
-            'deviceid' => $device_id,
+            'deviceid' => $deviceId,
             'synckey'  => SyncKey::getInstance()->string(),
         ];
 
@@ -116,7 +116,7 @@ class Api
     public function pullMessage()
     {
         $payload = [
-            'BaseRequest' => $this->base_request,
+            'BaseRequest' => $this->baseRequest,
             'SyncKey'     => [
                 'Count' => SyncKey::getInstance()->count(),
                 'List'  => SyncKey::getInstance()->get()
@@ -124,13 +124,13 @@ class Api
             'rr'          => Utils::timeStamp()
         ];
 
-        $query_string = [
+        $queryString = [
             'sid'         => app()->auth->sid,
             'skey'        => app()->auth->skey,
-            'pass_ticket' => app()->auth->pass_ticket
+            'pass_ticket' => app()->auth->passTicket
         ];
 
-        $url = uri('base_uri') . '/webwxsync?' . http_build_query($query_string);
+        $url = uri('base_uri') . '/webwxsync?' . http_build_query($queryString);
         $content = http()->post($url, Utils::json_encode($payload));
 
         $this->debug($content);
@@ -141,8 +141,8 @@ class Api
             throw new \Exception("同步获取消息数据失败");
         }
 
-        $sync_key = $data['SyncKey']['List'];
-        SyncKey::getInstance()->setSyncKey($sync_key);
+        $syncKey = $data['SyncKey']['List'];
+        SyncKey::getInstance()->setSyncKey($syncKey);
 
         return $data;
     }
@@ -156,12 +156,12 @@ class Api
     public function getContact()
     {
         $auth = app()->auth;
-        $query_string = http_build_query([
-            'pass_ticket' => $auth->pass_ticket,
+        $queryString = http_build_query([
+            'pass_ticket' => $auth->passTicket,
             'skey'        => $auth->skey,
             'r'           => Utils::timeStamp()
         ]);
-        $url = uri('base_uri') . '/webwxgetcontact?' . $query_string;
+        $url = uri('base_uri') . '/webwxgetcontact?' . $queryString;
         $content = http()->post($url);
 
         $this->debug($content);
@@ -184,17 +184,17 @@ class Api
      */
     public function sendMessage($username, $text)
     {
-        $url = uri("base_uri") . '/webwxsendmsg?pass_ticket=' . app()->auth->pass_ticket;
-        $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
+        $url = uri("base_uri") . '/webwxsendmsg?pass_ticket=' . app()->auth->passTicket;
+        $msgId = (time() * 1000) . substr(uniqid(), 0, 5);
         $payload = [
-            'BaseRequest' => $this->base_request,
+            'BaseRequest' => $this->baseRequest,
             'Msg'         => [
                 "Type"         => 1,
                 "Content"      => $text,
                 "FromUserName" => Account::username(),
                 "ToUserName"   => $username,
-                "LocalID"      => $msg_id,
-                "ClientMsgId"  => $msg_id
+                "LocalID"      => $msgId,
+                "ClientMsgId"  => $msgId
             ]
         ];
         $data = http()->post($url, Utils::json_encode($payload));
@@ -206,12 +206,12 @@ class Api
         return $flag;
     }
 
-    protected function getMessageResource($type, $msg_id)
+    protected function getMessageResource($type, $msgId)
     {
         if (!in_array($type, ['image', 'voice', 'video'])) {
             return false;
         }
-        if (empty($msg_id)) {
+        if (empty($msgId)) {
             return false;
         }
         $path = [
@@ -220,27 +220,27 @@ class Api
             'video' => 'webwxgetvideo',
         ];
         $url = uri('base_uri') . '/' . $path[$type] . '?' . http_build_query([
-                'MsgID' => $msg_id,
+                'MsgID' => $msgId,
                 'skey'  => app()->auth->skey
             ]);
 
         if ($type == 'video') {
-            $http_config = [
+            $httpConfig = [
                 'timeout' => 300,
                 'headers' => [
                     'Range: bytes=0-'
                 ]
             ];
         } else {
-            $http_config = [
+            $httpConfig = [
                 'timeout' => 60,
             ];
         }
 
         try {
-            $data = http()->get($url, [], $http_config);
+            $data = http()->get($url, [], $httpConfig);
         } catch (\Exception $e) {
-            Console::log("下载 [{$msg_id}] 资源超时, 类型： {$type}", Console::WARNING);
+            Console::log("下载 [{$msgId}] 资源超时, 类型： {$type}", Console::WARNING);
             return null;
         }
         return $data;
@@ -249,34 +249,34 @@ class Api
     /**
      * 获取图片数据
      *
-     * @param $msg_id
+     * @param $msgId
      * @return array|mixed
      */
-    public function getMessageImage($msg_id)
+    public function getMessageImage($msgId)
     {
-        return $this->getMessageResource('image', $msg_id);
+        return $this->getMessageResource('image', $msgId);
     }
 
     /**
      * 获取语音
      *
-     * @param $msg_id
+     * @param $msgId
      * @return array|bool|mixed
      */
-    public function getMessageVoice($msg_id)
+    public function getMessageVoice($msgId)
     {
-        return $this->getMessageResource('voice', $msg_id);
+        return $this->getMessageResource('voice', $msgId);
     }
 
     /**
      * 获取视频
      *
-     * @param $msg_id
+     * @param $msgId
      * @return array|bool|mixed
      */
-    public function getMessageVideo($msg_id)
+    public function getMessageVideo($msgId)
     {
-        return $this->getMessageResource('video', $msg_id);
+        return $this->getMessageResource('video', $msgId);
     }
 
     /**
@@ -292,17 +292,17 @@ class Api
         }
 
         $payload = [
-            'BaseRequest'  => $this->base_request,
+            'BaseRequest'  => $this->baseRequest,
             'ClientMsgId'  => Utils::timeStamp(),
             'Code'         => 3,
             'FromUserName' => $username,
             'ToUserName'   => $username
         ];
-        $query_string = [
+        $queryString = [
             'lang'        => 'zh_CN',
-            'pass_ticket' => app()->auth->pass_ticket
+            'pass_ticket' => app()->auth->passTicket
         ];
-        $url = uri('base_uri') . "/webwxstatusnotify?" . http_build_query($query_string);
+        $url = uri('base_uri') . "/webwxstatusnotify?" . http_build_query($queryString);
 
         $content = http()->post($url, Utils::json_encode($payload));
 
@@ -323,32 +323,33 @@ class Api
      * @param $uin
      * @param $sid
      * @param string $skey
+     * @param string $passTicket
      * @return mixed
      */
-    public function webWxInit($uin, $sid, $skey = '', $pass_ticket = '')
+    public function webWxInit($uin, $sid, $skey = '', $passTicket = '')
     {
-        $base_request = [
+        $baseRequest = [
             'Uin'      => $uin,
             'Sid'      => $sid,
             'Skey'     => $skey,
             'DeviceID' => Utils::generateDeviceID(),
         ];
 
-        $query_string = [
+        $queryString = [
             'r'           => Utils::timeStamp(),
-            'pass_ticket' => $pass_ticket
+            'pass_ticket' => $passTicket
         ];
 
-        $params = Utils::json_encode(['BaseRequest' => $base_request]);
-        $url = uri('base_uri') . '/webwxinit?' . http_build_query($query_string);
+        $params = Utils::json_encode(['BaseRequest' => $baseRequest]);
+        $url = uri('base_uri') . '/webwxinit?' . http_build_query($queryString);
         $content = http()->post($url, $params);
 
         $this->debug($content);
 
-        $base_response = Utils::json_decode($content);
+        $baseResponse = Utils::json_decode($content);
 
-        if (checkBaseResponse($base_response)) {
-            $this->base_request = [
+        if (checkBaseResponse($baseResponse)) {
+            $this->baseRequest = [
                 'Uin'      => app()->keymap->get('uin'),
                 'Sid'      => app()->keymap->get('sid'),
                 'Skey'     => app()->keymap->get('skey'),
@@ -356,7 +357,7 @@ class Api
             ];
         }
 
-        return $base_response;
+        return $baseResponse;
     }
 
     /**
@@ -427,10 +428,10 @@ class Api
         preg_match('/window.redirect_uri="(\S+?)";/', $content, $matches);
 
         if (isset($matches[1])) {
-            $this->redirect_uri = $matches[1];
+            $this->redirectURI = $matches[1];
             //获取主机地址
-            $url_parser = parse_url($this->redirect_uri);
-            $host = $url_parser['host'];
+            $urlParser = parse_url($this->redirectURI);
+            $host = $urlParser['host'];
             //记录uri的host
             app()->keymap->set('uri_host', $host)->save();
             //变更uri的host
@@ -464,7 +465,7 @@ class Api
     public function getToken()
     {
 
-        if (empty($this->redirect_uri)) {
+        if (empty($this->redirectURI)) {
             throw new \Exception("获取权限验证数据失败");
         }
 
@@ -474,7 +475,7 @@ class Api
             'version' => 'v2'
         );
 
-        $content = http()->get($this->redirect_uri, $payload);
+        $content = http()->get($this->redirectURI, $payload);
 
         $this->debug($content);
 
@@ -508,7 +509,7 @@ class Api
 
         $url = uri('base_uri') . '/webwxbatchgetcontact?' . http_build_query([
                 'type'        => 'ex',
-                'pass_ticket' => app()->auth->pass_ticket,
+                'pass_ticket' => app()->auth->passTicket,
                 'r'           => Utils::timeStamp()
             ]);
 
@@ -519,7 +520,7 @@ class Api
         }
 
         $payload = [
-            'BaseRequest' => $this->base_request,
+            'BaseRequest' => $this->baseRequest,
             "Count"       => count($users),
             "List"        => $list
         ];
@@ -550,7 +551,7 @@ class Api
 
         $url = uri('file_uri') . '/webwxuploadmedia?f=json';
 
-        list($mime, $media_type) = $this->getMediaType($file);
+        list($mime, $mediaType) = $this->getMediaType($file);
 
         $data = [
             'id'                 => 'WU_FILE_' . $this->getMediaCount(),
@@ -558,9 +559,9 @@ class Api
             'type'               => $mime,
             'lastModifieDate'    => gmdate('D M d Y H:i:s TO', filemtime($file)) . ' (CST)',
             'size'               => filesize($file),
-            'mediatype'          => $media_type,
+            'mediatype'          => $mediaType,
             'uploadmediarequest' => Utils::json_encode([
-                'BaseRequest'   => $this->base_request,
+                'BaseRequest'   => $this->baseRequest,
                 'ClientMediaId' => time(),
                 'TotalLen'      => filesize($file),
                 'StartPos'      => 0,
@@ -572,7 +573,7 @@ class Api
                 'FileMd5'       => md5_file($file)
             ]),
             'webwx_data_ticket'  => $this->getDataTicket(),
-            'pass_ticket'        => app()->auth->pass_ticket,
+            'pass_ticket'        => app()->auth->passTicket,
             'filename'           => new \CURLFile($file),
         ];
 
@@ -614,18 +615,18 @@ class Api
             return false;
         }
 
-        $media_id = $response['MediaId'];
-        $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
-        $url = uri('base_uri') . '/webwxsendappmsg?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
+        $mediaId = $response['MediaId'];
+        $msgId = (time() * 1000) . substr(uniqid(), 0, 5);
+        $url = uri('base_uri') . '/webwxsendappmsg?fun=async&f=json&pass_ticket=' . app()->auth->passTicket;
         $payload = [
-            'BaseRequest' => $this->base_request,
+            'BaseRequest' => $this->baseRequest,
             'Msg'         => [
                 'Type'         => 6,
-                'Content'      => sprintf("<appmsg appid='wxeb7ec651dd0aefa9' sdkver=''><title>%s</title><des></des><action></action><type>6</type><content></content><url></url><lowurl></lowurl><appattach><totallen>%s</totallen><attachid>%s</attachid><fileext>%s</fileext></appattach><extinfo></extinfo></appmsg>", basename($file), filesize($file), $media_id, end(explode('.', $file))),
+                'Content'      => sprintf("<appmsg appid='wxeb7ec651dd0aefa9' sdkver=''><title>%s</title><des></des><action></action><type>6</type><content></content><url></url><lowurl></lowurl><appattach><totallen>%s</totallen><attachid>%s</attachid><fileext>%s</fileext></appattach><extinfo></extinfo></appmsg>", basename($file), filesize($file), $mediaId, end(explode('.', $file))),
                 'FromUserName' => Account::username(),
                 'ToUserName'   => $username,
-                'LocalID'      => $msg_id,
-                'ClientMsgId'  => $msg_id
+                'LocalID'      => $msgId,
+                'ClientMsgId'  => $msgId
             ]
         ];
 
@@ -656,19 +657,19 @@ class Api
             return false;
         }
 
-        $media_id = $response['MediaId'];
-        $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
-        $url = uri('base_uri') . '/webwxsendmsgimg?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
+        $mediaId = $response['MediaId'];
+        $msgId = (time() * 1000) . substr(uniqid(), 0, 5);
+        $url = uri('base_uri') . '/webwxsendmsgimg?fun=async&f=json&pass_ticket=' . app()->auth->passTicket;
         $payload = [
-            'BaseRequest' => $this->base_request,
+            'BaseRequest' => $this->baseRequest,
             'Msg'         => [
                 'Type'         => 3,
                 'Content'      => '',
-                'MediaId'      => $media_id,
+                'MediaId'      => $mediaId,
                 'FromUserName' => Account::username(),
                 'ToUserName'   => $username,
-                'LocalID'      => $msg_id,
-                'ClientMsgId'  => $msg_id
+                'LocalID'      => $msgId,
+                'ClientMsgId'  => $msgId
             ],
             'Scene'       => 0
         ];
@@ -700,19 +701,19 @@ class Api
             return false;
         }
 
-        $media_id = $response['MediaId'];
-        $msg_id = (time() * 1000) . substr(uniqid(), 0, 5);
-        $url = uri('base_uri') . '/webwxsendemoticon?fun=sys&f=json&pass_ticket=' . app()->auth->pass_ticket;
+        $mediaId = $response['MediaId'];
+        $msgId = (time() * 1000) . substr(uniqid(), 0, 5);
+        $url = uri('base_uri') . '/webwxsendemoticon?fun=sys&f=json&pass_ticket=' . app()->auth->passTicket;
         $payload = [
-            'BaseRequest' => $this->base_request,
+            'BaseRequest' => $this->baseRequest,
             'Msg'         => [
                 'Type'         => 47,
                 "EmojiFlag"    => 2,
-                'MediaId'      => $media_id,
+                'MediaId'      => $mediaId,
                 'FromUserName' => Account::username(),
                 'ToUserName'   => $username,
-                'LocalID'      => $msg_id,
-                'ClientMsgId'  => $msg_id
+                'LocalID'      => $msgId,
+                'ClientMsgId'  => $msgId
             ]
         ];
 
@@ -741,11 +742,11 @@ class Api
         finfo_close($info);
 
         if (stripos($mime, "image") !== false) {
-            $media_type = 'pic';
+            $mediaType = 'pic';
         } else {
-            $media_type = 'doc';
+            $mediaType = 'doc';
         }
-        return [$mime, $media_type];
+        return [$mime, $mediaType];
     }
 
     /**
@@ -759,13 +760,13 @@ class Api
         if ($ticket != false) {
             return $ticket;
         }
-        $cookie_path = config('cookiefile_path');
-        if (file_exists($cookie_path)) {
-            $fp = fopen($cookie_path, 'r');
+        $cookiePath = config('cookiefile_path');
+        if (file_exists($cookiePath)) {
+            $fp = fopen($cookiePath, 'r');
             while ($line = fgets($fp)) {
                 if (strpos($line, 'webwx_data_ticket') !== false) {
-                    $meta_data = explode("\t", trim($line));
-                    $ticket = $meta_data[6];
+                    $metaData = explode("\t", trim($line));
+                    $ticket = $metaData[6];
                     break;
                 }
             }

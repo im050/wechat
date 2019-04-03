@@ -8,13 +8,13 @@ class Auth
 
     public $uuid = '';
 
-    public $device_id = '';
+    public $deviceId = '';
 
     public $sid = '';
 
     public $skey = '';
 
-    public $pass_ticket = '';
+    public $passTicket = '';
 
     public $uin = '';
 
@@ -58,7 +58,7 @@ class Auth
      */
     public function loadTokenFromCache()
     {
-        $need = ['sid', 'skey', 'uin', 'pass_ticket'];
+        $need = ['sid', 'skey', 'uin', 'passTicket'];
         foreach ($need as $key) {
             $this->$key = app()->keymap->get($key);
         }

@@ -103,64 +103,64 @@ class FileSystem
     /**
      * 保存图片
      *
-     * @param $msg_id
+     * @param $msgId
      * @return bool|int
      */
-    public static function saveImage($msg_id) {
+    public static function saveImage($msgId) {
         $api = app()->api;
-        $image = $api->getMessageImage($msg_id);
+        $image = $api->getMessageImage($msgId);
         if (strlen($image) <= 0) {
             return false;
         }
-        $file = self::getImagePath() . DIRECTORY_SEPARATOR . $msg_id . '.jpg';
+        $file = self::getImagePath() . DIRECTORY_SEPARATOR . $msgId . '.jpg';
         return self::write($image, $file);
     }
 
     /**
      * 保存语音
      *
-     * @param $msg_id
+     * @param $msgId
      * @return bool|int
      */
-    public static function saveVoice($msg_id) {
+    public static function saveVoice($msgId) {
         $api = app()->api;
-        $voice = $api->getMessageVoice($msg_id);
+        $voice = $api->getMessageVoice($msgId);
         if (strlen($voice) <= 0) {
             return false;
         }
-        $file = self::getVoicePath() . DIRECTORY_SEPARATOR . $msg_id . '.mp3';
+        $file = self::getVoicePath() . DIRECTORY_SEPARATOR . $msgId . '.mp3';
         return self::write($voice, $file);
     }
 
     /**
      * 保存视频
      *
-     * @param $msg_id
+     * @param $msgId
      * @return bool|int
      */
-    public static function saveVideo($msg_id) {
+    public static function saveVideo($msgId) {
         $api = app()->api;
-        $video = $api->getMessageVideo($msg_id);
+        $video = $api->getMessageVideo($msgId);
         if (strlen($video) <= 0) {
             return false;
         }
-        $file = self::getVideoPath() . DIRECTORY_SEPARATOR . $msg_id . '.mp4';
+        $file = self::getVideoPath() . DIRECTORY_SEPARATOR . $msgId . '.mp4';
         return self::write($video, $file);
     }
 
     /**
      * 保存表情
      *
-     * @param $msg_id
+     * @param $msgId
      * @return bool|int
      */
-    public static function saveEmoticon($msg_id) {
+    public static function saveEmoticon($msgId) {
         $api = app()->api;
-        $image = $api->getMessageImage($msg_id);
+        $image = $api->getMessageImage($msgId);
         if (strlen($image) <= 0) {
             return false;
         }
-        $file = self::getImagePath() . DIRECTORY_SEPARATOR . $msg_id . '.gif';
+        $file = self::getImagePath() . DIRECTORY_SEPARATOR . $msgId . '.gif';
         return self::write($image, $file);
     }
 }

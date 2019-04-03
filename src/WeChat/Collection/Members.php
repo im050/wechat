@@ -29,7 +29,7 @@ class Members
 
     public $specials = null;
 
-    public static $special_username = ['newsapp', 'fmessage', 'filehelper', 'weibo', 'qqmail',
+    public static $specialUsername = ['newsapp', 'fmessage', 'filehelper', 'weibo', 'qqmail',
         'fmessage', 'tmessage', 'qmessage', 'qqsync', 'floatbottle', 'lbsapp', 'shakeapp',
         'medianote', 'qqfriend', 'readerapp', 'blogapp', 'facebookapp', 'masssendapp',
         'meishiapp', 'feedsapp', 'voip', 'blogappweixin', 'weixin', 'brandsessionholder',
@@ -203,35 +203,35 @@ class Members
      * 判断是否常规联系人
      *
      * @param $username
-     * @param int $verify_flag
+     * @param int $verifyFlag
      * @return boolean;
      */
-    public static function isContact($username, $verify_flag = 0)
+    public static function isContact($username, $verifyFlag = 0)
     {
-        return self::isContactOrOfficial($username, $verify_flag, true);
+        return self::isContactOrOfficial($username, $verifyFlag, true);
     }
 
     /**
      * 判断是否公众号
      *
      * @param $username
-     * @param int $verify_flag
+     * @param int $verifyFlag
      * @return bool
      */
-    public static function isOfficial($username, $verify_flag = 0)
+    public static function isOfficial($username, $verifyFlag = 0)
     {
-        return self::isContactOrOfficial($username, $verify_flag, false);
+        return self::isContactOrOfficial($username, $verifyFlag, false);
     }
 
     /**
      * 通用判断公众号或者常规联系人
      *
      * @param $username
-     * @param $verify_flag
+     * @param $verifyFlag
      * @param bool $type
      * @return bool
      */
-    public static function isContactOrOfficial($username, $verify_flag, $type = true)
+    public static function isContactOrOfficial($username, $verifyFlag, $type = true)
     {
         $pattern = '/^(@[a-z0-9]{1})/';
         preg_match($pattern, $username, $matches);
@@ -240,9 +240,9 @@ class Members
         }
 
         if ($type == true) {
-            $flag = (($verify_flag & 8) == 0);
+            $flag = (($verifyFlag & 8) == 0);
         } else {
-            $flag = (($verify_flag & 8) != 0);
+            $flag = (($verifyFlag & 8) != 0);
         }
 
         return $flag;

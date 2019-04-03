@@ -14,7 +14,7 @@ class HttpClient
 
     public $status = 0;
 
-    public $query_uri = '';
+    public $queryURI = '';
 
     /**
      * default config
@@ -36,7 +36,7 @@ class HttpClient
         'encoding' => 'gzip',
     ];
 
-    public $params_map = [
+    public $paramsMap = [
         'timeout' => CURLOPT_TIMEOUT,
         'cookie' => CURLOPT_COOKIE,
         'header' => CURLOPT_HEADER,
@@ -78,13 +78,13 @@ class HttpClient
             if ($val == '') {
                 continue;
             }
-            if (!isset($this->params_map[$key])) {
+            if (!isset($this->paramsMap[$key])) {
                 continue;
             }
             if ($key == 'cookie' && is_array($val)) {
                 $val = $this->parseCookie($val);
             }
-            curl_setopt($this->curl, $this->params_map[$key], $val);
+            curl_setopt($this->curl, $this->paramsMap[$key], $val);
         }
         return $config;
     }
@@ -140,22 +140,22 @@ class HttpClient
      *
      * @return boolean
      */
-    public function parseCookie($cookie_string)
+    public function parseCookie($cookieString)
     {
         $data = array();
-        foreach ($cookie_string as $key => $val) {
+        foreach ($cookieString as $key => $val) {
             $data[] = $key . "=" . $val;
         }
-        $array_cookies_string = '';
+        $arrayCookiesString = '';
         if (!empty($data)) {
-            $array_cookies_string = implode(";", $data);
+            $arrayCookiesString = implode(";", $data);
         }
-        if (empty($cookie_string)) {
-            $cookie_string = $array_cookies_string;
+        if (empty($cookieString)) {
+            $cookieString = $arrayCookiesString;
         } else {
-            $cookie_string .= ";" . $array_cookies_string;
+            $cookieString .= ";" . $arrayCookiesString;
         }
-        return $cookie_string;
+        return $cookieString;
     }
 
 
@@ -170,13 +170,13 @@ class HttpClient
     public function get($uri = '/', $data = array(), $config = [])
     {
         if (!empty($data)) {
-            $query_string = http_build_query($data);
+            $queryString = http_build_query($data);
             if (stripos($uri, "?") === FALSE) {
-                $link_symbol = '?';
+                $linkSymbol = '?';
             } else {
-                $link_symbol = '&';
+                $linkSymbol = '&';
             }
-            $uri .= $link_symbol . $query_string;
+            $uri .= $linkSymbol . $queryString;
         }
         return $this->request($uri, [], 'get', $config);
     }
@@ -218,7 +218,7 @@ class HttpClient
     public function setURI($uri)
     {
         curl_setopt($this->curl, CURLOPT_URL, $uri);
-        $this->query_uri = $uri;
+        $this->queryURI = $uri;
     }
 
     /**
@@ -228,7 +228,7 @@ class HttpClient
      */
     public function getQueryURI()
     {
-        return $this->query_uri;
+        return $this->queryURI;
     }
 
     /**

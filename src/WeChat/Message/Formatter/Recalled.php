@@ -10,7 +10,7 @@ class Recalled extends Message
 
     public $origin = 0;
 
-    public $recall_message = null;
+    public $recallMessage = null;
 
     /**
      * 解析message获取msgId
@@ -38,25 +38,25 @@ class Recalled extends Message
     public function backup()
     {
         $this->origin = $this->parseMsgId($this->content);
-        $this->recall_message = messages()->get($this->origin);
+        $this->recallMessage = messages()->get($this->origin);
         try {
-            $this->recall_message = MessageFactory::create($this->recall_message['MsgType'], $this->recall_message);
+            $this->recallMessage = MessageFactory::create($this->recallMessage['MsgType'], $this->recallMessage);
         } catch (\Exception $e) {
             return false;
         }
         //下载资源
         if (in_array(
-            $this->recall_message->getMessageType(), array(
+            $this->recallMessage->getMessageType(), array(
             Message::EMOTICON_MESSAGE,
             Message::IMAGE_MESSAGE,
             Message::VIDEO_MESSAGE,
             Message::MICROVIDEO_MESSAGE,
             Message::VOICE_MESSAGE
         ))) {
-            return $this->recall_message->download(true);
+            return $this->recallMessage->download(true);
         } else {
             $string = "[" . Utils::now() . "] ";
-            $string .= $this->recall_message->printMessage();
+            $string .= $this->recallMessage->printMessage();
             return FileSystem::append($string, FileSystem::getCurrentUserPath() . '/撤回消息记录.log');
         }
     }
@@ -67,7 +67,7 @@ class Recalled extends Message
      * @return null
      */
     public function getOriginMessage() {
-        return $this->recall_message;
+        return $this->recallMessage;
     }
 
     public function printMessage()

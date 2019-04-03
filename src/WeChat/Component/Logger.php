@@ -27,16 +27,16 @@ class Logger
             return false;
         }
 
-        $log_string = '';
+        $logString = '';
 
         foreach ($data as $column => $content) {
-            $log_string .= "[{$column}] {$content} " . PHP_EOL;
+            $logString .= "[{$column}] {$content} " . PHP_EOL;
         }
 
-        if (empty($log_string)) {
+        if (empty($logString)) {
             return false;
         }
 
-        return FileSystem::append($log_string, $file);
+        return FileSystem::append($logString, $file);
     }
 }

@@ -59,18 +59,18 @@ class Utils
      * 生成随机字符
      *
      * @param int $length
-     * @param bool $is_number
+     * @param bool $isNumber
      * @return string
      */
-    public static function randomString($length = 16, $is_number = false)
+    public static function randomString($length = 16, $isNumber = false)
     {
-        $number_poor = "0123456789";
-        $eng_poor = "abcdefghijklmnopqrstuvwxyz";
+        $numberPoor = "0123456789";
+        $engPoor = "abcdefghijklmnopqrstuvwxyz";
         $string = '';
-        if (!$is_number) {
-            $poor = $number_poor . $eng_poor;
+        if (!$isNumber) {
+            $poor = $numberPoor . $engPoor;
         } else {
-            $poor = $number_poor;
+            $poor = $numberPoor;
         }
         for ($i = 0; $i < $length; $i++) {
             $random = mt_rand(0, strlen($poor) - 1);
@@ -118,14 +118,14 @@ class Utils
     /**
      * 获取当前时间
      *
-     * @param string $time_zone
+     * @param string $timeZone
      * @param string $format
      * @return false|string
      */
-    public static function now($time_zone = '', $format = 'Y-m-d H:i:s')
+    public static function now($timeZone = '', $format = 'Y-m-d H:i:s')
     {
-        if (!empty($time_zone)) {
-            date_default_timezone_set($time_zone);
+        if (!empty($timeZone)) {
+            date_default_timezone_set($timeZone);
         }
         return date($format, time());
     }

@@ -24,7 +24,7 @@ class MessageHandler
      *
      * @var null
      */
-    protected $heart_process = null;
+    protected $heartProcess = null;
 
     /**
      * 存放回调事件
@@ -55,30 +55,23 @@ class MessageHandler
      */
     public function listen()
     {
-
         Console::log("开始监听消息...");
-
         //执行登录成功回调
         if (isset($this->events['login_success'])) {
             $this->events['login_success']['closure']($this->events['login_success']['robot']);
         }
-
         $api = app()->api;
-
-        $failed_times = 0;
-
+        $failedTimes = 0;
         $this->heartCheck();
-
         while (true) {
-
             try {
                 list($retcode, $selector) = $api->syncCheck();
-                if ($failed_times > 0) {
-                    $failed_times--;
+                if ($failedTimes > 0) {
+                    $failedTimes--;
                 }
             } catch (\Exception $e) {
-                $failed_times++;
-                if ($failed_times == 10) {
+                $failedTimes++;
+                if ($failedTimes == 10) {
                     Console::log("监听消息失败超过 10 次，程序退出。", Console::ERROR);
                 }
                 Console::log("监听消息失败，Exception：" . $e->getMessage(), Console::WARNING);
@@ -138,11 +131,11 @@ class MessageHandler
             return false;
         }
 
-        $msg_list = $response['AddMsgList'];
-        foreach ($msg_list as $key => $msg) {
-            $msg_type = $msg['MsgType'];
+        $messageList = $response['AddMsgList'];
+        foreach ($messageList as $key => $msg) {
+            $msgType = $msg['MsgType'];
             try {
-                $message = MessageFactory::create($msg_type, $msg);
+                $message = MessageFactory::create($msgType, $msg);
                 //将消息加入记录集合
                 messages()->add($message);
                 //控制台打印消息
@@ -154,7 +147,7 @@ class MessageHandler
                 }
                 if (config('debug')) {
                     $log = [
-                        '消息类型' => $msg_type,
+                        '消息类型' => $msgType,
                         '消息数据' => Utils::json_encode($msg),
                         '日志时间' => Utils::now()
                     ];
@@ -164,14 +157,14 @@ class MessageHandler
             } catch (\Exception $e) {
                 if (config('debug')) {
                     $log = [
-                        '消息类型' => $msg_type,
+                        '消息类型' => $msgType,
                         '消息数据' => Utils::json_encode($msg),
                         '日志时间' => Utils::now()
                     ];
                     $path = config('unknown_message_log_path');
                     Logger::write($log, $path);
                 }
-                Console::log("收到未知消息格式的数据类型，[MSG_TYPE] : {$msg_type}", Console::DEBUG);
+                Console::log("收到未知消息格式的数据类型，[MSG_TYPE] : {$msgType}", Console::DEBUG);
             }
         }
         return true;
@@ -184,8 +177,8 @@ class MessageHandler
      */
     public function printMessage(Message $message)
     {
-        $print_message = $message->printMessage();
-        Console::log($print_message);
+        $printMessage = $message->printMessage();
+        Console::log($printMessage);
     }
 
     /**
@@ -231,13 +224,13 @@ class MessageHandler
      */
     protected function heartCheck($time = 180000)
     {
-        $parent_pid = posix_getpid();
-        $this->heart_process = new \swoole_process(function ($worker) use ($time, $parent_pid) {
-            swoole_timer_tick($time, function () use ($worker, $parent_pid) {
+        $parentPid = posix_getpid();
+        $this->heartProcess = new \swoole_process(function ($worker) use ($time, $parentPid) {
+            swoole_timer_tick($time, function () use ($worker, $parentPid) {
                 $time = time();
                 $filehelper = members()->getSpecials()->getContactByUserName('filehelper');
                 $ppid = posix_getppid();
-                if ($ppid != $parent_pid) {
+                if ($ppid != $parentPid) {
                     $filehelper->sendMessage('你的父进程异常GG了，赶快去服务器上看一下吧。', true);
                     call_user_func(array($this, 'clear'));
                 } else {
@@ -246,7 +239,7 @@ class MessageHandler
                 app()->keymap->set('login_time', $time)->save();
             });
         });
-        $this->heart_process->start();
+        $this->heartProcess->start();
     }
 
     /**
@@ -257,7 +250,7 @@ class MessageHandler
         //关闭任务进程
         TaskQueue::shutdown();
         //关闭心跳进程
-        $this->heart_process->exit(0);
+        $this->heartProcess->exit(0);
         //关闭自己
         exit(0);
     }

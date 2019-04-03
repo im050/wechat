@@ -52,13 +52,13 @@ class Robot
         $this->boot();
 
         //配置应用
-        $cookie_path = config('tmp_path') . '/cookies.txt';
+        $cookiePath = config('tmp_path') . '/cookies.txt';
 
         //设置cookie路径
-        http()->setConfig('cookiejar', $cookie_path);
-        http()->setConfig('cookiefile', $cookie_path);
+        http()->setConfig('cookiejar', $cookiePath);
+        http()->setConfig('cookiefile', $cookiePath);
 
-        config('cookiefile_path', $cookie_path);
+        config('cookiefile_path', $cookiePath);
         config('exception_log_path', config('tmp_path') . '/log/exception.log');
         config('warning_log_path', config('tmp_path') . '/log/warning.log');
         config('api_debug_log_path', config('tmp_path') . '/log/api_debug.log');
@@ -141,9 +141,9 @@ class Robot
         //文件键值对管理
         app()->singleton('keymap', function () {
             $config = Config::getInstance();
-            $tmp_path = $config->get('tmp_path');
+            $tmpPath = $config->get('tmp_path');
             return new Storage(new FileHandler([
-                'file' => $tmp_path . DIRECTORY_SEPARATOR . 'keymap.json'
+                'file' => $tmpPath . DIRECTORY_SEPARATOR . 'keymap.json'
             ]));
         });
     }

@@ -4,7 +4,7 @@ namespace Im050\WeChat\Core;
 
 class SyncKey
 {
-    public $sync_key = [];
+    public $syncKey = [];
 
     public $count = 0;
 
@@ -25,16 +25,16 @@ class SyncKey
     /**
      * 设置SyncKey
      *
-     * @param $sync_key
+     * @param $syncKey
      */
-    public function setSyncKey($sync_key)
+    public function setSyncKey($syncKey)
     {
-        if (is_array($sync_key)) {
-            $this->sync_key = $sync_key;
+        if (is_array($syncKey)) {
+            $this->syncKey = $syncKey;
         } else {
-            $this->sync_key = $this->parse($sync_key);
+            $this->syncKey = $this->parse($syncKey);
         }
-        $this->count = count($this->sync_key);
+        $this->count = count($this->syncKey);
     }
 
     /**
@@ -44,7 +44,7 @@ class SyncKey
      */
     public function get()
     {
-        return $this->sync_key;
+        return $this->syncKey;
     }
 
     /**
@@ -65,7 +65,7 @@ class SyncKey
     public function string()
     {
         $string = '';
-        foreach ($this->sync_key as $key => $item) {
+        foreach ($this->syncKey as $key => $item) {
             $string .= $item['Key'] . "_" . $item['Val'] . '|';
         }
         $string = rtrim($string, "|");

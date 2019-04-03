@@ -21,7 +21,7 @@ class MessageCollection extends Collection
      *
      * @var int
      */
-    public $max_items = 2048;
+    public $maxItems = 2048;
 
     protected static $_instance = null;
 
@@ -41,18 +41,18 @@ class MessageCollection extends Collection
      */
     public function add($message) {
         if ($message instanceof Message) {
-            $msg_id = $message->getMessageID();
+            $msgId = $message->getMessageID();
             $raw = $message->raw();
         } else {
-            $msg_id = $message['MsgId'];
+            $msgId = $message['MsgId'];
             $raw = $message;
         }
 
-        if ($this->count() >= $this->max_items) {
+        if ($this->count() >= $this->maxItems) {
             $this->pop();
         }
 
-        return $this->prepend($raw, $msg_id);
+        return $this->prepend($raw, $msgId);
     }
 
     /**

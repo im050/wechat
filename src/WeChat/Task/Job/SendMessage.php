@@ -18,6 +18,9 @@ class SendMessage extends Job
         $username = $this->username;
         $content = $this->content;
         $type = $this->type;
+        if ($type == null || $type == "") {
+            $type = "text";
+        }
         try {
             $flag = false;
             switch ($type) {

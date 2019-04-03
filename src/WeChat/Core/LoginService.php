@@ -1,6 +1,7 @@
 <?php
 namespace Im050\WeChat\Core;
 
+use Im050\WeChat\Collection\Element\Group;
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
@@ -19,7 +20,7 @@ class LoginService
 
     const LOGIN_CONFIRM = 201;
 
-    public $init_response = [];
+    public $initResponse = [];
 
     /**
      * 扫码登录
@@ -57,11 +58,11 @@ class LoginService
             $uin = app()->auth->uin;
             $sid = app()->auth->sid;
             $skey = app()->auth->skey;
-            $pass_ticket = app()->auth->pass_ticket;
+            $passTicket = app()->auth->passTicket;
 
-            $response = app()->api->webWxInit($uin, $sid, $skey, $pass_ticket);
+            $response = app()->api->webWxInit($uin, $sid, $skey, $passTicket);
 
-            $this->init_response = $response;
+            $this->initResponse = $response;
 
             if (!checkBaseResponse($response)) {
                 Console::log("初始化失败，请重新运行本程序", Console::ERROR);
@@ -99,7 +100,7 @@ class LoginService
         //尝试初始化
         $response = app()->api->webWxInit('xuin=' . app()->auth->uin, app()->auth->sid);
 
-        $this->init_response = $response;
+        $this->initResponse = $response;
 
         if (!checkBaseResponse($response)) {
             Console::log("免扫码登录失败..." . $response['BaseResponse']['Ret']);
@@ -127,11 +128,11 @@ class LoginService
      */
     public function start()
     {
-        $last_login_time = app()->keymap->get('login_time');
+        $lastLoginTime = app()->keymap->get('login_time');
 
         $status = false;
 
-        if (time() - $last_login_time <= 300) {
+        if (time() - $lastLoginTime <= 300) {
             $status = $this->tryLogin();
         }
 
@@ -173,34 +174,35 @@ class LoginService
 
 
         //处理contact接口获取的用户列表
-        $member_list = $data['MemberList'];
+        $memberList = $data['MemberList'];
 
-        foreach ($member_list as $key => $item) {
+        foreach ($memberList as $key => $item) {
             $members->push($item);
         }
 
         //处理wxwebinit接口获取的用户列表
-        $contact_list = $this->init_response['ContactList'];
+        $contactList = $this->initResponse['ContactList'];
 
-        foreach ($contact_list as $key => $item) {
+        foreach ($contactList as $key => $item) {
             $members->push($item);
         }
 
         Console::log("初始化群成员数据信息...");
         //初始化群成员
-        $group_list = $members->getGroups();
-        $batch_username = [];
-        foreach($group_list as $key => $item) {
-            array_push($batch_username, $item['UserName']);
+        $groupList = $members->getGroups();
+        $batchUsername = [];
+        foreach($groupList as $key => $item) {
+            array_push($batchUsername, $item['UserName']);
         }
 
-        $batch_info = app()->api->getBatchContact($batch_username);
-        $batch_contact_list = $batch_info['ContactList'];
-        foreach ($batch_contact_list as $key => $item) {
-            $member_list = $item['MemberList'];
-            $group = $group_list->getContactByUserName($item['UserName']);
+        $batchInfo = app()->api->getBatchContact($batchUsername);
+        $batchContactList = $batchInfo['ContactList'];
+        foreach ($batchContactList as $key => $item) {
+            $memberList = $item['MemberList'];
+            /** @var Group $group */
+            $group = $groupList->getContactByUserName($item['UserName']);
             if ($group) {
-                $group->setMemberList($member_list);
+                $group->setMemberList($memberList);
             } else {
                 Console::log("未找到群 " . $item['UserName'] . "...");
             }
@@ -223,9 +225,9 @@ class LoginService
      */
     public function pollingLogin()
     {
-        $max_times = 10;
+        $maxTimes = 10;
 
-        for ($retry_times = 0; $retry_times <= $max_times; $retry_times++) {
+        for ($retryTimes = 0; $retryTimes <= $maxTimes; $retryTimes++) {
 
             $code = app()->api->getLoginStatus();
 
@@ -239,12 +241,12 @@ class LoginService
                     return $code;
                 case self::LOGIN_CONFIRM:
 
-                    if (!isset($click_btn)) {
-                        $click_btn = true;
+                    if (!isset($clickBtn)) {
+                        $clickBtn = true;
                         Console::log("请在手机上点击登录按钮.");
                     }
 
-                    $retry_times -= 1;
+                    $retryTimes -= 1;
 
                     sleep(1);
 
@@ -262,9 +264,9 @@ class LoginService
      */
     public function openQRcode()
     {
-        $max_times = 10;
+        $maxTimes = 10;
 
-        for ($retry_times = 0; $retry_times <= $max_times; $retry_times++) {
+        for ($retryTimes = 0; $retryTimes <= $maxTimes; $retryTimes++) {
             $uuid = app()->api->getUuid();
 
             if ($uuid === false) {
@@ -275,8 +277,8 @@ class LoginService
 
             if (config('save_qrcode')) {
                 //下载二维码图片
-                $img_url = 'https://login.weixin.qq.com/qrcode/' . $uuid;
-                FileSystem::download($img_url, config('tmp_path') . '/qrcode.png');
+                $imgUrl = 'https://login.weixin.qq.com/qrcode/' . $uuid;
+                FileSystem::download($imgUrl, config('tmp_path') . '/qrcode.png');
             }
 
             //生成二维码在控制台

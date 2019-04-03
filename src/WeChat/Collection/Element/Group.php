@@ -42,10 +42,10 @@ class Group extends MemberElement
     /**
      * 设置成员
      *
-     * @param $member_list
+     * @param $memberList
      */
-    public function setMemberList($member_list) {
-        $this->members = $member_list;
+    public function setMemberList($memberList) {
+        $this->members = $memberList;
     }
 
     /**

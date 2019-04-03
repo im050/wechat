@@ -54,9 +54,9 @@ class ContactCollection extends Collection
     public function findContactFromAPI($username)
     {
         $data = app()->api->getBatchContact($username);
-        $contact_list = $data['ContactList'];
-        if (!empty($contact_list)) {
-            return reset($contact_list);
+        $contactList = $data['ContactList'];
+        if (!empty($contactList)) {
+            return reset($contactList);
         } else {
             return null;
         }

@@ -20,7 +20,7 @@ class TaskQueue
      * @var array
      */
     public $config = [
-        'max_process_num' => 10
+        'max_processNum' => 10
     ];
 
     /**
@@ -28,14 +28,14 @@ class TaskQueue
      *
      * @var int|mixed
      */
-    public $process_num = 0;
+    public $processNum = 0;
 
     /**
      * 进程池
      *
      * @var array
      */
-    public $process_pool = [];
+    public $processPool = [];
 
     /**
      * TaskQueue constructor.
@@ -45,7 +45,7 @@ class TaskQueue
     public function __construct($config = array())
     {
         $this->config = array_merge($this->config, $config);
-        $this->process_num = $this->config['max_process_num'];
+        $this->processNum = $this->config['max_processNum'];
     }
 
     /**
@@ -53,11 +53,11 @@ class TaskQueue
      */
     public function createProcess()
     {
-        for ($i = 0; $i < $this->process_num; $i++) {
+        for ($i = 0; $i < $this->processNum; $i++) {
             $process = new \swoole_process(array($this, "onTask"));
             $process->useQueue();
             $pid = $process->start();
-            $this->process_pool[$pid] = &$process;
+            $this->processPool[$pid] = &$process;
         }
     }
 
@@ -105,12 +105,12 @@ class TaskQueue
     public function task($job, $params)
     {
         //延迟创建进程
-        if (count($this->process_pool) <= 0) {
+        if (count($this->processPool) <= 0) {
             $this->createProcess();
         }
-        $process = current($this->process_pool);
+        $process = current($this->processPool);
         $data = array(
-            'job' => $job,
+            'job'    => $job,
             'params' => $params
         );
         $data = Utils::json_encode($data);
@@ -138,13 +138,15 @@ class TaskQueue
     public static function shutdown()
     {
         if (app()->hasInstance('task_queue')) {
-            $task_queue = app()->get('task_queue');
+            $taskQueue = app()->get('task_queue');
+            if (isset($taskQueue) && $taskQueue instanceof TaskQueue) {
+                reset($taskQueue->processPool);
+                foreach ($taskQueue->processPool as $pid => $process) {
+                    posix_kill($pid, SIGTERM);
+                }
+            }
         } else {
             Console::log("尚未创建任务队列", Console::ERROR);
-        }
-        reset($task_queue->process_pool);
-        foreach($task_queue->process_pool as $pid => $process) {
-            posix_kill($pid, SIGTERM);
         }
     }
 
