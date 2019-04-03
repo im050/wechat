@@ -83,7 +83,7 @@ class Api
         $sid = app()->auth->sid;
         $skey = app()->auth->skey;
         $uin = app()->auth->uin;
-        $deviceId = app()->auth->deviceId;
+        $deviceId = app()->auth->device_id;
 
         $payload = [
             'r'        => Utils::timeStamp(),
@@ -127,7 +127,7 @@ class Api
         $queryString = [
             'sid'         => app()->auth->sid,
             'skey'        => app()->auth->skey,
-            'pass_ticket' => app()->auth->passTicket
+            'pass_ticket' => app()->auth->pass_ticket
         ];
 
         $url = uri('base_uri') . '/webwxsync?' . http_build_query($queryString);
@@ -157,7 +157,7 @@ class Api
     {
         $auth = app()->auth;
         $queryString = http_build_query([
-            'pass_ticket' => $auth->passTicket,
+            'pass_ticket' => $auth->pass_ticket,
             'skey'        => $auth->skey,
             'r'           => Utils::timeStamp()
         ]);
@@ -184,7 +184,7 @@ class Api
      */
     public function sendMessage($username, $text)
     {
-        $url = uri("base_uri") . '/webwxsendmsg?pass_ticket=' . app()->auth->passTicket;
+        $url = uri("base_uri") . '/webwxsendmsg?pass_ticket=' . app()->auth->pass_ticket;
         $msgId = (time() * 1000) . substr(uniqid(), 0, 5);
         $payload = [
             'BaseRequest' => $this->baseRequest,
@@ -300,7 +300,7 @@ class Api
         ];
         $queryString = [
             'lang'        => 'zh_CN',
-            'pass_ticket' => app()->auth->passTicket
+            'pass_ticket' => app()->auth->pass_ticket
         ];
         $url = uri('base_uri') . "/webwxstatusnotify?" . http_build_query($queryString);
 
@@ -509,7 +509,7 @@ class Api
 
         $url = uri('base_uri') . '/webwxbatchgetcontact?' . http_build_query([
                 'type'        => 'ex',
-                'pass_ticket' => app()->auth->passTicket,
+                'pass_ticket' => app()->auth->pass_ticket,
                 'r'           => Utils::timeStamp()
             ]);
 
@@ -573,7 +573,7 @@ class Api
                 'FileMd5'       => md5_file($file)
             ]),
             'webwx_data_ticket'  => $this->getDataTicket(),
-            'pass_ticket'        => app()->auth->passTicket,
+            'pass_ticket'        => app()->auth->pass_ticket,
             'filename'           => new \CURLFile($file),
         ];
 
@@ -617,7 +617,7 @@ class Api
 
         $mediaId = $response['MediaId'];
         $msgId = (time() * 1000) . substr(uniqid(), 0, 5);
-        $url = uri('base_uri') . '/webwxsendappmsg?fun=async&f=json&pass_ticket=' . app()->auth->passTicket;
+        $url = uri('base_uri') . '/webwxsendappmsg?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
         $payload = [
             'BaseRequest' => $this->baseRequest,
             'Msg'         => [
@@ -659,7 +659,7 @@ class Api
 
         $mediaId = $response['MediaId'];
         $msgId = (time() * 1000) . substr(uniqid(), 0, 5);
-        $url = uri('base_uri') . '/webwxsendmsgimg?fun=async&f=json&pass_ticket=' . app()->auth->passTicket;
+        $url = uri('base_uri') . '/webwxsendmsgimg?fun=async&f=json&pass_ticket=' . app()->auth->pass_ticket;
         $payload = [
             'BaseRequest' => $this->baseRequest,
             'Msg'         => [
@@ -703,7 +703,7 @@ class Api
 
         $mediaId = $response['MediaId'];
         $msgId = (time() * 1000) . substr(uniqid(), 0, 5);
-        $url = uri('base_uri') . '/webwxsendemoticon?fun=sys&f=json&pass_ticket=' . app()->auth->passTicket;
+        $url = uri('base_uri') . '/webwxsendemoticon?fun=sys&f=json&pass_ticket=' . app()->auth->pass_ticket;
         $payload = [
             'BaseRequest' => $this->baseRequest,
             'Msg'         => [

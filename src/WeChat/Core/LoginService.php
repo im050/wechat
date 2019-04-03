@@ -58,7 +58,7 @@ class LoginService
             $uin = app()->auth->uin;
             $sid = app()->auth->sid;
             $skey = app()->auth->skey;
-            $passTicket = app()->auth->passTicket;
+            $passTicket = app()->auth->pass_ticket;
 
             $response = app()->api->webWxInit($uin, $sid, $skey, $passTicket);
 
