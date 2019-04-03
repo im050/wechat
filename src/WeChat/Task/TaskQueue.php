@@ -20,7 +20,7 @@ class TaskQueue
      * @var array
      */
     public $config = [
-        'max_processNum' => 10
+        'max_process_num' => 1
     ];
 
     /**
@@ -45,7 +45,7 @@ class TaskQueue
     public function __construct($config = array())
     {
         $this->config = array_merge($this->config, $config);
-        $this->processNum = $this->config['max_processNum'];
+        $this->processNum = $this->config['max_process_num'];
     }
 
     /**

@@ -47,7 +47,6 @@ $robot->onMessage(function (Message $message, Robot $robot) {
         Console::log("获取消息发送者失败");
         return ;
     }
-    echo "come on";
     switch ($message->getMessageType()) {
         case Message::TEXT_MESSAGE:
             $message->getMessenger()->sendMessage("ok");
@@ -56,6 +55,9 @@ $robot->onMessage(function (Message $message, Robot $robot) {
         case Message::IMAGE_MESSAGE:
             $file = Utils::getRandomFileName(__DIR__ . '/pic');
             $messenger->sendEmoticon($file);
+            break;
+        case Message::RECALLED_MESSAGE:
+            $messenger->sendMessage("有个兄弟撤回了消息！不过没关系，我记住了。");
             break;
     }
 });
