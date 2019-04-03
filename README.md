@@ -1,5 +1,5 @@
 # WeChat Robot
-一款基于PHP开发的微信机器人程序（个人号非公众号）
+一款基于PHP开发的微信机器人程序（个人号非公众号），仅供个人学习及研究
 
 ![image](https://img.shields.io/badge/PHP-5.6-orange.svg?style=flat)
 ![image](https://img.shields.io/badge/license-MIT-green.svg?style=flat)
@@ -46,21 +46,11 @@ composer update
 php example/start.php
 ```
 
-## 关于
-
-项目开始之初，在网上无意发现基于`python`开发的微信机器人（ItChat），于是想以学习的目的使用PHP开发一个微信机器人。由于时间的关系，截至目前为止，很多功能均未完善，另外，由于使用了`swoole`扩展，所以请在`linux`环境下运行该程序。以下同类型的项目在处理微信协议上给予了我莫大的帮助，其次以下项目也更加健全，更适合要求高的朋友们使用。
+## 更好的选择
 
 1. [littlecodersh/ItChat](https://github.com/littlecodersh/ItChat) 
 2. [HanSon/vbot](https://github.com/HanSon/vbot) 
 3. [lbbniu/WebWechat](https://github.com/lbbniu/WebWechat) 
-
-在此，感谢以上项目作者的无私奉献，我也会坚持将自己的微信机器人完善下去。
-
-## 联系
-
-    Email: service@im050.com
-    QQ: 52619941
-    WeChat: cnmemory
 
 ## 截图
 

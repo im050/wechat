@@ -73,7 +73,7 @@ $robot->onLoginSuccess(function () {
 /**
  * 消息事件回调
  */
-$robot->onMessage(function (Message $message, $robot) {
+$robot->onMessage(function (Message $message) {
     $messageType = $message->getMessageType();
     $messenger = $message->getMessenger();
     if ($messenger == null) {
@@ -107,7 +107,7 @@ $robot->onMessage(function (Message $message, $robot) {
             break;
         case Message::EMOTICON_MESSAGE:
         case Message::IMAGE_MESSAGE:
-            $file = Utils::getRandomFileName('pic');
+            $file = Utils::getRandomFileName(__DIR__ . '/pic');
             $messenger->sendEmoticon($file)->sendMessage("来，战个痛快！");
             break;
         case Message::SYS_MESSAGE:

@@ -86,7 +86,7 @@ class MessageHandler
             }
 
             if ($retcode != 0) {
-                Console::log("微信客户端异常退出", Console::ERROR);
+                Console::log("微信客户端异常退出 {$retcode}", Console::ERROR);
             }
 
             if ($selector == 0) {
