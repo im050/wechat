@@ -125,8 +125,8 @@ class TaskQueue
      */
     public static function run($job, $params)
     {
-        if (app()->hasInstance('task_queue')) {
-            app()->get('task_queue')->task($job, $params);
+        if (app()->hasInstance('taskQueue')) {
+            app()->taskQueue->task($job, $params);
         } else {
             Console::log("尚未创建任务队列", Console::ERROR);
         }
@@ -137,8 +137,8 @@ class TaskQueue
      */
     public static function shutdown()
     {
-        if (app()->hasInstance('task_queue')) {
-            $taskQueue = app()->get('task_queue');
+        if (app()->hasInstance('taskQueue')) {
+            $taskQueue = app()->taskQueue;
             if (isset($taskQueue) && $taskQueue instanceof TaskQueue) {
                 reset($taskQueue->processPool);
                 foreach ($taskQueue->processPool as $pid => $process) {

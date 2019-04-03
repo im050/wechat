@@ -121,7 +121,7 @@ class Api
                 'Count' => SyncKey::getInstance()->count(),
                 'List'  => SyncKey::getInstance()->get()
             ],
-            'rr'          => Utils::timeStamp()
+            'rr'          => ~time()
         ];
 
         $queryString = [

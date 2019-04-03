@@ -132,7 +132,7 @@ class Robot
         });
 
         //任务队列
-        app()->singleton('task_queue', function () {
+        app()->singleton('taskQueue', function () {
             return new TaskQueue([
                 'max_process_num' => config('task_process_num')
             ]);

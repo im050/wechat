@@ -1,7 +1,16 @@
 <?php
 namespace Im050\WeChat\Core;
 
-
+/**
+ * Class Application
+ *
+ * @package Im050\WeChat\Core
+ * @property \Im050\WeChat\Core\Api $api
+ * @property \Im050\WeChat\Message\MessageHandler $message
+ * @property \Im050\WeChat\Task\TaskQueue $taskQueue
+ * @property \Im050\WeChat\Core\Auth $auth
+ * @property \Im050\WeChat\Component\Config $config
+ */
 class Application
 {
 
