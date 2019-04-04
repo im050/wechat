@@ -191,7 +191,7 @@ function activateRobot(Message $message)
 function silenceCheck(Message $message)
 {
     $silence = &$GLOBALS['silence'];
-    if (isset($silence) && array_key_exists($silence, $message->getFromUserName())) {
+    if (isset($silence) && array_key_exists($message->getFromUserName(), $silence)) {
         return true;
     }
     return false;

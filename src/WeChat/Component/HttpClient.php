@@ -2,6 +2,8 @@
 namespace Im050\WeChat\Component;
 
 use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\FileCookieJar;
 
 /**
  * Class HttpClient
@@ -10,225 +12,129 @@ use Exception;
 class HttpClient
 {
 
-    public $curl = null;
+    private $client;
 
-    public $status = 0;
-
-    public $queryURI = '';
+    /**
+     * @var FileCookieJar|null
+     */
+    private $cookieJar;
 
     /**
      * default config
      *
      * @var array
      */
-    public $config = [
+    private $config = [
         'timeout' => 60,
-        //'cookie' => '',
-        //'header' => [],
-        'useragent' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
-        'return_transfer' => 1,
-        //'referer' => '',
-        //'cookiejar' => '',
-        //'cookiefile' => '',
-        'ssl_verify_peer' => false,
-        'ssl_verify_host' => 2,
-        'follow_location' => 0,
-        'encoding' => 'gzip',
+        'connect_timeout' => 10,
+        'cookies' => true,
+        'headers' => [
+            'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
+            'Accept'     => 'application/json',
+            'Accept-Encoding' => 'gzip'
+        ],
+        'allow_redirects' => false,
+        'verify' => true,
     ];
 
-    public $paramsMap = [
-        'timeout' => CURLOPT_TIMEOUT,
-        'cookie' => CURLOPT_COOKIE,
-        'header' => CURLOPT_HEADER,
-        'headers' => CURLOPT_HTTPHEADER,
-        'user_agent' => CURLOPT_USERAGENT,
-        'return_transfer' => CURLOPT_RETURNTRANSFER,
-        'referer' => CURLOPT_REFERER,
-        'cookiejar' => CURLOPT_COOKIEJAR,
-        'cookiefile' => CURLOPT_COOKIEFILE,
-        'ssl_verify_peer' => CURLOPT_SSL_VERIFYPEER,
-        'ssl_verify_host' => CURLOPT_SSL_VERIFYHOST,
-        'follow_location' => CURLOPT_FOLLOWLOCATION,
-        'encoding' => CURLOPT_ENCODING
-    ];
+    /**
+     * @return Client
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
+     * @param Client $client
+     * @return HttpClient
+     */
+    public function setClient($client)
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+    /**
+     * @return FileCookieJar|null
+     */
+    public function getCookieJar()
+    {
+        return $this->cookieJar;
+    }
+
+    /**
+     * @param FileCookieJar|null $cookieJar
+     * @return HttpClient
+     */
+    public function setCookieJar($cookieJar)
+    {
+        $this->cookieJar = $cookieJar;
+        return $this;
+    }
 
     public function __construct($config = array())
     {
         $this->config = array_merge($this->config, $config);
     }
 
-    public function init()
-    {
-        if ($this->curl == null) {
-            $this->curl = curl_init();
-            curl_setopt($this->curl, CURLINFO_HEADER_OUT, true);
-        }
-    }
-
-    public function updateOption($config)
-    {
-        if (is_null($this->curl)) {
-            $this->init();
-        }
-
-        //合并自定义参数
-        $config = array_merge($this->config, $config);
-
-        foreach ($config as $key => $val) {
-            if ($val == '') {
-                continue;
-            }
-            if (!isset($this->paramsMap[$key])) {
-                continue;
-            }
-            if ($key == 'cookie' && is_array($val)) {
-                $val = $this->parseCookie($val);
-            }
-            curl_setopt($this->curl, $this->paramsMap[$key], $val);
-        }
-        return $config;
-    }
-
-    /**
-     * 关闭CURL句柄
-     */
-    public function close()
-    {
-        if ($this->curl != null) {
-            curl_close($this->curl);
-            $this->curl = null;
-        }
-    }
-
-    /**
-     * 获得请求内容
-     * @return mixed
-     * @throws Exception
-     */
-    public function response()
-    {
-        if ($this->curl == null) {
-            $this->init();
-        }
-
-        $data = curl_exec($this->curl);
-
-        if ($data === false) {
-            throw new Exception(curl_error($this->curl));
-        }
-
-        $this->status = curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
-
-        return $data;
+    public function init() {
+        $this->cookieJar = new FileCookieJar($this->config['cookiefile_path'], true);
+        $this->config['cookies'] = $this->cookieJar;
+        $this->client = new Client($this->config);
     }
 
     /**
      * 发起POST请求
      *
-     * @param string $uri
-     * @param array $data
-     * @param array $config
+     * @param string $url
+     * @param array $query
+     * @param array|bool $array
      * @return mixed
      */
-    public function post($uri = '/', $data = array(), $config = [])
+    public function post($url = '/', $query = [], $array = false)
     {
-        return $this->request($uri, $data, 'post', $config);
-    }
+        $key = is_array($query) ? 'form_params' : 'body';
 
-    /**
-     * 将数组解析为Cookie字符串
-     *
-     * @return boolean
-     */
-    public function parseCookie($cookieString)
-    {
-        $data = array();
-        foreach ($cookieString as $key => $val) {
-            $data[] = $key . "=" . $val;
-        }
-        $arrayCookiesString = '';
-        if (!empty($data)) {
-            $arrayCookiesString = implode(";", $data);
-        }
-        if (empty($cookieString)) {
-            $cookieString = $arrayCookiesString;
-        } else {
-            $cookieString .= ";" . $arrayCookiesString;
-        }
-        return $cookieString;
+        $content = $this->request($url, 'POST', [$key => $query]);
+
+        return $array ? json_decode($content, true) : $content;
     }
 
 
     /**
      * 发起GET请求
      *
-     * @param string $uri
+     * @param string $url
      * @param array $data
-     * @param array $config
+     * @param array $options
      * @return array|mixed
      */
-    public function get($uri = '/', $data = array(), $config = [])
+    public function get($url = '/', $data = [], array $options = [])
     {
-        if (!empty($data)) {
-            $queryString = http_build_query($data);
-            if (stripos($uri, "?") === FALSE) {
-                $linkSymbol = '?';
-            } else {
-                $linkSymbol = '&';
+        $queryString = http_build_query($data);
+        if (!empty($queryString)) {
+            $url .= "?" . $queryString;
+        }
+        return $this->request($url, 'GET', $options);
+    }
+
+    public function request($url, $method = 'GET', $options = [], $retry = false)
+    {
+        //var_dump($this->getClient()->getConfig('timeout'));
+        //var_dump($this->getClient()->getConfig('cookies'));
+        try {
+            $options = array_merge(['verify' => false, 'cookies' => $this->cookieJar], $options);
+            $response = $this->getClient()->request($method, $url, $options);
+            $this->cookieJar->save($this->config['cookiefile_path']);
+            return $response->getBody()->getContents();
+        } catch (\Exception $e) {
+            Console::log($url.$e->getMessage(), Console::ERROR);
+            if (!$retry) {
+                return $this->request($url, $method, $options, true);
             }
-            $uri .= $linkSymbol . $queryString;
+            return false;
         }
-        return $this->request($uri, [], 'get', $config);
-    }
-
-    /**
-     * 发起请求
-     *
-     * @param $uri
-     * @param $data
-     * @param string $method
-     * @param array $config
-     * @return mixed
-     */
-    public function request($uri, $data = [], $method = 'get', $config = [])
-    {
-        $this->init();
-
-        $this->updateOption($config);
-
-        if ($method == 'post') {
-            curl_setopt($this->curl, CURLOPT_POST, 1);
-            curl_setopt($this->curl, CURLOPT_POSTFIELDS, $data);
-        }
-
-        $this->setURI($uri);
-
-        $data = $this->response();
-
-        $this->close();
-
-        return $data;
-    }
-
-    /**
-     * 设置请求目标地址
-     *
-     * @param $uri
-     */
-    public function setURI($uri)
-    {
-        curl_setopt($this->curl, CURLOPT_URL, $uri);
-        $this->queryURI = $uri;
-    }
-
-    /**
-     * 获取最近请求记录
-     *
-     * @return string
-     */
-    public function getQueryURI()
-    {
-        return $this->queryURI;
     }
 
     /**

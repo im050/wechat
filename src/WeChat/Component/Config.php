@@ -14,23 +14,14 @@ class Config
 
     public $config = array();
 
-    protected static $_instance = null;
-
-    private function __construct()
+    public function __construct()
     {
-    }
-
-    public static function getInstance()
-    {
-        if (self::$_instance === null) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
     }
 
     public function setConfig($config)
     {
         $this->config = $config;
+        return $this;
     }
 
     public function get($param)
@@ -41,6 +32,7 @@ class Config
     public function set($param, $value)
     {
         $this->__set($param, $value);
+        return $this;
     }
 
     public function __set($param, $value)

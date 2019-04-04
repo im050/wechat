@@ -4,6 +4,7 @@ namespace Im050\WeChat\Core;
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\Console;
+use Im050\WeChat\Component\HttpClient;
 use Im050\WeChat\Component\Storage\Handler\FileHandler;
 use Im050\WeChat\Component\Storage\Storage;
 use Im050\WeChat\Message\MessageHandler;
@@ -14,80 +15,67 @@ class Robot
 {
 
     /**
-     * 存放公共对象的容器
-     *
-     * @var Application|null
-     */
-    protected $app = null;
-
-    /**
-     * 默认配置参数
+     * default config
      *
      * @var array
      */
-    protected $config = [
-        'tmp_path'      => '',
-        'debug'         => false,
-        'api_debug'     => false,
-        'save_qrcode'   => true,
-        'auto_download' => true,
-        'daemonize'     => false,
+    private $config = [
+        'tmp_path'         => '',
+        'debug'            => false,
+        'api_debug'        => false,
+        'save_qrcode'      => true,
+        'auto_download'    => true,
+        'daemonize'        => false,
         'task_process_num' => 1
     ];
 
     public function __construct($config = array())
     {
-        //合并配置参数
+        // merge config params
         $config = array_merge($this->config, $config);
+        // check config and fix it.
+        $this->initConfig($config);
 
-        //检查配置参数
-        $this->fixConfig($config);
-
-        //将配置参数设置到Config类
-        Config::getInstance()->setConfig($config);
-
-        //初始化APP容器
-        $this->app = Application::getInstance();
-
-        //启动应用
+        // mount something class into app container
         $this->boot();
 
-        //配置应用
-        $cookiePath = config('tmp_path') . '/cookies.txt';
-
-        //设置cookie路径
-        http()->setConfig('cookiejar', $cookiePath);
-        http()->setConfig('cookiefile', $cookiePath);
-
-        config('cookiefile_path', $cookiePath);
-        config('exception_log_path', config('tmp_path') . '/log/exception.log');
-        config('warning_log_path', config('tmp_path') . '/log/warning.log');
-        config('api_debug_log_path', config('tmp_path') . '/log/api_debug.log');
-        config('message_log_path', config('tmp_path') . '/log/message.log');
-        config('unknown_message_log_path', config('tmp_path') . '/log/unknown_message.log');
+        // init http server
+        app()->http->setConfig("cookiefile_path", app()->config->get('cookiefile_path'));
+        app()->http->init();
     }
 
     /**
-     * 调整Config
+     * check and adjust config
      *
      * @param $config
-     * @return mixed
+     * @return void
      */
-    public function fixConfig($config)
+    private function initConfig($config)
     {
+        // config manager
+        app()->singleton('config', function () {
+            return new Config();
+        });
+
         if (!isset($config['tmp_path']) || empty($config['tmp_path'])) {
-            Console::log("没有设置临时文件路径，请设置。", Console::ERROR);
+            Console::log("Please setting tmp path.", Console::ERROR);
         }
 
         if (!isset($config['cookie_path']) || empty($config['cookie_path'])) {
             $config['cookie_path'] = $config['tmp_path'];
         }
 
-        return $config;
+        app()->config->setConfig($config);
+        app()->config->set('cookiefile_path', config('cookie_path') . '/cookies.txt')
+            ->set('exception_log_path', config('tmp_path') . '/log/exception.log')
+            ->set('warning_log_path', config('tmp_path') . '/log/warning.log')
+            ->set('api_debug_log_path', config('tmp_path') . '/log/api_debug.log')
+            ->set('message_log_path', config('tmp_path') . '/log/message.log')
+            ->set('unknown_message_log_path', config('tmp_path') . '/log/unknown_message.log');
     }
 
     /**
-     * 运行
+     * Run
      */
     public function run()
     {
@@ -107,41 +95,37 @@ class Robot
         }
     }
 
-    /**
-     * 启动加载
-     */
-    public function boot()
+    private function boot()
     {
-        //初始化微信登录权限类
+        app()->singleton("http", function () {
+            return new HttpClient();
+        });
+
+        // auth for wechat login
         app()->singleton("auth", function () {
             return Auth::getInstance();
         });
 
-        //初始化配置类
-        app()->singleton("config", function () {
-            return Config::getInstance();
-        });
-
-        //同步轮询
+        // init wechat api operator
         app()->singleton('api', function () {
             return new Api();
         });
 
-        //消息处理类
+        // message handler
         app()->singleton('message', function () {
             return MessageHandler::getInstance();
         });
 
-        //任务队列
+        // task queue
         app()->singleton('taskQueue', function () {
             return new TaskQueue([
                 'max_process_num' => config('task_process_num')
             ]);
         });
 
-        //文件键值对管理
+        // keymap for manage auth info.
         app()->singleton('keymap', function () {
-            $config = Config::getInstance();
+            $config = app()->config;
             $tmpPath = $config->get('tmp_path');
             return new Storage(new FileHandler([
                 'file' => $tmpPath . DIRECTORY_SEPARATOR . 'keymap.json'
@@ -150,7 +134,7 @@ class Robot
     }
 
     /**
-     * 消息回调
+     * When you receive a message, you can do something right here by a closure.
      *
      * @param \Closure $closure
      */
@@ -160,7 +144,7 @@ class Robot
     }
 
     /**
-     * 登录成功回调事件
+     * When you login success
      *
      * @param \Closure $closure
      */
@@ -170,7 +154,7 @@ class Robot
     }
 
     /**
-     * 退出登录回调事件
+     * When you logout
      *
      * @param \Closure $closure
      */
@@ -180,7 +164,7 @@ class Robot
     }
 
     /**
-     * 获取联系人列表
+     * Quick to get contacts
      *
      * @return \Im050\WeChat\Collection\ContactCollection
      */
@@ -190,7 +174,7 @@ class Robot
     }
 
     /**
-     * 获取群组列表
+     * Quick to get groups
      *
      * @return \Im050\WeChat\Collection\ContactCollection
      */
@@ -200,7 +184,7 @@ class Robot
     }
 
     /**
-     * 获取特殊账号列表
+     * Quick to get specials
      *
      * @return \Im050\WeChat\Collection\ContactCollection
      */
@@ -210,7 +194,7 @@ class Robot
     }
 
     /**
-     * 获取公众号列表
+     * Quick to get officials
      *
      * @return \Im050\WeChat\Collection\ContactCollection
      */

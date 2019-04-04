@@ -19,11 +19,7 @@ if (!function_exists('http')) {
      */
     function http()
     {
-        static $http = null;
-        if ($http == null) {
-            $http = new HttpClient();
-        }
-        return $http;
+        return app()->http;
     }
 }
 
@@ -92,7 +88,7 @@ if (!function_exists('config')) {
      */
     function config($param, $value = '', $force = false)
     {
-        $config = Config::getInstance();
+        $config = app()->config;
         if (empty($value)) {
             return $config->get($param);
         } else {

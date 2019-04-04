@@ -1,6 +1,7 @@
 <?php
 namespace Im050\WeChat\Core;
 
+
 /**
  * Class Application
  *
@@ -10,6 +11,7 @@ namespace Im050\WeChat\Core;
  * @property \Im050\WeChat\Task\TaskQueue $taskQueue
  * @property \Im050\WeChat\Core\Auth $auth
  * @property \Im050\WeChat\Component\Config $config
+ * @property \Im050\WeChat\Component\HttpClient $http
  */
 class Application
 {
@@ -34,7 +36,7 @@ class Application
     }
 
     /**
-     * 注册一个回调方法
+     * register a closure, base on addMap function.
      *
      * @param $alias
      * @param \Closure $closure
@@ -47,7 +49,7 @@ class Application
     }
 
     /**
-     * 根据别名生成对应对象
+     * make a instance
      *
      * @param $alias
      * @return mixed|null
@@ -63,7 +65,7 @@ class Application
     }
 
     /**
-     * 获得已经存在的对象或生成对象
+     * get an exists instance
      *
      * @param $alias
      * @return bool|mixed
@@ -82,7 +84,7 @@ class Application
     }
 
     /**
-     * 注册一个单例对象
+     * register a singleton instance
      *
      * @param $alias
      * @param \Closure $closure
@@ -94,7 +96,7 @@ class Application
     }
 
     /**
-     * 检查是否存在回调
+     * check the instance closure exists
      *
      * @param $alias
      * @return bool
@@ -105,7 +107,7 @@ class Application
     }
 
     /**
-     * 检查是否存在实例
+     * has the instance
      *
      * @param $alias
      * @return bool
@@ -116,7 +118,7 @@ class Application
     }
 
     /**
-     * 增加回调方法到map
+     * add a callback
      *
      * @param $alias
      * @param \Closure $closure
@@ -138,7 +140,8 @@ class Application
     }
 
     /**
-     * 使得可以通过app()->alias访问对象
+     * magic function
+     * use app->var to visit the existed instance.
      *
      * @param $params
      * @return mixed|null
