@@ -77,6 +77,15 @@ class ContactCollection extends Collection
         return null;
     }
 
+    public function getContactByRemarkName($remarkName)
+    {
+        $member = $this->find($remarkName, 'RemarkName', true);
+        if (!empty($member)) {
+            return ContactFactory::create($member);
+        }
+        return null;
+    }
+
     /**
      * 获取女性联系人
      *

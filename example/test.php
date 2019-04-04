@@ -8,6 +8,8 @@ use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Core\Robot;
 use Im050\WeChat\Message\Formatter\Message;
+use Im050\WeChat\Task\Job\RobotReply;
+use Im050\WeChat\Task\TaskQueue;
 
 $robot = new Robot([
     'tmp_path'      => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
@@ -40,24 +42,35 @@ $robot->onLogout(function (Robot $robot) {
 });
 
 $robot->onMessage(function (Message $message, Robot $robot) {
-//    $filehelper = members()->getSpecials()->getContactByUserName("filehelper");
-//    $filehelper->sendMessage("当前历史记录:" . messages()->count());
     $messenger = $message->getMessenger();
     if ($messenger == null) {
         Console::log("获取消息发送者失败");
         return ;
     }
+    if ($message->isGroup()) {
+        //群消息不处理
+        return ;
+    }
     switch ($message->getMessageType()) {
         case Message::TEXT_MESSAGE:
-            $message->getMessenger()->sendMessage("ok");
+            TaskQueue::run(RobotReply::class, [
+                'username'     => $messenger->getUserName(),
+                'from_message' => $message->string(),
+                'userid'       => md5($messenger->getUserName())
+            ]);
+            //消息转发
+            /** @var \Im050\WeChat\Collection\Element\MemberElement $master */
+            $master = $robot->getContacts()->getContactByRemarkName("主人");
+            if ($master != null) {
+                $master->sendMessage($messenger->getNickName() . ":" . $message->string());
+            }
             break;
         case Message::EMOTICON_MESSAGE:
         case Message::IMAGE_MESSAGE:
-            $file = Utils::getRandomFileName(__DIR__ . '/pic');
-            $messenger->sendEmoticon($file);
+            $message->getMessenger()->sendMessage("都不知道你在说啥？");
             break;
         case Message::RECALLED_MESSAGE:
-            $messenger->sendMessage("有个兄弟撤回了消息！不过没关系，我记住了。");
+            $messenger->sendMessage("撤回了也没用，我看见了");
             break;
     }
 });
