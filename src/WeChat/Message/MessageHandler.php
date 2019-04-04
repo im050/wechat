@@ -239,7 +239,7 @@ class MessageHandler
                     $filehelper->sendMessage("心跳正常\n内存使用情况：" . Utils::convert(memory_get_usage()) . "\n时间：" . Utils::now());
                 }
                 app()->keymap->set('login_time', $time)->save();
-                sleep($seconds);
+                sleep($seconds + mt_rand(10, 20));
             }
         });
         $this->heartProcess->start();
