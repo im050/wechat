@@ -761,15 +761,9 @@ class Api
         if ($ticket != false) {
             return $ticket;
         }
-        $cookiePath = config('cookiefile_path');
-        if (file_exists($cookiePath)) {
-            $content = file_get_contents($cookiePath);
-            $content = json_decode($content, true);
-            foreach ($content as $key => $item) {
-                if ($item['Name'] == 'webwx_data_ticket') {
-                    $ticket = $item['Value'];
-                }
-            }
+        $cookie = app()->http->getCookieJar()->getCookieByName("webwx_data_ticket");
+        if ($cookie != null) {
+            $ticket = $cookie->getValue();
         }
         return $ticket;
     }
