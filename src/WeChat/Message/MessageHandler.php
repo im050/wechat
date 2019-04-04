@@ -23,7 +23,7 @@ class MessageHandler
     /**
      * 心跳检测进程
      *
-     * @var null
+     * @var Process|null
      */
     protected $heartProcess = null;
 
@@ -108,6 +108,7 @@ class MessageHandler
 
             $this->handleMessage($message);
         }
+        Process::wait();
     }
 
     /**
@@ -221,12 +222,12 @@ class MessageHandler
     /**
      * 心跳检测
      *
-     * @param int $time
+     * @param int $seconds
      */
-    protected function heartCheck($time = 600)
+    protected function heartCheck($seconds = 600)
     {
         $parentPid = posix_getpid();
-        $this->heartProcess = new Process(function ($worker) use ($time, $parentPid) {
+        $this->heartProcess = new Process(function () use ($seconds, $parentPid) {
             while (true) {
                 $time = time();
                 $filehelper = members()->getSpecials()->getContactByUserName('filehelper');
@@ -238,7 +239,7 @@ class MessageHandler
                     $filehelper->sendMessage("心跳正常\n内存使用情况：" . Utils::convert(memory_get_usage()) . "\n时间：" . Utils::now());
                 }
                 app()->keymap->set('login_time', $time)->save();
-                sleep($time);
+                sleep($seconds);
             }
         });
         $this->heartProcess->start();
