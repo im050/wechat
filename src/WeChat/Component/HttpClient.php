@@ -124,7 +124,7 @@ class HttpClient
         //var_dump($this->getClient()->getConfig('timeout'));
         //var_dump($this->getClient()->getConfig('cookies'));
         try {
-            $options = array_merge(['verify' => false, 'cookies' => $this->cookieJar], $options);
+            $options = array_merge(['verify' => false], $options);
             $response = $this->getClient()->request($method, $url, $options);
             $this->cookieJar->save($this->config['cookiefile_path']);
             return $response->getBody()->getContents();

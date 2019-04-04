@@ -763,17 +763,14 @@ class Api
         }
         $cookiePath = config('cookiefile_path');
         if (file_exists($cookiePath)) {
-            $fp = fopen($cookiePath, 'r');
-            while ($line = fgets($fp)) {
-                if (strpos($line, 'webwx_data_ticket') !== false) {
-                    $metaData = explode("\t", trim($line));
-                    $ticket = $metaData[6];
-                    break;
+            $content = file_get_contents($cookiePath);
+            $content = json_decode($content, true);
+            foreach ($content as $key => $item) {
+                if ($item['Name'] == 'webwx_data_ticket') {
+                    $ticket = $item['Value'];
                 }
             }
-            fclose($fp);
         }
-
         return $ticket;
     }
 

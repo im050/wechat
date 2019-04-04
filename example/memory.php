@@ -75,29 +75,32 @@ $robot->onLoginSuccess(function () {
 $robot->onMessage(function (Message $message) {
     $messageType = $message->getMessageType();
     $messenger = $message->getMessenger();
+    Console::log("收到消息");
     if ($messenger == null) {
         return ;
     }
-
+    Console::log("check messenger");
     if (!($messenger instanceof Group) && !($messenger instanceof Contact)) {
         return;
     }
-
+    Console::log("check command");
     //检查是否有命令需要执行
     if (commandHandler($message)) {
         return;
     }
-
+    Console::log("check silence");
     //静默状态检查
     if (silenceCheck($message)) {
         return;
     }
 
+    Console::log("处理消息");
     switch ($messageType) {
         case Message::TEXT_MESSAGE:
             if ($message->isGroup() && !$message->isAt()) {
                 return;
             }
+            Console::log("机器人应答消息");
             TaskQueue::run(RobotReply::class, [
                 'username'     => $messenger->getUserName(),
                 'from_message' => $message->string(),
@@ -106,10 +109,12 @@ $robot->onMessage(function (Message $message) {
             break;
         case Message::EMOTICON_MESSAGE:
         case Message::IMAGE_MESSAGE:
+        Console::log("图片消息");
             $file = Utils::getRandomFileName(__DIR__ . '/pic');
             $messenger->sendEmoticon($file)->sendMessage("来，战个痛快！");
             break;
         case Message::SYS_MESSAGE:
+            Console::log("系统消息");
             if ($message->isRedPacket()) {
                 $file = __DIR__ . '/pic/thanks_boss.gif';
                 $messenger->sendEmoticon($file);
@@ -191,7 +196,7 @@ function activateRobot(Message $message)
 function silenceCheck(Message $message)
 {
     $silence = &$GLOBALS['silence'];
-    if (isset($silence) && array_key_exists($message->getFromUserName(), $silence)) {
+    if (isset($silence) && @$silence[$message->getFromUserName()]) {
         return true;
     }
     return false;
