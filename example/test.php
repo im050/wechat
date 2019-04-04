@@ -51,26 +51,27 @@ $robot->onMessage(function (Message $message, Robot $robot) {
         //群消息不处理
         return ;
     }
+    /** @var \Im050\WeChat\Collection\Element\MemberElement $master */
+    $master = $robot->getContacts()->getContactByRemarkName("主人");
+    if ($master == null) {
+        return ;
+    }
     switch ($message->getMessageType()) {
         case Message::TEXT_MESSAGE:
-            TaskQueue::run(RobotReply::class, [
-                'username'     => $messenger->getUserName(),
-                'from_message' => $message->string(),
-                'userid'       => md5($messenger->getUserName())
-            ]);
+//            TaskQueue::run(RobotReply::class, [
+//                'username'     => $messenger->getUserName(),
+//                'from_message' => $message->string(),
+//                'userid'       => md5($messenger->getUserName())
+//            ]);
             //消息转发
-            /** @var \Im050\WeChat\Collection\Element\MemberElement $master */
-            $master = $robot->getContacts()->getContactByRemarkName("主人");
-            if ($master != null) {
-                $master->sendMessage($messenger->getNickName() . ":" . $message->string());
-            }
+            $master->sendMessage($messenger->getNickName() . ":" . $message->string() );
             break;
         case Message::EMOTICON_MESSAGE:
         case Message::IMAGE_MESSAGE:
-            $message->getMessenger()->sendMessage("都不知道你在说啥？");
+            $master->sendMessage($messenger->getNickName() . ": [表情]" );
             break;
         case Message::RECALLED_MESSAGE:
-            $messenger->sendMessage("撤回了也没用，我看见了");
+            $master->sendMessage($messenger->getNickName() . ": [撤回]" );
             break;
     }
 });
