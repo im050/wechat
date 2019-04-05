@@ -93,7 +93,7 @@ class Api
             'sid'      => $sid,
             'uin'      => $uin,
             'deviceid' => $deviceId,
-            'synckey'  => SyncKey::getInstance()->string(),
+            'synckey'  => app()->syncKey->string(),
         ];
 
         $url = uri('push_uri') . '/synccheck';
@@ -119,8 +119,8 @@ class Api
         $payload = [
             'BaseRequest' => $this->baseRequest,
             'SyncKey'     => [
-                'Count' => SyncKey::getInstance()->count(),
-                'List'  => SyncKey::getInstance()->get()
+                'Count' => app()->syncKey->count(),
+                'List'  => app()->syncKey->get()
             ],
             'rr'          => ~time()
         ];
@@ -143,7 +143,7 @@ class Api
         }
 
         $syncKey = $data['SyncKey']['List'];
-        SyncKey::getInstance()->setSyncKey($syncKey);
+        app()->syncKey->setSyncKey($syncKey);
 
         return $data;
     }

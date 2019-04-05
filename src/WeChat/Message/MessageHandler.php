@@ -18,8 +18,6 @@ use Swoole\Process;
 class MessageHandler
 {
 
-    protected static $_instance = null;
-
     /**
      * 心跳检测进程
      *
@@ -33,23 +31,6 @@ class MessageHandler
      * @var array
      */
     protected $events = [];
-
-    private function __construct()
-    {
-    }
-
-    /**
-     * 单例模式
-     *
-     * @return MessageHandler|null
-     */
-    public static function getInstance()
-    {
-        if (self::$_instance === null) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
-    }
 
     /**
      * 监听消息

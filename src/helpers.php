@@ -73,7 +73,7 @@ if (!function_exists('members')) {
      */
     function members()
     {
-        return Members::getInstance();
+        return app()->members;
     }
 }
 
@@ -114,6 +114,6 @@ if (!function_exists('messages')) {
      */
     function messages()
     {
-        return MessageCollection::getInstance();
+        return app()->messageCollection;
     }
 }

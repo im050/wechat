@@ -21,16 +21,14 @@ class MessageCollection extends Collection
      *
      * @var int
      */
-    public $maxItems = 2048;
+    private $maxItems = 2048;
 
-    protected static $_instance = null;
-
-    public static function getInstance()
+    public function __construct($maxItems = null, $items = [])
     {
-        if (self::$_instance === null) {
-            self::$_instance = new self();
+        parent::__construct($items);
+        if ($maxItems !== null && is_int($maxItems)) {
+            $this->maxItems = $maxItems;
         }
-        return self::$_instance;
     }
 
     /**

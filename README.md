@@ -8,7 +8,7 @@
 
 | 环境          | 版本           |
 | ------------- | ------------- |
-| [PHP](http://www.php.net)           | \>=5.6 | 
+| [PHP](http://www.php.net)           | \>=7.0 | 
 | [Swoole 扩展](http://www.swoole.com/)    | \>=1.9.*      |
 | [Fileinfo 扩展](http://php.net/manual/en/book.fileinfo.php)  | \>=1.0.*      |
 | [Posix 扩展](http://www.php.net/manual/en/book.posix.php)     | -             |

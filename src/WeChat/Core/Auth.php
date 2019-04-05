@@ -3,9 +3,6 @@ namespace Im050\WeChat\Core;
 
 class Auth
 {
-
-    protected static $_instance = null;
-
     public $uuid = '';
 
     public $device_id = '';
@@ -17,18 +14,6 @@ class Auth
     public $pass_ticket = '';
 
     public $uin = '';
-
-    private function __construct()
-    {
-    }
-
-    public static function getInstance()
-    {
-        if (self::$_instance === null) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
-    }
 
     /**
      * 设置UUID

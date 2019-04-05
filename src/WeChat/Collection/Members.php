@@ -41,7 +41,7 @@ class Members
     /**
      * Members constructor.
      */
-    private function __construct()
+    public function __construct()
     {
         //初始化特殊用户列表容器
         $this->specials = new ContactCollection();
@@ -54,19 +54,6 @@ class Members
 
         //初始化公众号列表容器
         $this->officials = new ContactCollection();
-    }
-
-    /**
-     * Single instance
-     *
-     * @return Members|null
-     */
-    public static function getInstance()
-    {
-        if (self::$_instance === null) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
     }
 
     /**

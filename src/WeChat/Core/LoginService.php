@@ -67,8 +67,8 @@ class LoginService
             if (!checkBaseResponse($response)) {
                 Console::log("初始化失败，请重新运行本程序", Console::ERROR);
             } else {
-                Account::getInstance()->setUser($response['User']);
-                SyncKey::getInstance()->setSyncKey($response['SyncKey']['List']);
+                app()->account->setUser($response['User']);
+                app()->syncKey->setSyncKey($response['SyncKey']['List']);
                 return true;
             }
 
@@ -107,8 +107,8 @@ class LoginService
             return false;
         } else {
             //初始化成功更新数据
-            Account::getInstance()->setUser($response['User']);
-            SyncKey::getInstance()->setSyncKey($response['SyncKey']['List']);
+            app()->account->setUser($response['User']);
+            app()->syncKey->setSyncKey($response['SyncKey']['List']);
             //更新skey和登录时间
             app()->auth->skey = isset($response['SKey']) ? $response['SKey'] : app()->auth->skey;
             app()->keymap->setMultiple([
@@ -158,7 +158,7 @@ class LoginService
 
         Console::log("正在初始化联系人...");
 
-        $members = Members::getInstance();
+        $members = app()->members;
 
         $data = [];
 

@@ -2,6 +2,7 @@
 namespace Im050\WeChat\Core;
 
 use Im050\WeChat\Collection\Members;
+use Im050\WeChat\Collection\MessageCollection;
 use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\HttpClient;
@@ -37,9 +38,9 @@ class Robot
         $this->initConfig($config);
 
         // mount something class into app container
-        $this->boot();
+        app()->bootstrap();
 
-        // init http server
+        // init http client
         app()->http->setConfig("cookiefile_path", app()->config->get('cookiefile_path'));
         app()->http->init();
     }
@@ -95,44 +96,6 @@ class Robot
         }
     }
 
-    private function boot()
-    {
-        app()->singleton("http", function () {
-            return new HttpClient();
-        });
-
-        // auth for wechat login
-        app()->singleton("auth", function () {
-            return Auth::getInstance();
-        });
-
-        // init wechat api operator
-        app()->singleton('api', function () {
-            return new Api();
-        });
-
-        // message handler
-        app()->singleton('message', function () {
-            return MessageHandler::getInstance();
-        });
-
-        // task queue
-        app()->singleton('taskQueue', function () {
-            return new TaskQueue([
-                'max_process_num' => config('task_process_num')
-            ]);
-        });
-
-        // keymap for manage auth info.
-        app()->singleton('keymap', function () {
-            $config = app()->config;
-            $tmpPath = $config->get('tmp_path');
-            return new Storage(new FileHandler([
-                'file' => $tmpPath . DIRECTORY_SEPARATOR . 'keymap.json'
-            ]));
-        });
-    }
-
     /**
      * When you receive a message, you can do something right here by a closure.
      *
@@ -140,7 +103,7 @@ class Robot
      */
     public function onMessage(\Closure $closure)
     {
-        MessageHandler::getInstance()->onMessage($closure, $this);
+        app()->message->onMessage($closure, $this);
     }
 
     /**
@@ -150,7 +113,7 @@ class Robot
      */
     public function onLoginSuccess(\Closure $closure)
     {
-        MessageHandler::getInstance()->onLoginSuccess($closure, $this);
+        app()->message->onLoginSuccess($closure, $this);
     }
 
     /**
@@ -160,7 +123,7 @@ class Robot
      */
     public function onLogout(\Closure $closure)
     {
-        MessageHandler::getInstance()->onLogout($closure, $this);
+        app()->message->onLogout($closure, $this);
     }
 
     /**
@@ -170,7 +133,7 @@ class Robot
      */
     public function getContacts()
     {
-        return Members::getInstance()->getContacts();
+        return members()->getContacts();
     }
 
     /**
@@ -180,7 +143,7 @@ class Robot
      */
     public function getGroups()
     {
-        return Members::getInstance()->getGroups();
+        return members()->getGroups();
     }
 
     /**
@@ -190,7 +153,7 @@ class Robot
      */
     public function getSpecials()
     {
-        return Members::getInstance()->getSpecials();
+        return members()->getSpecials();
     }
 
     /**
@@ -200,7 +163,7 @@ class Robot
      */
     public function getOfficials()
     {
-        return Members::getInstance()->getOfficials();
+        return members()->getOfficials();
     }
 
 }

@@ -1,5 +1,12 @@
 <?php
 namespace Im050\WeChat\Core;
+use Im050\WeChat\Collection\Members;
+use Im050\WeChat\Collection\MessageCollection;
+use Im050\WeChat\Component\HttpClient;
+use Im050\WeChat\Component\Storage\Handler\FileHandler;
+use Im050\WeChat\Component\Storage\Storage;
+use Im050\WeChat\Message\MessageHandler;
+use Im050\WeChat\Task\TaskQueue;
 
 
 /**
@@ -12,6 +19,10 @@ namespace Im050\WeChat\Core;
  * @property \Im050\WeChat\Core\Auth $auth
  * @property \Im050\WeChat\Component\Config $config
  * @property \Im050\WeChat\Component\HttpClient $http
+ * @property \Im050\WeChat\Collection\Members $members
+ * @property \Im050\WeChat\Core\SyncKey $syncKey
+ * @property \Im050\WeChat\Core\Account $account
+ * @property \Im050\WeChat\Collection\MessageCollection $messageCollection
  */
 class Application
 {
@@ -25,6 +36,63 @@ class Application
     private function __construct()
     {
         //nothing
+    }
+
+    public function bootstrap() {
+        $this->singleton("http", function () {
+            return new HttpClient();
+        });
+
+        // auth for wechat login
+        $this->singleton("auth", function () {
+            return new Auth();
+        });
+
+        // init wechat api operator
+        $this->singleton('api', function () {
+            return new Api();
+        });
+
+        // account
+        $this->singleton('account', function() {
+            return new Account();
+        });
+
+        // Sync Key
+        $this->singleton('syncKey', function() {
+            return new SyncKey();
+        });
+
+        // message handler
+        $this->singleton('message', function () {
+            return new MessageHandler();
+        });
+
+        // message collection
+        $this->singleton('messageCollection', function() {
+            return new MessageCollection(config('mc_items'));
+        });
+
+        // task queue
+        $this->singleton('taskQueue', function () {
+            return new TaskQueue([
+                'max_process_num' => config('task_process_num')
+            ]);
+        });
+
+        // member collection
+        $this->singleton('members', function() {
+            return new Members();
+        });
+
+        // keymap for manage auth info.
+        $this->singleton('keymap', function () {
+            $config = app()->config;
+            $tmpPath = $config->get('tmp_path');
+            return new Storage(new FileHandler([
+                'file' => $tmpPath . DIRECTORY_SEPARATOR . 'keymap.json'
+            ]));
+        });
     }
 
     public static function getInstance()
