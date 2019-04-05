@@ -32,6 +32,8 @@
 
 ## 安装
 
+#### 通过Git
+
 1. 下载
 ```
 git clone https://github.com/im050/wechat_robot.git
@@ -39,6 +41,12 @@ git clone https://github.com/im050/wechat_robot.git
 2. 更新依赖包
 ```
 composer update
+```
+
+#### 通过Composer (推荐)
+
+```
+composer require im050/wechat
 ```
 
 ## 运行
