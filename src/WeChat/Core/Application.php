@@ -66,4 +66,17 @@ class Application extends Container
         }
     }
 
+    /**
+     * 清理进程
+     */
+    public function clear()
+    {
+        //关闭任务进程
+        TaskQueue::shutdown();
+        //关闭心跳进程
+        $this->message->heartProcess->exit(0);
+        //关闭自己
+        exit(0);
+    }
+
 }

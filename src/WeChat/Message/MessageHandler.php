@@ -11,6 +11,7 @@ namespace Im050\WeChat\Message;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
+use Im050\WeChat\Exception\AbnormalExitException;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Task\TaskQueue;
 use Swoole\Process;
@@ -23,7 +24,7 @@ class MessageHandler
      *
      * @var Process|null
      */
-    protected $heartProcess = null;
+    public $heartProcess = null;
 
     /**
      * 存放回调事件
@@ -44,10 +45,19 @@ class MessageHandler
         Console::log("开始监听消息...");
         //执行登录成功回调
         app()->loginSuccessObserver->trigger();
-        $this->heartCheck();
+        //启动心跳检测进程
+        $this->heartbeat();
+        //开始监听消息
+        $this->pollingMessage();
+        //等待子进程回收
+        Process::wait();
+        exit(0);
+    }
+
+    private function pollingMessage() {
         while (true && $this->listenMessageFailedTimes < $this->maxFailedTimes) {
             try {
-                if (!$this->checkRetCode()) {
+                if (!$this->handleSyncCheck()) {
                     continue;
                 }
                 // 拉取最新消息
@@ -60,12 +70,8 @@ class MessageHandler
                 Console::log("同步获取消息失败，Exception: " . $e->getMessage(), Console::WARNING);
                 continue;
             }
-
             $this->handleMessage($message);
         }
-        //等待子进程回收
-        Process::wait();
-        exit(0);
     }
 
     /**
@@ -73,18 +79,19 @@ class MessageHandler
      *
      * @return bool
      */
-    private function checkRetCode() : bool
+    private function handleSyncCheck() : bool
     {
         try {
             list($retCode, $selector) = app()->api->syncCheck();
             if (in_array($retCode, array(1100, 1101, 1102, 1205))) {
-
                 Console::log("微信已经退出或在其他地方登录", Console::ERROR);
+                app()->logoutObserver->trigger($retCode);
+                return false;
             }
             if ($retCode != 0) {
                 Console::log("微信客户端异常退出 {$retCode}", Console::ERROR);
+                throw new AbnormalExitException("Client abnormal exit");
             }
-            app()->logoutObserver->trigger($retCode);
             if ($selector == 0) {
                 return false;
             }
@@ -169,7 +176,7 @@ class MessageHandler
      *
      * @param int $seconds
      */
-    protected function heartCheck($seconds = 600)
+    protected function heartbeat($seconds = 600)
     {
         $parentPid = posix_getpid();
         $this->heartProcess = new Process(function () use ($seconds, $parentPid) {
@@ -179,7 +186,7 @@ class MessageHandler
                 $ppid = posix_getppid();
                 if ($ppid != $parentPid) {
                     $filehelper->sendMessage('你的父进程异常GG了，赶快去服务器上看一下吧。', true);
-                    call_user_func(array($this, 'clear'));
+                    call_user_func(array(app(), 'clear'));
                 } else {
                     $filehelper->sendMessage("心跳正常\n内存使用情况：" . Utils::convert(memory_get_usage()) . "\n时间：" . Utils::now());
                 }
@@ -190,17 +197,6 @@ class MessageHandler
         $this->heartProcess->start();
     }
 
-    /**
-     * 清理进程
-     */
-    public function clear()
-    {
-        //关闭任务进程
-        TaskQueue::shutdown();
-        //关闭心跳进程
-        $this->heartProcess->exit(0);
-        //关闭自己
-        exit(0);
-    }
+
 
 }
