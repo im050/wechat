@@ -1,15 +1,8 @@
 <?php
 namespace Im050\WeChat\Core;
 
-use Im050\WeChat\Collection\Members;
-use Im050\WeChat\Collection\MessageCollection;
 use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\Console;
-use Im050\WeChat\Component\HttpClient;
-use Im050\WeChat\Component\Storage\Handler\FileHandler;
-use Im050\WeChat\Component\Storage\Storage;
-use Im050\WeChat\Message\MessageHandler;
-use Im050\WeChat\Task\TaskQueue;
 use Swoole\Process;
 
 class Robot

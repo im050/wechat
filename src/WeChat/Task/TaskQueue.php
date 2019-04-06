@@ -93,7 +93,6 @@ class TaskQueue
 
             unset($instance);
         }
-
         $worker->exit(0);
     }
 

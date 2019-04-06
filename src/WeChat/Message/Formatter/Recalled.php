@@ -47,16 +47,16 @@ class Recalled extends Message
         //下载资源
         if (in_array(
             $this->recallMessage->getMessageType(), array(
-            Message::EMOTICON_MESSAGE,
-            Message::IMAGE_MESSAGE,
-            Message::VIDEO_MESSAGE,
-            Message::MICROVIDEO_MESSAGE,
-            Message::VOICE_MESSAGE
+            MessageFactory::EMOTICON_MESSAGE,
+            MessageFactory::IMAGE_MESSAGE,
+            MessageFactory::VIDEO_MESSAGE,
+            MessageFactory::MICROVIDEO_MESSAGE,
+            MessageFactory::VOICE_MESSAGE
         ))) {
             return $this->recallMessage->download(true);
         } else {
             $string = "[" . Utils::now() . "] ";
-            $string .= $this->recallMessage->printMessage();
+            $string .= $this->recallMessage->friendlyMessage();
             return FileSystem::append($string, FileSystem::getCurrentUserPath() . '/撤回消息记录.log');
         }
     }
@@ -70,7 +70,7 @@ class Recalled extends Message
         return $this->recallMessage;
     }
 
-    public function printMessage()
+    public function friendlyMessage()
     {
         return $this->string;
     }

@@ -8,36 +8,67 @@
 
 namespace Im050\WeChat\Message;
 
-use Im050\WeChat\Message\Formatter\Animate;
-use Im050\WeChat\Message\Formatter\Card;
-use Im050\WeChat\Message\Formatter\DestoryMessage;
 use Im050\WeChat\Message\Formatter\Emoticon;
-use Im050\WeChat\Message\Formatter\Friend;
 use Im050\WeChat\Message\Formatter\Image;
-use Im050\WeChat\Message\Formatter\JoinGroup;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Message\Formatter\MicroVideo;
 use Im050\WeChat\Message\Formatter\Recalled;
 use Im050\WeChat\Message\Formatter\SysMessage;
 use Im050\WeChat\Message\Formatter\Text;
-use Im050\WeChat\Message\Formatter\UnRead;
 use Im050\WeChat\Message\Formatter\Video;
 use Im050\WeChat\Message\Formatter\Voice;
-use Im050\WeChat\Message\Formatter\Share;
 
 class MessageFactory
 {
 
+    //文本消息
+    const TEXT_MESSAGE = 1;
+    //图片消息
+    const IMAGE_MESSAGE = 3;
+    //语音消息
+    const VOICE_MESSAGE = 34;
+    //视频消息
+    const VIDEO_MESSAGE = 43;
+    //验证消息
+    const VERIFYMSG_MESSAGE = 37;
+    //好友请求消息
+    const FRIEND_MESSAGE = 38;
+    //系统消息
+    const SYSNOTICE_MESSAGE = 9999;
+    //好友消息
+    const POSSIBLEFRIEND_MSG = 40;
+    //名片消息
+    const SHARECARD_MESSAGE = 42;
+    //动画消息
+    const EMOTICON_MESSAGE = 47;
+    //本地消息
+    const LOCATION_MESSAGE = 48;
+    //分享消息
+    const APP_MESSAGE = 49;
+    //VOIP MESSAGE
+    const VOIPMSG_MESSAGE = 50;
+    //VOIP NOTIFY
+    const VOIPNOTIFY_MESSAGE = 52;
+    const VOIPINVITE_MESSAGE = 53;
+    //未读消息
+    const STATUSNOTIFY_MESSAGE = 51;
+    //小视频视频消息
+    const MICROVIDEO_MESSAGE = 62;
+    //消息撤回
+    const RECALLED_MESSAGE = 10002;
+    //群系统消息
+    const SYS_MESSAGE = 10000;
+
     public static $factory = [
-        Message::TEXT_MESSAGE => Text::class,
-        Message::IMAGE_MESSAGE => Image::class,
-        Message::VOICE_MESSAGE => Voice::class,
-        Message::MICROVIDEO_MESSAGE => Video::class,
-        Message::VIDEO_MESSAGE => Video::class,
-        Message::SYS_MESSAGE => SysMessage::class,
-        Message::EMOTICON_MESSAGE => Emoticon::class,
-        Message::MICROVIDEO_MESSAGE => MicroVideo::class,
-        Message::RECALLED_MESSAGE => Recalled::class
+        self::TEXT_MESSAGE => Text::class,
+        self::IMAGE_MESSAGE => Image::class,
+        self::VOICE_MESSAGE => Voice::class,
+        self::MICROVIDEO_MESSAGE => Video::class,
+        self::VIDEO_MESSAGE => Video::class,
+        self::SYS_MESSAGE => SysMessage::class,
+        self::EMOTICON_MESSAGE => Emoticon::class,
+        self::MICROVIDEO_MESSAGE => MicroVideo::class,
+        self::RECALLED_MESSAGE => Recalled::class
     ];
 
     /**

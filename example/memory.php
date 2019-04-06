@@ -13,6 +13,7 @@ use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Task\Job\RobotReply;
 use Im050\WeChat\Task\TaskQueue;
 use Im050\WeChat\Core\Robot;
+use Swoole\Process;
 
 $robot = new Robot([
     //临时文件夹
@@ -67,6 +68,17 @@ $robot->onLoginSuccess(function () {
         $silence = &$GLOBALS['silence'];
         $silence[$contact->getUserName()] = true;
     });
+
+//$process = new \Swoole\Process(function() {
+//    go(function() {
+//        \Swoole\Timer::tick(1000, function() {
+//            echo time() . PHP_EOL;
+//        });
+//    });
+//});
+//$process->start();
+
+
 });
 
 /**
@@ -96,7 +108,7 @@ $robot->onMessage(function (Message $message) {
 
     Console::log("处理消息");
     switch ($messageType) {
-        case Message::TEXT_MESSAGE:
+        case MessageFactory::TEXT_MESSAGE:
             if ($message->isGroup() && !$message->isAt()) {
                 return;
             }
@@ -107,20 +119,20 @@ $robot->onMessage(function (Message $message) {
                 'userid'       => md5($messenger->getUserName())
             ]);
             break;
-        case Message::EMOTICON_MESSAGE:
-        case Message::IMAGE_MESSAGE:
+        case MessageFactory::EMOTICON_MESSAGE:
+        case MessageFactory::IMAGE_MESSAGE:
         Console::log("图片消息");
             $file = Utils::getRandomFileName(__DIR__ . '/pic');
             $messenger->sendEmoticon($file)->sendMessage("来，战个痛快！");
             break;
-        case Message::SYS_MESSAGE:
+        case MessageFactory::SYS_MESSAGE:
             Console::log("系统消息");
             if ($message->isRedPacket()) {
                 $file = __DIR__ . '/pic/thanks_boss.gif';
                 $messenger->sendEmoticon($file);
             }
             break;
-        case Message::RECALLED_MESSAGE:
+        case MessageFactory::RECALLED_MESSAGE:
             $messenger->sendMessage("撤回也没用，我看见了！");
 
     }

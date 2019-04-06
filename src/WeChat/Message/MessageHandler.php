@@ -122,7 +122,7 @@ class MessageHandler
                 //将消息加入记录集合
                 messages()->add($message);
                 //控制台打印消息
-                $this->printMessage($message);
+                $this->friendlyMessage($message);
                 if (isset($this->events['message'])) {
                     $this->events['message']['closure']($message, $this->events['message']['robot']);
                     //释放资源
@@ -158,10 +158,10 @@ class MessageHandler
      *
      * @param Message $message
      */
-    public function printMessage(Message $message)
+    public function friendlyMessage(Message $message)
     {
-        $printMessage = $message->printMessage();
-        Console::log($printMessage);
+        $friendlyMessage = $message->friendlyMessage();
+        Console::log($friendlyMessage);
     }
 
     /**

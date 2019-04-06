@@ -9,6 +9,7 @@ use Im050\WeChat\Collection\Element\Contact;
 use Im050\WeChat\Collection\Element\Group;
 use Im050\WeChat\Collection\Element\Official;
 use Im050\WeChat\Core\Account;
+use Im050\WeChat\Message\MessageFactory;
 use Im050\WeChat\Task\TaskQueue;
 
 $robot = new \Im050\WeChat\Core\Robot([
@@ -52,10 +53,10 @@ $robot->onMessage(function(Message $message, $robot){
     $messageType = $message->getMessageType();
     //判断消息类型
     switch($messageType) {
-        case Message::TEXT_MESSAGE: //equals "$message instanceof Text";
+        case MessageFactory::TEXT_MESSAGE: //equals "$message instanceof Text";
             Console::log("文本消息");
             break;
-        case Message::VOICE_MESSAGE:
+        case MessageFactory::VOICE_MESSAGE:
             Console::log("语音消息");
             break;
         //and so on...

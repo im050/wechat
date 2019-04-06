@@ -8,8 +8,7 @@ use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Core\Robot;
 use Im050\WeChat\Message\Formatter\Message;
-use Im050\WeChat\Task\Job\RobotReply;
-use Im050\WeChat\Task\TaskQueue;
+use Im050\WeChat\Message\MessageFactory;
 
 $robot = new Robot([
     'tmp_path'      => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
@@ -57,7 +56,7 @@ $robot->onMessage(function (Message $message, Robot $robot) {
         return ;
     }
     switch ($message->getMessageType()) {
-        case Message::TEXT_MESSAGE:
+        case MessageFactory::TEXT_MESSAGE:
 //            TaskQueue::run(RobotReply::class, [
 //                'username'     => $messenger->getUserName(),
 //                'from_message' => $message->string(),
@@ -66,11 +65,11 @@ $robot->onMessage(function (Message $message, Robot $robot) {
             //消息转发
             $master->sendMessage($messenger->getNickName() . ":" . $message->string() );
             break;
-        case Message::EMOTICON_MESSAGE:
-        case Message::IMAGE_MESSAGE:
+        case MessageFactory::EMOTICON_MESSAGE:
+        case MessageFactory::IMAGE_MESSAGE:
             $master->sendMessage($messenger->getNickName() . ": [表情]" );
             break;
-        case Message::RECALLED_MESSAGE:
+        case MessageFactory::RECALLED_MESSAGE:
             $master->sendMessage($messenger->getNickName() . ": [撤回]" );
             break;
     }
