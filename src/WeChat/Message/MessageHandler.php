@@ -32,6 +32,10 @@ class MessageHandler
      */
     protected $events = [];
 
+    private $listenMessageFailedTimes = 0;
+
+    private $maxFailedTimes = 10;
+
     /**
      * 监听消息
      */
@@ -39,57 +43,57 @@ class MessageHandler
     {
         Console::log("开始监听消息...");
         //执行登录成功回调
-        if (isset($this->events['login_success'])) {
-            $this->events['login_success']['closure']($this->events['login_success']['robot']);
-        }
-        $api = app()->api;
-        $failedTimes = 0;
+        app()->loginSuccessObserver->trigger();
         $this->heartCheck();
-        while (true) {
+        while (true && $this->listenMessageFailedTimes < $this->maxFailedTimes) {
             try {
-                list($retcode, $selector) = $api->syncCheck();
-                if ($failedTimes > 0) {
-                    $failedTimes--;
+                if (!$this->checkRetCode()) {
+                    continue;
                 }
-            } catch (\Exception $e) {
-                $failedTimes++;
-                if ($failedTimes == 10) {
-                    Console::log("监听消息失败超过 10 次，程序退出。", Console::ERROR);
+                // 拉取最新消息
+                $message = app()->api->pullMessage();
+                if (!checkBaseResponse($message)) {
+                    Console::log("接收数据异常，程序结束", Console::ERROR);
+                    break;
                 }
-                Console::log("监听消息失败，Exception：" . $e->getMessage(), Console::WARNING);
-                continue;
-            }
-
-            if ($retcode == 1100 || $retcode == 1101) {
-                if (isset($this->events['logout']['closure'])) {
-                    $this->events['logout']['closure']($this->events['logout']['robot']);
-                }
-                Console::log("微信已经退出或在其他地方登录", Console::ERROR);
-            }
-
-            if ($retcode != 0) {
-                Console::log("微信客户端异常退出 {$retcode}", Console::ERROR);
-            }
-
-            if ($selector == 0) {
-                sleep(1);
-                continue;
-            }
-
-            try {
-                $message = $api->pullMessage();
             } catch (\Exception $e) {
                 Console::log("同步获取消息失败，Exception: " . $e->getMessage(), Console::WARNING);
                 continue;
             }
 
-            if (!checkBaseResponse($message)) {
-                Console::log("接收数据异常，程序结束", Console::ERROR);
-            }
-
             $this->handleMessage($message);
         }
+        //等待子进程回收
         Process::wait();
+        exit(0);
+    }
+
+    /**
+     * 同步检测
+     *
+     * @return bool
+     */
+    private function checkRetCode() : bool
+    {
+        try {
+            list($retCode, $selector) = app()->api->syncCheck();
+            if (in_array($retCode, array(1100, 1101, 1102, 1205))) {
+
+                Console::log("微信已经退出或在其他地方登录", Console::ERROR);
+            }
+            if ($retCode != 0) {
+                Console::log("微信客户端异常退出 {$retCode}", Console::ERROR);
+            }
+            app()->logoutObserver->trigger($retCode);
+            if ($selector == 0) {
+                return false;
+            }
+            $this->listenMessageFailedTimes > 0 && $this->listenMessageFailedTimes--;
+            return true;
+        } catch (\Exception $e) {
+            $this->listenMessageFailedTimes++;
+            return false;
+        }
     }
 
     /**
@@ -123,11 +127,7 @@ class MessageHandler
                 messages()->add($message);
                 //控制台打印消息
                 $this->friendlyMessage($message);
-                if (isset($this->events['message'])) {
-                    $this->events['message']['closure']($message, $this->events['message']['robot']);
-                    //释放资源
-                    unset($message);
-                }
+                app()->messageObserver->trigger($message);
                 if (config('debug')) {
                     $log = [
                         '消息类型' => $msgType,
@@ -162,42 +162,6 @@ class MessageHandler
     {
         $friendlyMessage = $message->friendlyMessage();
         Console::log($friendlyMessage);
-    }
-
-    /**
-     * 消息触发回调事件
-     *
-     * @param \Closure $closure
-     * @param $robot
-     */
-    public function onMessage(\Closure $closure, $robot)
-    {
-        $this->events['message']['closure'] = $closure;
-        $this->events['message']['robot'] = $robot;
-    }
-
-    /**
-     * 登录成功回调事件
-     *
-     * @param \Closure $closure
-     * @param $robot
-     */
-    public function onLoginSuccess(\Closure $closure, $robot)
-    {
-        $this->events['login_success']['closure'] = $closure;
-        $this->events['login_success']['robot'] = $robot;
-    }
-
-    /**
-     * 微信退出回调事件
-     *
-     * @param \Closure $closure
-     * @param $robot
-     */
-    public function onLogout(\Closure $closure, $robot)
-    {
-        $this->events['logout']['closure'] = $closure;
-        $this->events['logout']['robot'] = $robot;
     }
 
     /**

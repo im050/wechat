@@ -90,33 +90,34 @@ class Robot
     }
 
     /**
-     * When you receive a message, you can do something right here by a closure.
+     * 接收消息观察者
      *
-     * @param \Closure $closure
+     * @param callable $callback
      */
-    public function onMessage(\Closure $closure)
+    public function onMessage(callable $callback)
     {
-        app()->message->onMessage($closure, $this);
+        app()->messageObserver->setCallback($callback);
     }
 
     /**
-     * When you login success
+     * 登录成功回调事件
      *
-     * @param \Closure $closure
+     * @param callable $callback
+     * @return void
      */
-    public function onLoginSuccess(\Closure $closure)
+    public function onLoginSuccess(callable $callback)
     {
-        app()->message->onLoginSuccess($closure, $this);
+        app()->loginSuccessObserver->setCallback($callback);
     }
 
     /**
-     * When you logout
+     * 微信退出
      *
-     * @param \Closure $closure
+     * @param callable $callback
      */
-    public function onLogout(\Closure $closure)
+    public function onLogout(callable $callback)
     {
-        app()->message->onLogout($closure, $this);
+        app()->logoutObserver->setCallback($callback);
     }
 
     /**

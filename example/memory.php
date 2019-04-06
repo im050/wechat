@@ -10,6 +10,7 @@ use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Core\Account;
 use Im050\WeChat\Message\Formatter\Message;
+use Im050\WeChat\Message\MessageFactory;
 use Im050\WeChat\Task\Job\RobotReply;
 use Im050\WeChat\Task\TaskQueue;
 use Im050\WeChat\Core\Robot;
