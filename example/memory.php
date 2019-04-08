@@ -15,6 +15,7 @@ use Im050\WeChat\Task\Job\RobotReply;
 use Im050\WeChat\Task\TaskQueue;
 use Im050\WeChat\Core\Robot;
 use Swoole\Process;
+use Im050\WeChat\Component\Timer;
 
 $robot = new Robot([
     //临时文件夹
@@ -69,16 +70,6 @@ $robot->onLoginSuccess(function () {
         $silence = &$GLOBALS['silence'];
         $silence[$contact->getUserName()] = true;
     });
-
-//$process = new \Swoole\Process(function() {
-//    go(function() {
-//        \Swoole\Timer::tick(1000, function() {
-//            echo time() . PHP_EOL;
-//        });
-//    });
-//});
-//$process->start();
-
 
 });
 

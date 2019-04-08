@@ -7,9 +7,4 @@ class SysMessage extends Message
     {
         $this->string = $this->content;
     }
-
-    public function isRedPacket()
-    {
-        return stripos($this->string(), "红包") !== false;
-    }
 }

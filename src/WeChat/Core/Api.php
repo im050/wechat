@@ -4,6 +4,7 @@ namespace Im050\WeChat\Core;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
+use Im050\WeChat\Exception\SyncKeyException;
 use Swoole\Atomic;
 
 class Api
@@ -139,7 +140,7 @@ class Api
         $data = Utils::json_decode($content);
 
         if (!checkBaseResponse($data)) {
-            throw new \Exception("同步获取消息数据失败");
+            throw new SyncKeyException("Sync key explain failed, content: " . $content);
         }
 
         $syncKey = $data['SyncKey']['List'];

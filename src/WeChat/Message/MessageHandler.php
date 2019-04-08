@@ -12,6 +12,8 @@ use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Exception\AbnormalExitException;
+use Im050\WeChat\Exception\SyncKeyException;
+use Im050\WeChat\Exception\UnknownMessageException;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Task\TaskQueue;
 use Swoole\Process;
@@ -62,12 +64,10 @@ class MessageHandler
                 }
                 // 拉取最新消息
                 $message = app()->api->pullMessage();
-                if (!checkBaseResponse($message)) {
-                    Console::log("接收数据异常，程序结束", Console::ERROR);
-                    break;
-                }
-            } catch (\Exception $e) {
+            } catch (SyncKeyException $e) {
                 Console::log("同步获取消息失败，Exception: " . $e->getMessage(), Console::WARNING);
+                $this->listenMessageFailedTimes++;
+                sleep(1);
                 continue;
             }
             $this->handleMessage($message);
@@ -144,7 +144,7 @@ class MessageHandler
                     $path = config('message_log_path');
                     Logger::write($log, $path);
                 }
-            } catch (\Exception $e) {
+            } catch (UnknownMessageException $e) {
                 if (config('debug')) {
                     $log = [
                         '消息类型' => $msgType,
@@ -154,7 +154,9 @@ class MessageHandler
                     $path = config('unknown_message_log_path');
                     Logger::write($log, $path);
                 }
-                Console::log("收到未知消息格式的数据类型，[MSG_TYPE] : {$msgType}", Console::DEBUG);
+                Console::log($e->getMessage(), Console::DEBUG);
+            } catch (\Exception $e) {
+                Console::log($e->getMessage(), Console::DEBUG);
             }
         }
         return true;
