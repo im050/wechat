@@ -16,6 +16,7 @@
             "email": "service@im050.com"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
         "symfony/console": "^3.2",
         "aferrandini/phpqrcode": "^1.0",
