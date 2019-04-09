@@ -49,6 +49,8 @@ class MessageHandler
         app()->loginSuccessObserver->trigger();
         //启动心跳检测进程
         $this->heartbeat();
+        //启动定时任务
+        app()->crontab->start();
         //开始监听消息
         $this->pollingMessage();
         //等待子进程回收

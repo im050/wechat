@@ -6,9 +6,11 @@ use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\HttpClient;
 use Im050\WeChat\Component\Storage\Handler\FileHandler;
 use Im050\WeChat\Component\Storage\Storage;
+use Im050\WeChat\Crontab\Crontab;
 use Im050\WeChat\Message\MessageHandler;
 use Im050\WeChat\Observers\MessageObserver;
 use Im050\WeChat\Providers\CoreProvider;
+use Im050\WeChat\Providers\CrontabProvider;
 use Im050\WeChat\Providers\ObserversProvider;
 use Im050\WeChat\Providers\ServiceProvider;
 use Im050\WeChat\Task\TaskQueue;
@@ -33,6 +35,7 @@ use Im050\WeChat\Observers\LogoutObserver;
  * @property LoginSuccessObserver $loginSuccessObserver
  * @property \Im050\WeChat\Observers\MessageObserver $messageObserver
  * @property \Im050\WeChat\Observers\LogoutObserver $logoutObserver
+ * @property Crontab $crontab
  */
 class Application extends Container
 {
@@ -41,7 +44,8 @@ class Application extends Container
 
     private $providers = [
         CoreProvider::class,
-        ObserversProvider::class
+        ObserversProvider::class,
+        CrontabProvider::class
     ];
 
     public static function getInstance()

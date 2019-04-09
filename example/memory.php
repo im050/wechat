@@ -79,31 +79,35 @@ $robot->onLoginSuccess(function () {
 $robot->onMessage(function (Message $message) {
     $messageType = $message->getMessageType();
     $messenger = $message->getMessenger();
-    Console::log("收到消息");
+
+    if ($message instanceof \Im050\WeChat\Message\Formatter\Text) {
+        if ($message->getMessenger()->getRemarkName() == 'memory') {
+            $message->getMessenger()->sendMessage(time());
+            Console::log("测试" . time());
+        }
+    }
+
     if ($messenger == null) {
         return ;
     }
-    Console::log("check messenger");
     if (!($messenger instanceof Group) && !($messenger instanceof Contact)) {
         return;
     }
-    Console::log("check command");
     //检查是否有命令需要执行
     if (commandHandler($message)) {
         return;
     }
-    Console::log("check silence");
     //静默状态检查
     if (silenceCheck($message)) {
         return;
     }
 
-    Console::log("处理消息");
     switch ($messageType) {
         case MessageFactory::TEXT_MESSAGE:
             if ($message->isGroup() && !$message->isAt()) {
                 return;
             }
+
             Console::log("机器人应答消息");
             TaskQueue::run(RobotReply::class, [
                 'username'     => $messenger->getUserName(),
@@ -128,6 +132,11 @@ $robot->onMessage(function (Message $message) {
             $messenger->sendMessage("撤回也没用，我看见了！");
 
     }
+});
+
+$robot->cron("*/1 * * * *", function () {
+    $filehelper = members()->getContactByUserName("filehelper");
+    $filehelper->sendMessage("hello crontab. the time is " . date("Y-m-d H:i:s", time()));
 });
 
 $robot->run();

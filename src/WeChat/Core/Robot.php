@@ -89,6 +89,10 @@ class Robot
         }
     }
 
+    public function cron($cronString, callable $callback) {
+        app()->crontab->register($cronString, $callback);
+    }
+
     /**
      * 接收消息观察者
      *
