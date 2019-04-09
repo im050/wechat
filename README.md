@@ -1,7 +1,7 @@
 # WeChat Robot
 一款基于PHP开发的微信机器人程序（个人号非公众号），仅供个人学习及研究
 
-![image](https://img.shields.io/badge/PHP-5.6-orange.svg?style=flat)
+![image](https://img.shields.io/badge/PHP-7.0-orange.svg?style=flat)
 ![image](https://img.shields.io/badge/license-MIT-green.svg?style=flat)
 
 ## 依赖
