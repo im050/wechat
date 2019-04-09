@@ -2,7 +2,7 @@
     "name": "im050/wechat",
     "type": "library",
     "description": "基于PHP开发自定义微信机器人，异步消息回复机制，消息记录，撤回消息保留",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "homepage": "https://github.com/im050/wechat_robot",
     "keywords": [
         "微信",
@@ -11,6 +11,7 @@
         "网页版微信"
     ],
     "license": "MIT",
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "memory",
