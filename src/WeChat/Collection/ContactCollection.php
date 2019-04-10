@@ -66,7 +66,7 @@ class ContactCollection extends Collection
      * 根据微信账号获取具体联系人实例
      *
      * @param $alias
-     * @return mixed|null
+     * @return MemberElement|null
      */
     public function getContactByAlias($alias)
     {
@@ -77,6 +77,12 @@ class ContactCollection extends Collection
         return null;
     }
 
+    /**
+     * 根据备注获取用户
+     *
+     * @param $remarkName
+     * @return MemberElement|null
+     */
     public function getContactByRemarkName($remarkName)
     {
         $member = $this->find($remarkName, 'RemarkName', true);
