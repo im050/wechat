@@ -68,6 +68,15 @@ php example/start.php
 2. [HanSon/vbot](https://github.com/HanSon/vbot) 
 3. [lbbniu/WebWechat](https://github.com/lbbniu/WebWechat) 
 
+## 常见问题
+
+1. **Q: 无法通过getContactByNickName获取到指定群？**    
+> A: 将群聊保存至通讯录
+2. **Q: 同步消息失败等无法获取最新消息**    
+> A: 尝试删除临时文件目录下的cookies.txt后重新登录
+3. **Q: 免扫码登录不起作用**  
+> A: 经测试发现，未绑定手机号的微信账号无法免扫码登录
+
 ## 截图
 
  ![image](https://github.com/im050/wechat_robot/raw/master/screenshots/screenshot.png)
