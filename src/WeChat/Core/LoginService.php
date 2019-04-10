@@ -1,12 +1,10 @@
 <?php
 namespace Im050\WeChat\Core;
 
+use Endroid\QrCode\QrCode;
 use Im050\WeChat\Collection\Element\Group;
-use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Utils;
-use Im050\WeChat\Task\TaskQueue;
-use PHPQRCode\QRcode;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Im050\WeChat\Component\Logger;
@@ -310,15 +308,13 @@ class LoginService
         } else {
             $pxMap = ['<whitec>  </whitec>', '<blackc>  </blackc>'];
         }
+        $qrCode = new QrCode($text);
+        $matrix = $qrCode->getData()['matrix'];
 
-        $text = QRcode::text($text);
-        $length = strlen($text[0]);
-
-        foreach ($text as $line) {
+        foreach ($matrix as $line) {
             $output->write($pxMap[0]);
-            for ($i = 0; $i < $length; $i++) {
-                $type = substr($line, $i, 1);
-                $output->write($pxMap[$type]);
+            foreach ($line as $item) {
+                $output->write($pxMap[$item]);
             }
             $output->writeln($pxMap[0]);
         }

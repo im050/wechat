@@ -21,7 +21,7 @@
     "require": {
         "php": ">=7.0.0",
         "symfony/console": "^3.2",
-        "aferrandini/phpqrcode": "^1.0",
+        "endroid/qr-code": "^3.5",
         "illuminate/support": "^5.4",
         "guzzlehttp/guzzle": "^6.3"
     },
