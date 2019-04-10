@@ -62,6 +62,14 @@ class ContactCollection extends Collection
         }
     }
 
+    public function getContactByFields($field, $value) {
+        $member = $this->find($value, $field, true);
+        if (!empty($member)) {
+            return ContactFactory::create($member);
+        }
+        return null;
+    }
+
     /**
      * 根据微信账号获取具体联系人实例
      *
@@ -70,11 +78,7 @@ class ContactCollection extends Collection
      */
     public function getContactByAlias($alias)
     {
-        $member = $this->find($alias, 'Alias', true);
-        if (!empty($member)) {
-            return ContactFactory::create($member);
-        }
-        return null;
+        return $this->getContactByFields("Alias", $alias);
     }
 
     /**
@@ -85,11 +89,18 @@ class ContactCollection extends Collection
      */
     public function getContactByRemarkName($remarkName)
     {
-        $member = $this->find($remarkName, 'RemarkName', true);
-        if (!empty($member)) {
-            return ContactFactory::create($member);
-        }
-        return null;
+        return $this->getContactByFields("RemarkName", $remarkName);
+    }
+
+    /**
+     * 根据NickName获取群
+     *
+     * @param $nickName
+     * @return MemberElement|null
+     */
+    public function getContactByNickName($nickName)
+    {
+        return $this->getContactByFields("NickName", $nickName);
     }
 
     /**
