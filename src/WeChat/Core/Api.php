@@ -10,6 +10,9 @@ use Swoole\Atomic;
 class Api
 {
 
+    const ADDSCENE_PF_WEB = 33;
+    const VERIFYUSER_OPCODE_VERIFYOK = 3;
+    const VERIFYUSER_OPCODE_SENDREQUEST = 2;
     /**
      * 基础请求信息
      *
@@ -686,6 +689,40 @@ class Api
         }
 
         return true;
+    }
+
+    public function approve($username, $ticket) {
+        $this->verifyUser(self::VERIFYUSER_OPCODE_VERIFYOK, [
+            'Value'            => $username,
+            'VerifyUserTicket' => $ticket,
+        ]);
+    }
+
+    /**
+     * 好友消息相关处理
+     *
+     * @param $code
+     * @param $userList
+     * @param null $content
+     * @return bool
+     */
+    public function verifyUser($code, $userList, $content = null)
+    {
+        $url = sprintf(uri('base_uri') .'/webwxverifyuser?lang=zh_CN&r=%s&pass_ticket=%s', time() * 1000, app()->auth->pass_ticket);
+        $data = [
+            'BaseRequest'        => $this->baseRequest,
+            'Opcode'             => $code,
+            'VerifyUserListSize' => 1,
+            'VerifyUserList'     => [$userList],
+            'VerifyContent'      => $content,
+            'SceneListCount'     => 1,
+            'SceneList'          => [self::ADDSCENE_PF_WEB],
+            'skey'               =>  app()->auth->skey,
+        ];
+
+        $result = http()->post($url, Utils::json_encode($data));
+
+        return checkBaseResponse(Utils::json_decode($result));
     }
 
     /**

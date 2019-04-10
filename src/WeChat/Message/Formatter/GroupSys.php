@@ -8,6 +8,8 @@
 
 namespace Im050\WeChat\Message\Formatter;
 
+use Illuminate\Support\Str;
+
 
 class GroupSys extends SysMessage
 {
@@ -28,12 +30,13 @@ class GroupSys extends SysMessage
     }
 
     /**
-     * via Vbot.
+     * @author Vbot.
+     * @modify memory
      */
     private function settingByContent() {
-        if (str_contains($this->content, '邀请你')) {
+        if (Str::contains($this->content, '邀请你')) {
             $this->setAction(self::ACTION_INVITE);
-        } elseif (str_contains($this->content, '加入了群聊') || str_contains($this->content, '分享的二维码加入群聊')) {
+        } elseif (Str::contains($this->content, '加入了群聊') || Str::contains($this->content, '分享的二维码加入群聊')) {
             $isMatch = preg_match('/"?(.+)"?邀请"(.+)"加入了群聊/', $this->content, $match);
             if ($isMatch) {
                 $this->inviter = $match[1];
@@ -44,13 +47,18 @@ class GroupSys extends SysMessage
                 $this->invited = $match[1];
             }
             $this->setAction(self::ACTION_ADD);
-        } elseif (str_contains($this->content, '移出了群聊')) {
+        } elseif (Str::contains($this->content, '移出了群聊')) {
             $this->setAction(self::ACTION_REMOVE);
-        } elseif (str_contains($this->content, '改群名为')) {
+        } elseif (Str::contains($this->content, '改群名为')) {
             $this->setAction(self::ACTION_RENAME);
-        } elseif (str_contains($this->content, '移出群聊')) {
+        } elseif (Str::contains($this->content, '移出群聊')) {
             $this->setAction(self::ACTION_BE_REMOVE);
         }
+    }
+
+    public function friendlyMessage()
+    {
+        return $this->content;
     }
 
     /**

@@ -12,7 +12,7 @@ use Im050\WeChat\Message\MessageFactory;
 
 $robot = new Robot([
     'tmp_path'      => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
-    'debug'         => false,
+    'debug'         => true,
     'api_debug'     => false,
     'save_qrcode'   => false,
     'auto_download' => false,
@@ -40,7 +40,11 @@ $robot->onLogout(function (Robot $robot) {
     Console::log("程序已经退出.");
 });
 
-$robot->onMessage(function (Message $message, Robot $robot) {
+$robot->onMessage(function (Message $message) use($robot) {
+    if ($message instanceof \Im050\WeChat\Message\Formatter\NewFriend) {
+        $message->approve();
+        return ;
+    }
     $messenger = $message->getMessenger();
     if ($messenger == null) {
         Console::log("获取消息发送者失败");

@@ -123,7 +123,7 @@ $robot->onMessage(function (Message $message) {
             break;
         case MessageFactory::SYS_MESSAGE:
             Console::log("系统消息");
-            if ($message->isRedPacket()) {
+            if ($message instanceof \Im050\WeChat\Message\Formatter\RedPacket) {
                 $file = __DIR__ . '/pic/thanks_boss.gif';
                 $messenger->sendEmoticon($file);
             }

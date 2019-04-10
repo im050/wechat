@@ -8,6 +8,7 @@
 
 namespace Im050\WeChat\Message;
 
+use Illuminate\Support\Str;
 use Im050\WeChat\Exception\UnknownMessageException;
 use Im050\WeChat\Message\Formatter\Emoticon;
 use Im050\WeChat\Message\Formatter\GroupSys;
@@ -73,7 +74,8 @@ class MessageFactory
         self::SYS_MESSAGE        => SysMessage::class,
         self::EMOTICON_MESSAGE   => Emoticon::class,
         self::MICROVIDEO_MESSAGE => MicroVideo::class,
-        self::RECALLED_MESSAGE   => Recalled::class
+        self::RECALLED_MESSAGE   => Recalled::class,
+        self::VERIFYMSG_MESSAGE  => NewFriend::class
     ];
 
     /**
@@ -82,28 +84,25 @@ class MessageFactory
      * @return Message
      * @throws \Exception
      */
-    public static function create($type, $msg) : Message
+    public static function create($type, $msg): Message
     {
         if ($type == self::SYS_MESSAGE) {
-            if (str_contains($msg['Content'], '利是') || str_contains($msg['Content'], '红包')) {
+            if (Str::contains($msg['Content'], '利是') || Str::contains($msg['Content'], '红包')) {
                 return new RedPacket($msg);
-            } elseif (str_contains($msg['Content'], '添加') || str_contains($msg['Content'], '打招呼')) {
-                // 添加好友
-                return new NewFriend($msg);
-            } elseif (str_contains($msg['Content'], '加入了群聊') || str_contains($msg['Content'], '移出了群聊') || str_contains($msg['Content'], '改群名为') || str_contains($msg['Content'], '移出群聊') || str_contains($msg['Content'], '邀请你') || str_contains($msg['Content'], '分享的二维码加入群聊')) {
+            } elseif (
+                Str::contains($msg['Content'], '加入了群聊') ||
+                Str::contains($msg['Content'], '移出了群聊') ||
+                Str::contains($msg['Content'], '改群名为') ||
+                Str::contains($msg['Content'], '移出群聊') ||
+                Str::contains($msg['Content'], '邀请你') ||
+                Str::contains($msg['Content'], '分享的二维码加入群聊')
+            ) {
                 return new GroupSys($msg);
             }
         } elseif ($type == self::APP_MESSAGE) {
             if ($msg['FileName'] === '微信转账') {
                 return new Transfer($msg);
             }
-//            } elseif ($msg['FileName'] === '我发起了位置共享') {
-//                return (new Location())->make($msg);
-//            } elseif (str_contains($msg['Content'], '该类型暂不支持，请在手机上查看')) {
-//                return;
-//            } else {
-//                return $this->vbot->shareFactory->make($msg);
-//            }
         }
         if (isset(self::$factory[$type])) {
             return new self::$factory[$type]($msg);
