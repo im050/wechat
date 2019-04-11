@@ -113,16 +113,6 @@ class MessageHandler
      */
     public function handleMessage($response)
     {
-
-        if (config('debug')) {
-            $log = [
-                '日志类型' => 'handleMessage',
-                '日志数据' => Utils::json_encode($response),
-                '记录时间' => Utils::now()
-            ];
-            Logger::write($log, config("message_log_path"));
-        }
-
         if ($response['AddMsgCount'] < 0) {
             return false;
         }
@@ -137,28 +127,12 @@ class MessageHandler
                 //控制台打印消息
                 $this->friendlyMessage($message);
                 app()->messageObserver->trigger($message);
-                if (config('debug')) {
-                    $log = [
-                        '消息类型' => $msgType,
-                        '消息数据' => Utils::json_encode($msg),
-                        '日志时间' => Utils::now()
-                    ];
-                    $path = config('message_log_path');
-                    Logger::write($log, $path);
-                }
             } catch (UnknownMessageException $e) {
-                if (config('debug')) {
-                    $log = [
-                        '消息类型' => $msgType,
-                        '消息数据' => Utils::json_encode($msg),
-                        '日志时间' => Utils::now()
-                    ];
-                    $path = config('unknown_message_log_path');
-                    Logger::write($log, $path);
-                }
                 Console::log($e->getMessage(), Console::DEBUG);
             } catch (\Exception $e) {
                 Console::log($e->getMessage(), Console::DEBUG);
+            } finally {
+                app()->log->debug($msg);
             }
         }
         return true;

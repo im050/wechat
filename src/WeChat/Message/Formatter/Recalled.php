@@ -8,9 +8,9 @@ use Im050\WeChat\Message\MessageFactory;
 class Recalled extends Message
 {
 
-    public $origin = 0;
+    private $origin = 0;  //原始消息ID
 
-    public $recallMessage = null;
+    private $recallMessage = null;
 
     /**
      * 解析message获取msgId
@@ -27,7 +27,6 @@ class Recalled extends Message
     public function handleMessage()
     {
         $this->string = $this->getMessenger()->getRemarkName() . " 撤回了一条消息";
-        $this->backup();
     }
 
     /**
@@ -57,8 +56,44 @@ class Recalled extends Message
         } else {
             $string = "[" . Utils::now() . "] ";
             $string .= $this->recallMessage->friendlyMessage();
-            return FileSystem::append($string, FileSystem::getCurrentUserPath() . '/撤回消息记录.log');
+            return FileSystem::append($string, FileSystem::getCurrentUserPath() . '/recalled.log');
         }
+    }
+
+    /**
+     * @return int
+     */
+    public function getOrigin(): int
+    {
+        return $this->origin;
+    }
+
+    /**
+     * @param int $origin
+     * @return Recalled
+     */
+    public function setOrigin(int $origin): Recalled
+    {
+        $this->origin = $origin;
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getRecallMessage()
+    {
+        return $this->recallMessage;
+    }
+
+    /**
+     * @param null $recallMessage
+     * @return Recalled
+     */
+    public function setRecallMessage($recallMessage)
+    {
+        $this->recallMessage = $recallMessage;
+        return $this;
     }
 
     /**

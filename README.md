@@ -77,6 +77,19 @@ php example/start.php
 3. **Q: 免扫码登录不起作用**  
 > A: 经测试发现，未绑定手机号的微信账号无法免扫码登录
 
+## 配置参数说明
+    private $config = [
+        'tmp_path'         => '',              //临时目录
+        'log_level'        => Logger::INFO,    //日志级别
+        'save_qrcode'      => true,            //是否保存二维码
+        'auto_download'    => true,            //是否自动下载
+        'daemonize'        => false,           //是否守护进程
+        'task_process_num' => 1                //任务队列进程数，推荐1个就行
+    ];
+    
+    //额外内置可用的配置参数cookiefile_path, cookie_path, message_log_path
+    
+
 ## 截图
 
  ![image](https://github.com/im050/wechat_robot/raw/master/screenshots/screenshot.png)

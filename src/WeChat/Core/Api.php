@@ -486,6 +486,7 @@ class Api
 
         $data = Utils::xmlToArray($content);
         if (intval($data['ret']) != 0) {
+            file_exists(config('cookiefile_path')) && @unlink(config('cookiefile_path'));
             throw new \Exception("获取通行证失败");
         }
 
@@ -814,16 +815,7 @@ class Api
      */
     public function debug($data)
     {
-        if (!config('api_debug')) {
-            return false;
-        }
-        $log = [
-            '代码追踪' => Utils::json_encode(debug_backtrace()),
-            '消息数据' => is_array($data) ? Utils::json_encode($data) : $data,
-            '日志时间' => Utils::now()
-        ];
-        $path = config('api_debug_log_path');
-        return Logger::write($log, $path);
+        return app()->log->debug(Utils::json_encode(debug_backtrace()), (array) $data);
     }
 
 }

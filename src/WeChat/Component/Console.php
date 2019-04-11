@@ -8,6 +8,8 @@
 
 namespace Im050\WeChat\Component;
 
+use Monolog\Logger;
+
 class Console
 {
 
@@ -24,23 +26,9 @@ class Console
     public static function log($message, $level = 'INFO')
     {
         $string = "[" . date("Y-m-d H:i:s", time()) . "][" . $level . "] " . $message . PHP_EOL;
-
-        echo $string;
-
-        if ($level == self::WARNING || $level == self::ERROR) {
-            if (config('debug')) {
-                $log = [
-                    '日志内容' => $message,
-                    '日志级别' => $level,
-                    '日志时间' => Utils::now()
-                ];
-
-                Logger::write($log, config('warning_log_path'));
-            }
-        }
-
-        if ($level == self::ERROR) {
-            exit(0);
+        file_put_contents("php://stdout", $string);
+        if (in_array($level, array_keys(Logger::getLevels()))) {
+            app()->log->log($level, $message);
         }
     }
 

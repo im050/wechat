@@ -151,23 +151,15 @@ class LoginService
     public function prepare()
     {
         Console::log("关闭手机通知状态...");
-
         app()->api->statusNotify();
-
         Console::log("正在初始化联系人...");
-
         $members = app()->members;
-
-        $data = [];
 
         try {
             $data = app()->api->getContact();
         } catch (\Exception $e) {
-            if (config('debug')) {
-                $path = config('exception_log_path');
-                Logger::write($e, $path);
-            }
-            Console::log("获取联系人失败...错误信息：" . $e->getMessage(), Console::ERROR);
+            app()->log->error("获取联系人失败", $e);
+            return ;
         }
 
 

@@ -3,6 +3,7 @@ namespace Im050\WeChat\Core;
 
 use Im050\WeChat\Component\Config;
 use Im050\WeChat\Component\Console;
+use Monolog\Logger;
 use Swoole\Process;
 
 class Robot
@@ -15,8 +16,7 @@ class Robot
      */
     private $config = [
         'tmp_path'         => '',
-        'debug'            => false,
-        'api_debug'        => false,
+        'log_level'        => Logger::INFO,
         'save_qrcode'      => true,
         'auto_download'    => true,
         'daemonize'        => false,
@@ -53,6 +53,7 @@ class Robot
 
         if (!isset($config['tmp_path']) || empty($config['tmp_path'])) {
             Console::log("Please setting tmp path.", Console::ERROR);
+            exit(0);
         }
 
         if (!isset($config['cookie_path']) || empty($config['cookie_path'])) {
@@ -61,11 +62,7 @@ class Robot
 
         app()->config->setConfig($config);
         app()->config->set('cookiefile_path', config('cookie_path') . '/cookies.txt')
-            ->set('exception_log_path', config('tmp_path') . '/log/exception.log')
-            ->set('warning_log_path', config('tmp_path') . '/log/warning.log')
-            ->set('api_debug_log_path', config('tmp_path') . '/log/api_debug.log')
-            ->set('message_log_path', config('tmp_path') . '/log/message.log')
-            ->set('unknown_message_log_path', config('tmp_path') . '/log/unknown_message.log');
+            ->set('message_log_path', config('tmp_path') . '/log/message.log');
     }
 
     /**
@@ -89,7 +86,8 @@ class Robot
         }
     }
 
-    public function cron($cronString, callable $callback) {
+    public function cron($cronString, callable $callback)
+    {
         app()->crontab->register($cronString, $callback);
     }
 

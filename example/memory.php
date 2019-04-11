@@ -20,10 +20,8 @@ use Im050\WeChat\Component\Timer;
 $robot = new Robot([
     //临时文件夹
     'tmp_path'         => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
-    //debug日志
-    'debug'            => true,
-    //api接口数据debug日志
-    'api_debug'        => false,
+    //日志级别
+    'log_level' => \Monolog\Logger::WARNING,
     //下载二维码
     'save_qrcode'      => false,
     //自动下载图片、语音、视频等资源

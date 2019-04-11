@@ -15,10 +15,8 @@ use Im050\WeChat\Task\TaskQueue;
 $robot = new \Im050\WeChat\Core\Robot([
     //临时文件夹
     'tmp_path'         => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
-    //debug日志
-    'debug'            => true,
-    //api接口数据debug日志
-    'api_debug'        => false,
+    //日志级别
+    'log_level' => \Monolog\Logger::INFO,
     //下载二维码
     'save_qrcode'      => false,
     //自动下载图片、语音、视频等资源
@@ -26,7 +24,7 @@ $robot = new \Im050\WeChat\Core\Robot([
     //守护进程
     'daemonize'        => false,
     //任务处理进程数量
-    'task_process_num' => 10,
+    'task_process_num' => 1,
 ]);
 
 /**

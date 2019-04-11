@@ -31,10 +31,7 @@ class ContactCollection extends Collection
             try {
                 $contact = $this->findContactFromAPI($username);
             } catch (\Exception $e) {
-                if (config('debug')) {
-                    $path = config('exception_log_path');
-                    Logger::write($e, $path);
-                }
+                app()->log->debug("find contact failed.", $e);
                 return null;
             }
             if ($contact != null) {
