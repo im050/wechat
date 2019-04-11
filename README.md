@@ -44,7 +44,7 @@
 
 1. 下载
 ```
-git clone https://github.com/im050/wechat_robot.git
+git clone https://github.com/im050/wechat.git
 ```
 2. 更新依赖包
 ```
@@ -62,7 +62,7 @@ composer require im050/wechat
 php example/example.php
 ```
 
-[查看demo代码](https://github.com/im050/wechat_robot/blob/master/example/example.php)
+[查看demo代码](https://github.com/im050/wechat/blob/master/example/example.php)
 
 ## 更好的选择
 
@@ -94,4 +94,4 @@ php example/example.php
 
 ## 截图
 
- ![image](https://github.com/im050/wechat_robot/raw/master/screenshots/screenshot.png)
+ ![image](https://github.com/im050/wechat/raw/master/screenshots/screenshot.png)
