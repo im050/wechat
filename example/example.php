@@ -43,6 +43,15 @@ $robot->onLoginSuccess(function () {
 });
 
 /**
+ * 定时任务
+ */
+$robot->cron("*/1 * * *", function() {
+    $fileHelper = members()->getContactByUserName('filehelper');
+    //第二个参数以阻塞方式发送消息
+    $fileHelper->sendMessage("hello! " . time(), true);
+});
+
+/**
  * 消息事件回调
  */
 $robot->onMessage(function(Message $message, $robot){
@@ -101,17 +110,6 @@ $robot->onMessage(function(Message $message, $robot){
     $messenger->sendImage($file);
     //传输文件
     $messenger->sendFile($file);
-
-    //允许回复的列表
-    $whiteContacts = [
-        '机器人体验群',
-        '皮皮鳝，往里钻',
-        '这样才是老子最酷灬'
-    ];
-
-    if (!in_array($messenger->getRemarkName(), $whiteContacts)) {
-        return ;
-    }
 
     //任务队列
     $job = 'RobotReply'; //内置的图灵机器人回复任务, 也可以写成 RobotReply::class
