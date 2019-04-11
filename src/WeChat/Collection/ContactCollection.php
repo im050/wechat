@@ -8,10 +8,9 @@
 
 namespace Im050\WeChat\Collection;
 
-
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use Im050\WeChat\Collection\Element\MemberElement;
-use Im050\WeChat\Component\Logger;
 
 class ContactCollection extends Collection
 {
@@ -67,7 +66,8 @@ class ContactCollection extends Collection
      * @param bool $blur
      * @return MemberElement|null
      */
-    public function getContactByFields($field, $value, $blur = false) {
+    public function getContactByFields($field, $value, $blur = false)
+    {
         $member = $this->find($value, $field, true, $blur);
         if (!empty($member)) {
             return ContactFactory::create($member);
@@ -116,7 +116,8 @@ class ContactCollection extends Collection
      *
      * @return ContactCollection|mixed
      */
-    public function getFemaleContacts() {
+    public function getFemaleContacts()
+    {
         return $this->find(2, 'Sex', false);
     }
 
@@ -125,7 +126,8 @@ class ContactCollection extends Collection
      *
      * @return ContactCollection|mixed
      */
-    public function getMaleContacts() {
+    public function getMaleContacts()
+    {
         return $this->find(1, 'Sex', false);
     }
 
@@ -134,34 +136,27 @@ class ContactCollection extends Collection
      *
      * @return ContactCollection|mixed
      */
-    public function getUnknownSexContacts() {
+    public function getUnknownSexContacts()
+    {
         return $this->find(0, 'Sex', false);
     }
 
     /**
-     * 根据键值对应查找
-     *
      * @param $search
      * @param $key
      * @param bool $first
      * @param bool $blur
-     * @return mixed|static
-     *
-     * @link http://github.com/HanSon/Vbot
-     * @via Vbot
+     * @return mixed
      */
     public function find($search, $key, $first = false, $blur = false)
     {
         $objects = $this->filter(function ($item) use ($search, $key, $blur) {
-
             if (!isset($item[$key])) return false;
-
-            if ($blur && str_contains($item[$key], $search)) {
+            if ($blur && Str::contains($item[$key], $search)) {
                 return true;
             } elseif (!$blur && $item[$key] === $search) {
                 return true;
             }
-
             return false;
         });
 
@@ -181,7 +176,6 @@ class ContactCollection extends Collection
                 break;
             }
         }
-
         return $this;
     }
 

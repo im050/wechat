@@ -9,13 +9,11 @@
 namespace Im050\WeChat\Message;
 
 use Im050\WeChat\Component\Console;
-use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
 use Im050\WeChat\Exception\AbnormalExitException;
 use Im050\WeChat\Exception\SyncKeyException;
 use Im050\WeChat\Exception\UnknownMessageException;
 use Im050\WeChat\Message\Formatter\Message;
-use Im050\WeChat\Task\TaskQueue;
 use Swoole\Process;
 
 class MessageHandler
@@ -28,13 +26,6 @@ class MessageHandler
      */
     public $heartProcess = null;
 
-    /**
-     * 存放回调事件
-     *
-     * @var array
-     */
-    protected $events = [];
-
     private $listenMessageFailedTimes = 0;
 
     private $maxFailedTimes = 10;
@@ -42,7 +33,7 @@ class MessageHandler
     /**
      * 监听消息
      */
-    public function listen()
+    public function listen(): void
     {
         Console::log("开始监听消息...");
         //执行登录成功回调
@@ -58,7 +49,8 @@ class MessageHandler
         exit(0);
     }
 
-    private function pollingMessage() {
+    private function pollingMessage(): void
+    {
         while (true && $this->listenMessageFailedTimes < $this->maxFailedTimes) {
             try {
                 if (!$this->handleSyncCheck()) {
@@ -81,7 +73,7 @@ class MessageHandler
      *
      * @return bool
      */
-    private function handleSyncCheck() : bool
+    private function handleSyncCheck(): bool
     {
         try {
             list($retCode, $selector) = app()->api->syncCheck();
@@ -111,7 +103,7 @@ class MessageHandler
      * @param $response
      * @return bool
      */
-    public function handleMessage($response)
+    public function handleMessage($response): bool
     {
         if ($response['AddMsgCount'] < 0) {
             return false;
@@ -132,18 +124,17 @@ class MessageHandler
             } catch (\Exception $e) {
                 Console::log($e->getMessage(), Console::DEBUG);
             } finally {
-                app()->log->debug($msg);
+                app()->messageLog->debug($msg);
             }
         }
         return true;
     }
 
     /**
-     * 控制台打印消息内容
-     *
      * @param Message $message
+     * @return void
      */
-    public function friendlyMessage(Message $message)
+    public function friendlyMessage(Message $message): void
     {
         $friendlyMessage = $message->friendlyMessage();
         Console::log($friendlyMessage);
@@ -154,7 +145,7 @@ class MessageHandler
      *
      * @param int $seconds
      */
-    protected function heartbeat($seconds = 600)
+    private function heartbeat($seconds = 600): void
     {
         $parentPid = posix_getpid();
         $this->heartProcess = new Process(function () use ($seconds, $parentPid) {
@@ -174,7 +165,6 @@ class MessageHandler
         });
         $this->heartProcess->start();
     }
-
 
 
 }

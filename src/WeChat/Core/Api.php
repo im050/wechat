@@ -4,6 +4,7 @@ namespace Im050\WeChat\Core;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Component\Logger;
 use Im050\WeChat\Component\Utils;
+use Im050\WeChat\Exception\InvalidTokenException;
 use Im050\WeChat\Exception\SyncKeyException;
 use Swoole\Atomic;
 
@@ -471,7 +472,7 @@ class Api
     {
 
         if (empty($this->redirectURI)) {
-            throw new \Exception("获取权限验证数据失败");
+            throw new InvalidTokenException("获取权限验证数据失败");
         }
 
         $payload = array(
@@ -486,8 +487,7 @@ class Api
 
         $data = Utils::xmlToArray($content);
         if (intval($data['ret']) != 0) {
-            file_exists(config('cookiefile_path')) && @unlink(config('cookiefile_path'));
-            throw new \Exception("获取通行证失败");
+            throw new InvalidTokenException("获取通行证失败");
         }
 
         $result = [
