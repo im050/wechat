@@ -34,8 +34,8 @@
 
 ## Todo
 
-1. 好友请求通知及通过好友请求
-2. 逐步提升稳定性
+1. 逐步提升稳定性
+2. 增加异常退出、程序崩溃的observer
 3. 提供HTTP协议API
 
 ## 安装
@@ -59,8 +59,10 @@ composer require im050/wechat
 
 ## 运行
 ```
-php example/start.php
+php example/example.php
 ```
+
+[查看demo代码](https://github.com/im050/wechat_robot/blob/master/example/example.php)
 
 ## 更好的选择
 
