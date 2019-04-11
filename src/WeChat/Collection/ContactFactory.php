@@ -9,6 +9,7 @@
 namespace Im050\WeChat\Collection;
 
 use Im050\WeChat\Collection\Element\Group;
+use Im050\WeChat\Collection\Element\MemberElement;
 use Im050\WeChat\Collection\Element\Official;
 use Im050\WeChat\Collection\Element\Contact;
 use Im050\WeChat\Collection\Element\Special;
@@ -22,7 +23,7 @@ class ContactFactory
      * 创建联系人实例
      *
      * @param $item
-     * @return mixed
+     * @return MemberElement
      */
     public static function create($item) {
         $username = $item['UserName'];

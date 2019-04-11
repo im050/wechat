@@ -59,8 +59,16 @@ class ContactCollection extends Collection
         }
     }
 
-    public function getContactByFields($field, $value) {
-        $member = $this->find($value, $field, true);
+    /**
+     * 根据字段搜索
+     *
+     * @param $field
+     * @param $value
+     * @param bool $blur
+     * @return MemberElement|null
+     */
+    public function getContactByFields($field, $value, $blur = false) {
+        $member = $this->find($value, $field, true, $blur);
         if (!empty($member)) {
             return ContactFactory::create($member);
         }
@@ -71,33 +79,36 @@ class ContactCollection extends Collection
      * 根据微信账号获取具体联系人实例
      *
      * @param $alias
+     * @param $blur
      * @return MemberElement|null
      */
-    public function getContactByAlias($alias)
+    public function getContactByAlias($alias, $blur = false)
     {
-        return $this->getContactByFields("Alias", $alias);
+        return $this->getContactByFields("Alias", $alias, $blur);
     }
 
     /**
      * 根据备注获取用户
      *
      * @param $remarkName
+     * @param $blur
      * @return MemberElement|null
      */
-    public function getContactByRemarkName($remarkName)
+    public function getContactByRemarkName($remarkName, $blur = false)
     {
-        return $this->getContactByFields("RemarkName", $remarkName);
+        return $this->getContactByFields("RemarkName", $remarkName, $blur);
     }
 
     /**
      * 根据NickName获取群
      *
      * @param $nickName
+     * @param $blur
      * @return MemberElement|null
      */
-    public function getContactByNickName($nickName)
+    public function getContactByNickName($nickName, $blur = false)
     {
-        return $this->getContactByFields("NickName", $nickName);
+        return $this->getContactByFields("NickName", $nickName, $blur);
     }
 
     /**
