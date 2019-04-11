@@ -33,5 +33,58 @@ class Transfer extends Message
         $this->string = current($des);
     }
 
+    /**
+     * @return mixed
+     */
+    public function getFee()
+    {
+        return $this->fee;
+    }
+
+    /**
+     * @param mixed $fee
+     * @return Transfer
+     */
+    public function setFee($fee)
+    {
+        $this->fee = $fee;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTransactionId()
+    {
+        return $this->transactionId;
+    }
+
+    /**
+     * @param mixed $transactionId
+     * @return Transfer
+     */
+    public function setTransactionId($transactionId)
+    {
+        $this->transactionId = $transactionId;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMemo()
+    {
+        return $this->memo;
+    }
+
+    /**
+     * @param mixed $memo
+     * @return Transfer
+     */
+    public function setMemo($memo)
+    {
+        $this->memo = $memo;
+        return $this;
+    }
 
 }
