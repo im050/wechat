@@ -238,10 +238,10 @@ class LoginService
                 continue;
             }
             app()->auth->setUuid($uuid);
-            if (config('save_qrcode')) {
+            if (config('robot.save_qrcode')) {
                 //下载二维码图片
                 $imgUrl = 'https://login.weixin.qq.com/qrcode/' . $uuid;
-                FileSystem::download($imgUrl, config('tmp_path') . '/qrcode.png');
+                FileSystem::download($imgUrl, config('robot.tmp_path') . '/qrcode.png');
             }
             //生成二维码在控制台
             $text = 'https://login.weixin.qq.com/l/' . $uuid;
@@ -280,7 +280,7 @@ class LoginService
     }
 
     public function cleanCookies() {
-        is_file(config('cookiefile_path')) && unlink(config('cookiefile_path'));
+        is_file(config('cookies.file')) && unlink(config('cookies.file'));
     }
 
 }

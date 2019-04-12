@@ -122,9 +122,9 @@ class MessageHandler
             } catch (UnknownMessageException $e) {
                 Console::log($e->getMessage(), Console::DEBUG);
             } catch (\Exception $e) {
-                Console::log($e->getMessage(), Console::DEBUG);
+                Console::log($e->getMessage(), Console::ERROR);
             } finally {
-                app()->messageLog->debug($msg);
+                app()->messageLog->info($msg);
             }
         }
         return true;

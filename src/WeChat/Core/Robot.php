@@ -15,12 +15,35 @@ class Robot
      * @var array
      */
     private $config = [
-        'tmp_path'         => '',
-        'log_level'        => Logger::INFO,
-        'save_qrcode'      => true,
-        'auto_download'    => true,
-        'daemonize'        => false,
-        'task_process_num' => 1
+        'log'     => [
+            'level'            => Logger::INFO, //日志级别
+            'path'             => '', //常规日志路径
+            'message_log_path' => '' //消息日志路径
+        ],
+        'robot'   => [
+            'tmp_path'          => '', //临时文件目录
+            'save_qrcode'       => true, //是否保存二维码
+            'auto_download'     => true, //是否自动下载
+            'daemonize'         => false, //守护进程
+            'task_process_num'  => 1, //任务进程数
+            'providers'         => [], //服务提供注册类
+            'max_message_items' => 2048 //最大消息保留数
+        ],
+        'cookies' => [
+            'file' => '' //cookie文件路径
+        ],
+        'http' => [
+            'timeout' => 60,
+            'connect_timeout' => 10,
+            'cookies' => true,
+            'headers' => [
+                'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
+                'Accept'     => 'application/json',
+                'Accept-Encoding' => 'gzip'
+            ],
+            'allow_redirects' => false,
+            'verify' => true,
+        ]
     ];
 
     public function __construct($config = array())
@@ -34,7 +57,6 @@ class Robot
         app()->bootstrap();
 
         // init http client
-        app()->http->setConfig("cookiefile_path", app()->config->get('cookiefile_path'));
         app()->http->init();
     }
 
@@ -47,22 +69,18 @@ class Robot
     private function initConfig($config)
     {
         // config manager
-        app()->singleton('config', function () {
-            return new Config();
+        app()->singleton('config', function () use ($config) {
+            return new Config($config);
         });
 
-        if (!isset($config['tmp_path']) || empty($config['tmp_path'])) {
+        if (!isset($config['robot']['tmp_path']) || empty($config['robot']['tmp_path'])) {
             Console::log("Please setting tmp path.", Console::ERROR);
             exit(0);
         }
 
-        if (!isset($config['cookie_path']) || empty($config['cookie_path'])) {
-            $config['cookie_path'] = $config['tmp_path'];
-        }
-
-        app()->config->setConfig($config);
-        app()->config->set('cookiefile_path', config('cookie_path') . '/cookies.txt')
-            ->set('message_log_path', config('tmp_path') . '/log/message.log');
+        config('cookies.file', config('robot.tmp_path') . '/cookies.txt');
+        config('log.path', config('robot.tmp_path') . '/log/');
+        config('log.message_log_path', config('log.path'));
     }
 
     /**
@@ -71,7 +89,7 @@ class Robot
     public function run()
     {
         if ((new LoginService())->start()) {
-            if (config('daemonize')) {
+            if (config('robot.daemonize')) {
                 (new Process(function (Process $worker) {
                     $sid = posix_setsid();
                     if ($sid < 0)

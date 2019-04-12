@@ -234,7 +234,7 @@ class Api
             $httpConfig = [
                 'timeout' => 300,
                 'headers' => [
-                    'Range: bytes=0-'
+                    'Range' => 'bytes=0-'
                 ]
             ];
         } else {

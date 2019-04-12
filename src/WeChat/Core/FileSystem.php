@@ -70,7 +70,7 @@ class FileSystem
      */
     public static function getCurrentUserPath()
     {
-        return config('tmp_path') . DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . app()->auth->uin;
+        return config('robot.tmp_path') . DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . app()->auth->uin;
     }
 
     /**

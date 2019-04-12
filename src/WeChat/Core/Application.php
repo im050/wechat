@@ -58,7 +58,7 @@ class Application extends Container
     }
 
     public function bootstrap() {
-        $serviceProviders = config("service_providers");
+        $serviceProviders = config("robot.providers");
         if (!empty($serviceProviders) && is_array($serviceProviders)) {
             $this->providers = array_merge($this->providers, $serviceProviders);
         }

@@ -20,24 +20,6 @@ class HttpClient
     private $cookieJar;
 
     /**
-     * default config
-     *
-     * @var array
-     */
-    private $config = [
-        'timeout' => 60,
-        'connect_timeout' => 10,
-        'cookies' => true,
-        'headers' => [
-            'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
-            'Accept'     => 'application/json',
-            'Accept-Encoding' => 'gzip'
-        ],
-        'allow_redirects' => false,
-        'verify' => true,
-    ];
-
-    /**
      * @return Client
      */
     public function getClient()
@@ -73,15 +55,11 @@ class HttpClient
         return $this;
     }
 
-    public function __construct($config = array())
-    {
-        $this->config = array_merge($this->config, $config);
-    }
 
     public function init() {
-        $this->cookieJar = new FileCookieJar($this->config['cookiefile_path'], true);
-        $this->config['cookies'] = $this->cookieJar;
-        $this->client = new Client($this->config);
+        $this->cookieJar = new FileCookieJar(config('cookies.file'), true);
+        config('http.cookies', $this->cookieJar);
+        $this->client = new Client(config('http'));
     }
 
     /**
@@ -126,7 +104,7 @@ class HttpClient
         try {
             $options = array_merge(['verify' => false], $options);
             $response = $this->getClient()->request($method, $url, $options);
-            $this->cookieJar->save($this->config['cookiefile_path']);
+            $this->cookieJar->save(config('cookies.file'));
             return $response->getBody()->getContents();
         } catch (\Exception $e) {
             Console::log($url.$e->getMessage(), Console::ERROR);
@@ -135,16 +113,5 @@ class HttpClient
             }
             return false;
         }
-    }
-
-    /**
-     * 设置参数
-     *
-     * @param $param
-     * @param $value
-     */
-    public function setConfig($param, $value)
-    {
-        $this->config[$param] = $value;
     }
 }

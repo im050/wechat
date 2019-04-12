@@ -14,20 +14,25 @@ use Im050\WeChat\Message\Formatter\Recalled;
 use Im050\WeChat\Message\Formatter\RedPacket;
 use Im050\WeChat\Message\Formatter\Text;
 use Im050\WeChat\Message\Formatter\Transfer;
+use Monolog\Logger;
 
 $robot = new \Im050\WeChat\Core\Robot([
     //临时文件夹
-    'tmp_path'         => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
-    //日志级别
-    'log_level'        => \Monolog\Logger::DEBUG,
-    //下载二维码
-    'save_qrcode'      => false,
-    //自动下载图片、语音、视频等资源
-    'auto_download'    => false,
-    //守护进程
-    'daemonize'        => false,
-    //任务处理进程数量
-    'task_process_num' => 1,
+    'robot' => [
+        'tmp_path'         => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
+        //下载二维码
+        'save_qrcode'      => false,
+        //自动下载图片、语音、视频等资源
+        'auto_download'    => false,
+        //守护进程
+        'daemonize'        => false,
+        //任务处理进程数量
+        'task_process_num' => 1,
+    ],
+    'log' => [
+        //日志级别
+        'level'        => Logger::DEBUG
+    ]
 ]);
 
 /**

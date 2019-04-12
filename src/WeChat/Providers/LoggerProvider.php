@@ -37,13 +37,13 @@ class LoggerProvider implements ServiceProvider
 
         $application->singleton('log', function () use($formatter) {
             $log = new Logger('robot');
-            $log->pushHandler((new StreamHandler(config('tmp_path') . '/log/robot.log', Logger::INFO))->setFormatter($formatter));
+            $log->pushHandler((new StreamHandler(config('log.path') . 'robot.log', config("log_level")))->setFormatter($formatter));
             return $log;
         });
 
         $application->singleton('messageLog', function () use($formatter) {
             $log = new Logger('message');
-            $log->pushHandler((new StreamHandler(config('message_log_path'), Logger::INFO))->setFormatter($formatter));
+            $log->pushHandler((new StreamHandler(config('log.message_log_path') . 'message.log', config("log_level")))->setFormatter($formatter));
             return $log;
         });
     }

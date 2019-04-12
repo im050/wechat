@@ -60,13 +60,13 @@ class CoreProvider implements ServiceProvider
 
         // message collection
         $application->singleton('messageCollection', function() {
-            return new MessageCollection(config('mc_items'));
+            return new MessageCollection(config('robot.max_message_items', 2048));
         });
 
         // task queue
         $application->singleton('taskQueue', function () {
             return new TaskQueue([
-                'max_process_num' => config('task_process_num')
+                'max_process_num' => config('robot.task_process_num')
             ]);
         });
 

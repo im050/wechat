@@ -260,7 +260,7 @@ class Message
      */
     public function download($ignoreConfig = false)
     {
-        if (!config('auto_download') && !$ignoreConfig) {
+        if (!config('robot.auto_download') && !$ignoreConfig) {
             return false;
         }
 

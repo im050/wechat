@@ -88,21 +88,7 @@ if (!function_exists('config')) {
      */
     function config($param, $value = '', $force = false)
     {
-        $config = app()->config;
-        if (empty($value)) {
-            return $config->get($param);
-        } else {
-            if (isset($config->config[$param])) {
-                if ($force) {
-                    $config->set($param, $value);
-                } else {
-                    return false;
-                }
-            } else {
-                $config->set($param, $value);
-            }
-            return true;
-        }
+        return app()->config->config($param, $value, $force);
     }
 }
 
