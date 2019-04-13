@@ -208,8 +208,7 @@ class Api
         $this->debug($data);
 
         $data = Utils::json_decode($data);
-        $flag = checkBaseResponse($data);
-        return $flag;
+        return checkBaseResponse($data);
     }
 
     protected function getMessageResource($type, $msgId)

@@ -78,7 +78,7 @@ class CoreProvider implements ServiceProvider
         // keymap for manage auth info.
         $application->singleton('keymap', function () {
             $config = app()->config;
-            $tmpPath = $config->get('tmp_path');
+            $tmpPath = $config->get('robot.tmp_path');
             return new Storage(new FileHandler([
                 'file' => $tmpPath . DIRECTORY_SEPARATOR . 'keymap.json'
             ]));

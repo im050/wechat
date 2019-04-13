@@ -124,7 +124,7 @@ class MessageHandler
             } catch (\Exception $e) {
                 Console::log($e->getMessage(), Console::ERROR);
             } finally {
-                app()->messageLog->info($msg);
+                app()->messageLog->info(Utils::json_encode($msg));
             }
         }
         return true;
