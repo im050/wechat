@@ -8,6 +8,7 @@ use Im050\WeChat\Collection\Element\Group;
 use Im050\WeChat\Collection\Element\Official;
 use Im050\WeChat\Component\Console;
 use Im050\WeChat\Core\Account;
+use Im050\WeChat\Core\Robot;
 use Im050\WeChat\Message\Formatter\Message;
 use Im050\WeChat\Message\Formatter\NewFriend;
 use Im050\WeChat\Message\Formatter\Recalled;
@@ -16,7 +17,7 @@ use Im050\WeChat\Message\Formatter\Text;
 use Im050\WeChat\Message\Formatter\Transfer;
 use Monolog\Logger;
 
-$robot = new \Im050\WeChat\Core\Robot([
+$robot = new Robot([
     //临时文件夹
     'robot' => [
         'tmp_path'         => BASE_PATH . DIRECTORY_SEPARATOR . 'tmp',
@@ -29,9 +30,9 @@ $robot = new \Im050\WeChat\Core\Robot([
         //任务处理进程数量
         'task_process_num' => 1,
     ],
-    'log' => [
+    'log'   => [
         //日志级别
-        'level'        => Logger::DEBUG
+        'level' => Logger::DEBUG
     ]
 ]);
 
