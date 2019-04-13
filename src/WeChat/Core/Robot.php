@@ -32,17 +32,26 @@ class Robot
         'cookies' => [
             'file' => '' //cookie文件路径
         ],
-        'http' => [
-            'timeout' => 60,
+        'http'    => [
+            'timeout'         => 60,
             'connect_timeout' => 10,
-            'cookies' => true,
-            'headers' => [
-                'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
-                'Accept'     => 'application/json',
+            'cookies'         => true,
+            'headers'         => [
+                'User-Agent'      => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
+                'Accept'          => 'application/json',
                 'Accept-Encoding' => 'gzip'
             ],
             'allow_redirects' => false,
-            'verify' => true,
+            'verify'          => true,
+        ],
+        'db'      => [
+            'default' => [
+                'database_type' => 'mysql',
+                'database_name' => 'test',
+                'server'        => 'localhost',
+                'username'      => 'root',
+                'password'      => 'root'
+            ]
         ]
     ];
 

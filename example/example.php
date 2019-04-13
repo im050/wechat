@@ -33,6 +33,15 @@ $robot = new Robot([
     'log'   => [
         //日志级别
         'level' => Logger::DEBUG
+    ],
+    'db'    => [
+        'default' => [
+            'database_type' => 'mysql',
+            'database_name' => 'test',
+            'server'        => 'localhost',
+            'username'      => 'root',
+            'password'      => 'root'
+        ]
     ]
 ]);
 
@@ -55,6 +64,9 @@ $robot->onLoginSuccess(function () {
  * 定时任务
  */
 $robot->cron("*/1 * * * *", function () {
+//    $conn = app()->database->getConnection();
+//    $list = $conn->select("test1", "*");
+//    var_dump($list);
     $fileHelper = members()->getContactByUserName('filehelper');
     //第二个参数以阻塞方式发送消息
     $fileHelper->sendMessage("hello! " . time(), true);

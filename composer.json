@@ -2,7 +2,7 @@
     "name": "im050/wechat",
     "type": "library",
     "description": "基于PHP开发自定义微信机器人，异步消息回复机制，消息记录，撤回消息保留",
-    "version": "1.2.3",
+    "version": "1.3.3",
     "homepage": "https://github.com/im050/wechat_robot",
     "keywords": [
         "微信",
@@ -24,7 +24,8 @@
         "endroid/qr-code": "^3.5",
         "illuminate/support": "^5.4",
         "guzzlehttp/guzzle": "^6.3",
-        "monolog/monolog": "^1.24"
+        "monolog/monolog": "^1.24",
+        "catfan/medoo": "dev-master"
     },
     "autoload": {
         "files": ["src/helpers.php"],

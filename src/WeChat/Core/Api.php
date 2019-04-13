@@ -136,6 +136,7 @@ class Api
             'pass_ticket' => app()->auth->pass_ticket
         ];
 
+
         $url = uri('base_uri') . '/webwxsync?' . http_build_query($queryString);
         $content = http()->post($url, Utils::json_encode($payload));
 

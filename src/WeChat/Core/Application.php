@@ -3,11 +3,13 @@ namespace Im050\WeChat\Core;
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Collection\MessageCollection;
 use Im050\WeChat\Component\Config;
+use Im050\WeChat\Component\Database;
 use Im050\WeChat\Component\HttpClient;
 use Im050\WeChat\Crontab\Crontab;
 use Im050\WeChat\Message\MessageHandler;
 use Im050\WeChat\Providers\CoreProvider;
 use Im050\WeChat\Providers\CrontabProvider;
+use Im050\WeChat\Providers\DatabaseProvider;
 use Im050\WeChat\Providers\LoggerProvider;
 use Im050\WeChat\Providers\ObserversProvider;
 use Im050\WeChat\Providers\ServiceProvider;
@@ -36,6 +38,7 @@ use Monolog\Logger;
  * @property Crontab $crontab
  * @property Logger $log
  * @property Logger $messageLog
+ * @property Database $database
  */
 class Application extends Container
 {
@@ -46,7 +49,8 @@ class Application extends Container
         CoreProvider::class,
         ObserversProvider::class,
         CrontabProvider::class,
-        LoggerProvider::class
+        LoggerProvider::class,
+        DatabaseProvider::class
     ];
 
     public static function getInstance()
