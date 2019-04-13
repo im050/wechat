@@ -36,7 +36,8 @@
 
 1. 逐步提升稳定性
 2. 增加异常退出、程序崩溃的observer
-3. 提供HTTP协议API
+3. 增加database和cache相关组件支持
+4. 提供HTTP协议API
 
 ## 安装
 
@@ -80,16 +81,37 @@ php example/example.php
 > A: 经测试发现，未绑定手机号的微信账号无法免扫码登录
 
 ## 配置参数说明
-    private $config = [
-        'tmp_path'         => '',              //临时目录
-        'log_level'        => Logger::INFO,    //日志级别
-        'save_qrcode'      => true,            //是否保存二维码
-        'auto_download'    => true,            //是否自动下载
-        'daemonize'        => false,           //是否守护进程
-        'task_process_num' => 1                //任务队列进程数，推荐1个就行
+    $config = [
+        'log'     => [
+            'level'            => Logger::INFO, //日志级别
+            'path'             => '', //常规日志路径
+            'message_log_path' => '' //消息日志路径
+        ],
+        'robot'   => [
+            'tmp_path'          => '', //临时文件目录
+            'save_qrcode'       => true, //是否保存二维码
+            'auto_download'     => true, //是否自动下载
+            'daemonize'         => false, //守护进程
+            'task_process_num'  => 1, //任务进程数
+            'providers'         => [], //服务提供注册类
+            'max_message_items' => 2048 //最大消息保留数
+        ],
+        'cookies' => [
+            'file' => '' //cookie存放文件, 默认tmp路径+cookies.txt
+        ],
+        'http' => [
+            'timeout' => 60,
+            'connect_timeout' => 10,
+            'cookies' => true,
+            'headers' => [
+                'User-Agent' => 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)',
+                'Accept'     => 'application/json',
+                'Accept-Encoding' => 'gzip'
+            ],
+            'allow_redirects' => false,
+            'verify' => true,
+        ]
     ];
-    
-    //额外内置可用的配置参数cookiefile_path, cookie_path, message_log_path
     
 
 ## 截图
