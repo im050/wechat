@@ -72,6 +72,18 @@ $robot->cron("*/1 * * * *", function () {
     $fileHelper->sendMessage("hello! " . time(), true);
 });
 
+/**
+ * 测试数据库
+ */
+$robot->cron("*/1 * * * *", function () {
+    $conn = app()->database->getConnection();
+    $list = $conn->query("SHOW VARIABLES WHERE variable_name like '%timeout'")->fetchAll();
+    Console::log(\Im050\WeChat\Component\Utils::json_encode($list));
+    sleep(20);
+    $list = $conn->query("SHOW VARIABLES WHERE variable_name like '%timeout'")->fetchAll();
+    Console::log(\Im050\WeChat\Component\Utils::json_encode($list));
+});
+
 $robot->onLogout(function ($code) {
     //code=1100 or 1101 在其他客户端登录
     //code=1102 无效的cookies

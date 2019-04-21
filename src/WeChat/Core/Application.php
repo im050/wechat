@@ -3,7 +3,7 @@ namespace Im050\WeChat\Core;
 use Im050\WeChat\Collection\Members;
 use Im050\WeChat\Collection\MessageCollection;
 use Im050\WeChat\Component\Config;
-use Im050\WeChat\Component\Database;
+use Im050\WeChat\Component\Database\DatabaseFactory;
 use Im050\WeChat\Component\HttpClient;
 use Im050\WeChat\Crontab\Crontab;
 use Im050\WeChat\Message\MessageHandler;
@@ -38,7 +38,7 @@ use Monolog\Logger;
  * @property Crontab $crontab
  * @property Logger $log
  * @property Logger $messageLog
- * @property Database $database
+ * @property DatabaseFactory $database
  */
 class Application extends Container
 {

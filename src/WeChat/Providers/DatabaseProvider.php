@@ -10,6 +10,7 @@ namespace Im050\WeChat\Providers;
 
 
 use Im050\WeChat\Component\Database;
+use Im050\WeChat\Component\Database\DatabaseFactory;
 use Im050\WeChat\Core\Application;
 
 class DatabaseProvider implements ServiceProvider
@@ -21,7 +22,7 @@ class DatabaseProvider implements ServiceProvider
     public function register(Application $application)
     {
         $application->singleton('database', function() {
-            return new Database();
+            return new DatabaseFactory();
         });
     }
 
